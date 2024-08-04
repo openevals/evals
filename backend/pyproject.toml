@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "openevals"
+version = "0.1.0"
+description = ""
+authors = ["Justin W. Lin <justin@lin.ai>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+alembic = "^1.13.2"
+python-dotenv = "^1.0.1"
+tenacity = "^9.0.0"
+openai = "^1.38.0"
+anthropic = "^0.32.0"
+google-generativeai = "^0.7.2"
+psycopg2-binary = "^2.9.9"
+pytest = "^8.3.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
