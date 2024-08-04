@@ -21,7 +21,7 @@ export default function Home() {
         <VStack w='80%'>
           <Tabs variant='soft-rounded' w='100%' px={2} defaultIndex={0}>
             <TabList>
-              <Tab>I'm feeling lucky 🍀</Tab>
+              <Tab>{"I'm feeling lucky 🍀"}</Tab>
               <Tab>Create your own eval (5 min) ⚒️</Tab>
               <Tab>Contribute to an existing eval! 💛</Tab>
               <Tab>Vote on important evals 😌</Tab>
