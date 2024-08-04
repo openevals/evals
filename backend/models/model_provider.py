@@ -1,9 +1,13 @@
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Type
+from enum import Enum, auto
+from pathlib import Path
+from typing import List
 
 import google.generativeai as gemini
 from anthropic import Anthropic
+from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 
@@ -20,7 +24,37 @@ class ModelResponse:
     num_tokens: int
 
 
+@dataclass
+class ModelQueryInput:
+    model_provider: "ModelProviderType"
+    model_name: str
+    input_message: str
+    temperature: float
+    max_tokens: int
+    stop_sequences: List[str]
+    api_key: str
+
+
 class ModelProvider(ABC):
+    @classmethod
+    def _api_key(cls, model_provider: "ModelProviderType") -> str:
+        provider_name = model_provider.name
+        env_var = f"{provider_name}_API_KEY"
+        current_dir = Path(__file__).resolve().parent
+        root_dir = current_dir.parent
+        env_path = root_dir / ".env"
+        if env_path.is_file():
+            load_dotenv(dotenv_path=env_path)
+        key = os.getenv(env_var)
+        if not key:
+            if env_path.is_file():
+                raise ValueError(f"{env_var} not set in .env file")
+            else:
+                raise ValueError(
+                    f"{env_var} not set in env vars, .env not found at {env_path}"
+                )
+        return key
+
     @classmethod
     def create_client(cls):
         return None
@@ -34,6 +68,7 @@ class ModelProvider(ABC):
         temperature: float,
         max_tokens: int,
         stop_sequences: List[str],
+        api_key: str,
     ):
         pass
 
@@ -47,24 +82,21 @@ class ModelProvider(ABC):
         pass
 
     @classmethod
-    def query(
-        cls,
-        model_name: str,
-        input_message: str,
-        temperature: float,
-        max_tokens: int,
-        stop_sequences: List[str],
-    ) -> tuple[ModelInput, ModelResponse]:
+    def query(cls, input: "ModelQueryInput") -> tuple[ModelInput, ModelResponse]:
+        if not input.api_key:
+            input.api_key = cls._api_key(input.model_provider)
         response = cls.query_model_provider(
-            model_name=model_name,
-            input_message=input_message,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stop_sequences=stop_sequences,
+            model_name=input.model_name,
+            input_message=input.input_message,
+            temperature=input.temperature,
+            max_tokens=input.max_tokens,
+            stop_sequences=input.stop_sequences,
+            api_key=input.api_key,
         )
-        return cls.parse_model_response(
+        provider = MODEL_PROVIDER_MAP[input.model_provider]
+        return provider.parse_model_response(
             response=response,
-            input_message=input_message,
+            input_message=input.input_message,
         )
 
 
@@ -148,34 +180,26 @@ class AnthropicModels(ModelProvider):
 
 
 class GoogleModels(ModelProvider):
+    model_name: str
+
     @classmethod
     def create_client(cls, model_name: str, api_key: str) -> gemini.GenerativeModel:
         gemini.configure(api_key=api_key)
         return gemini.GenerativeModel(model_name)
 
     @classmethod
-    def query(
-        cls,
-        model_name: str,
-        input_message: str,
-        temperature: float,
-        max_tokens: int,
-        stop_sequences: List[str],
-        api_key: str,
-    ) -> tuple[ModelInput, ModelResponse]:
+    def query(cls, input: ModelQueryInput) -> tuple[ModelInput, ModelResponse]:
         response = cls.query_model_provider(
-            model_name=model_name,
-            input_message=input_message,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stop_sequences=stop_sequences,
-            api_key=api_key,
+            model_name=input.model_name,
+            input_message=input.input_message,
+            temperature=input.temperature,
+            max_tokens=input.max_tokens,
+            stop_sequences=input.stop_sequences,
+            api_key=input.api_key,
         )
         return cls.parse_model_response(
             response=response,
-            input_message=input_message,
-            model_name=model_name,
-            api_key=api_key,
+            input=input,
         )
 
     @classmethod
@@ -185,10 +209,10 @@ class GoogleModels(ModelProvider):
         input_message: str,
         temperature: float,
         max_tokens: int,
-        api_key: str,
         stop_sequences: List[str],
-    ):
-        model = cls.create_client(model_name, api_key)
+        api_key: str,
+    ) -> gemini.types.GenerateContentResponse:
+        model = cls.create_client(model_name=model_name, api_key=api_key)
         return model.generate_content(
             contents=input_message,
             generation_config=gemini.types.GenerationConfig(
@@ -201,15 +225,12 @@ class GoogleModels(ModelProvider):
     @classmethod
     def parse_model_response(
         cls,
-        response,
-        input_message: str,
-        model_name: str,
-        api_key: str,
+        response: gemini.types.GenerateContentResponse,
+        input: ModelQueryInput,
     ) -> tuple[ModelInput, ModelResponse]:
-        model = cls.create_client(model_name, api_key)
         model_input = ModelInput(
-            value=input_message,
-            num_tokens=model.count_tokens(input_message).total_tokens,
+            value=input.input_message,
+            num_tokens=cls.count_tokens(input=input),
         )
         model_response = ModelResponse(
             value=response.text,
@@ -217,17 +238,27 @@ class GoogleModels(ModelProvider):
         )
         return model_input, model_response
 
-
-@dataclass
-class BaseModelInput(ABC):
-    model_name: str
-    input_message: str
-    temperature: float
-    max_tokens: int
-    stop_sequences: List[str]
-    api_key: str
-
     @classmethod
-    @abstractmethod
-    def get_provider(cls) -> Type[ModelProvider]:
-        pass
+    def count_tokens(cls, input: ModelQueryInput) -> int:
+        model = cls.create_client(input.model_name, input.api_key)
+        return model.count_tokens(input.input_message).total_tokens
+
+
+class ModelProviderType(Enum):
+    OPENAI = auto()
+    ANTHROPIC = auto()
+    GOOGLE = auto()
+
+
+MODEL_PROVIDER_MAP = {
+    ModelProviderType.OPENAI: OpenAIModels,
+    ModelProviderType.ANTHROPIC: AnthropicModels,
+    ModelProviderType.GOOGLE: GoogleModels,
+}
+
+
+def query(input: ModelQueryInput) -> tuple[ModelInput, ModelResponse]:
+    if not input.api_key:
+        input.api_key = ModelProvider._api_key(input.model_provider)
+    provider_class = MODEL_PROVIDER_MAP[input.model_provider]
+    return provider_class.query(input)
