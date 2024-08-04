@@ -1,15 +1,22 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-if os.path.exists(".env"):
-    load_dotenv(dotenv_path=".env", override=True)
-    print("Environment loaded successfully")
-else:
-    print("Warning: .env not found!")
 
+def load_env_file():
+    backend_env = Path(__file__).resolve().parent.parent / ".env"
+
+    if backend_env.exists():
+        load_dotenv(dotenv_path=str(backend_env), override=True)
+        print(f"Environment loaded successfully from {backend_env}")
+    else:
+        print(f"Warning: .env not found at {backend_env}")
+
+
+load_env_file()
 db_host = os.getenv("POSTGRESQL_HOST")
 db_username = os.getenv("POSTGRESQL_USERNAME")
 db_password = os.getenv("POSTGRESQL_PASSWORD")
