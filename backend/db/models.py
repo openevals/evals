@@ -21,7 +21,6 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     affiliation = Column(String)
 
-    secrets = relationship("Secret", back_populates="user")
     authored_evals = relationship("Eval", back_populates="authors")
 
 
@@ -69,13 +68,3 @@ class EvalRun(Base):
     eval = relationship("Eval", back_populates="eval_runs")
     validator_id = Column(Integer, ForeignKey("validators.id"), nullable=False)
     validator = relationship("Validator")
-
-
-class Secret(Base):
-    __tablename__ = "secrets"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    value = Column(String, nullable=False)
-
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user = relationship("User", back_populates="secrets")
