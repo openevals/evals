@@ -37,10 +37,10 @@ class Eval(Base):
     name = Column(String, nullable=False)
     description = Column(String)
     system_prompt = Column(String)
+    validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
 
     authors = relationship("User", back_populates="authored_evals")
     task_instances = relationship("TaskInstance", back_populates="eval")
-    validators = Column(ARRAY(SQLAlchemyEnum(ValidatorType)), nullable=False)
     eval_runs = relationship("EvalRun", back_populates="eval")
 
 
@@ -63,8 +63,7 @@ class EvalRun(Base):
     __tablename__ = "eval_runs"
     id = Column(Integer, primary_key=True)
     score = Column(Float, nullable=False)
+    validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
 
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
     eval = relationship("Eval", back_populates="eval_runs")
-    validator_id = Column(Integer, ForeignKey("validators.id"), nullable=False)
-    validator = relationship("Validator")
