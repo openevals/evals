@@ -1,18 +1,29 @@
 'use client';
 
-import { Button, Grid, GridItem, HStack } from '@chakra-ui/react';
 import {
+  getPanelElement,
+  getPanelGroupElement,
+  getResizeHandleElement,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from "react-resizable-panels";
+
+import { useState, useEffect } from 'react';
+import {
+  Button, 
+  Grid, 
+  GridItem, 
+  HStack, 
+  Kbd,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
-} from '@chakra-ui/react';
-import {
+  Heading,
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -30,12 +41,54 @@ import {
   Select,
   Progress,
   Spinner,
-} from '@chakra-ui/react'
-import { IconButton } from '@chakra-ui/react'
+  IconButton
+} from '@chakra-ui/react';
+import { Container, Tabs, TabList, Tab, TabPanels, TabPanel, Card, CardBody } from "@chakra-ui/react";
+import RunResults from "./runResults";
+import Results from './results';
+
+import dummyData from '../utils/dummyData.json';
+const { eval_runs } = dummyData;
+const filteredEvalRuns = eval_runs.map(({ model, score }) => ({ model, score }));
+
 import { InfoOutlineIcon } from '@chakra-ui/icons';
+import { MIN_EXAMPLES, MIN_INSTANCES, ValidatorType, ModelName, TaskInstanceInput } from '../lib/constants';
 
-export default function EditorPage() {
+export default function Editor() {
 
+  const [name, setName] = useState('');
+  const [validator, setValidator] = useState<ValidatorType | ''>('');
+  const [models, setModels] = useState<ModelName[]>([ModelName.GPT_4]);
+  const [systemPrompt, setSystemPrompt] = useState('');
+  const [userPrompt, setUserPrompt] = useState('');
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
+  const [instances, setInstances] = useState<TaskInstanceInput[]>([]);
+  const [progressPercent, setProgressPercent] = useState(0);
+
+  useEffect(() => {
+    // Calculate progress based on the completeness of the form
+    let progress = 0;
+    if (name) progress += 20;
+    if (validator) progress += 20;
+    if (models.length > 0) progress += 20;
+    
+    let instanceProgress = 0;
+    const incrementalProgress = 20 / MIN_INSTANCES;
+    
+    for (let i = 0; i < instances.length && i < MIN_INSTANCES; i++) {
+      instanceProgress += incrementalProgress;
+    }
+    progress += instanceProgress;
+    
+    const checkedExamples = instances.filter(instance => instance.input && instance.output).length;
+    if (checkedExamples >= MIN_EXAMPLES) progress += 20;
+
+    // Update the progress bar
+    setProgressPercent(progress);
+  }, [name, validator, models, instances]);
+
+  
   const toggleSpinner = () => {
     const loadingSpinner = document.getElementById('loadingSpinner');
     if (loadingSpinner) {
@@ -43,124 +96,258 @@ export default function EditorPage() {
     }
   };
 
+  const handleSubmit = () => {
+    toggleSpinner();
+    console.log('name:', name);
+    console.log('validator:', validator);
+    console.log('models:', models);
+    console.log('systemPrompt:', systemPrompt);
+    console.log('userPrompt:', userPrompt);
+    console.log('inputText:', inputText);
+    console.log('outputText:', outputText);
+    console.log('instances:', instances);
+    console.log('progressPercent:', progressPercent);
+    
+    // TODO: POSTs to (1) submit the eval with instances (2) get model results
+
+  }
+
+  const addInstance = () => {
+    if (inputText !== '' && outputText !== '') {
+      const newInstance: TaskInstanceInput = {
+        isPublic: false,
+        input: inputText,
+        ideal: outputText,
+      };
+      setInstances([...instances, newInstance]);
+      setInputText('');
+      setOutputText('');
+    } else {
+      console.error('Input text and output text must not be empty')
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      addInstance();
+    }
+  };
+
   return (
     <>
-      <Grid 
-        h='1024px'
-        w='100%'
-        templateRows='repeat(11, 1fr)'
-        templateColumns='repeat(2, 1fr)'
-        gap={4}
-        p={4}
-        border='1px'
-        borderColor='lightgray'
-        borderRadius='md'
-      >
-        <GridItem rowSpan={1} colSpan={2}>
-          <HStack mx={2}>
-            <Input variant='flushed' placeholder='Name of your Eval' maxW='384px'/>
-            <Spacer />
-            <Spinner id='loadingSpinner' hidden />
-            <IconButton variant='link' aria-label="Info on submit" icon={<InfoOutlineIcon/>} />
-            <Button px={8} onClick={toggleSpinner}>Submit to OpenEvals</Button>
-          </HStack>
-        </GridItem>
-        <GridItem rowSpan={1} colSpan={2}>
-          <Progress value={80} />
-        </GridItem>
-        <GridItem rowSpan={1} colSpan={2}>
-          <Accordion allowToggle allowMultiple defaultIndex={[0,1]}>
-            <AccordionItem>
-              <h2>
-                <AccordionButton>
-                  <Box as='span' flex='1' textAlign='left'>
-                    Method to evaluate
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4}>
-                <Select placeholder='Select validator type'>
-                  <option value='exact'>Exact</option>
-                  <option value='fuzzy'>Fuzzy</option>
-                  <option value='model-graded'>Model-graded</option>
-                  <option value='custom'>Custom</option>
-                </Select>
-              </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-              <h2>
-                <AccordionButton>
-                  <Box as='span' flex='1' textAlign='left'>
-                    Models to test
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4}>
-                <Wrap direction='column'>
-                  <WrapItem><Checkbox defaultChecked>Gemini-1.5-Pro-Exp-0801</Checkbox></WrapItem>
-                  <WrapItem><Checkbox defaultChecked>GPT-4o-2024-05-13</Checkbox></WrapItem>
-                  <WrapItem><Checkbox defaultChecked>GPT-4o-mini-2024-07-18</Checkbox></WrapItem>
-                  <WrapItem><Checkbox defaultChecked>claude-3-sonnet-20240620</Checkbox></WrapItem>
-                  <WrapItem><Checkbox>GPT-4</Checkbox></WrapItem>
-                  <WrapItem><Checkbox>Gemini-Advanced-0514</Checkbox></WrapItem>
-                  <WrapItem><Checkbox>claude-3-opus-20240229</Checkbox></WrapItem>
-                </Wrap>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
-        </GridItem>
-        <GridItem rowSpan={4} colSpan={1}>
-          Input
-          <Textarea placeholder='Input Text' />
-        </GridItem>
-        <GridItem rowSpan={4} colSpan={1}>
-          Output
-          <Textarea placeholder='Ideal Text Output' />
-        </GridItem>
-        <GridItem rowSpan={4} colSpan={2}>
-          Eval data
-          <TableContainer
-          border='1px'
-          borderRadius='md'
-          borderColor='lightgray'>
-            <Table 
-            variant='striped' 
-            colorScheme='blue' 
+     <PanelGroup direction="horizontal">
+        <Panel defaultSize={64} minSize={60}>
+          <Box w='100%' border='1px'
+              borderColor='lightgray'
+              borderRadius='md' >
+            <Grid 
+              h='calc(100vh - 10rem)'
+              w='100%'
+              overflowY='auto'
+              templateRows='repeat(12, 1fr)'
+              templateColumns='repeat(2, 1fr)'
+              gap={4}
+              p={4}
             >
-              <Thead>
-                <Tr>
-                  <Th>Public example?</Th>
-                  <Th>Input</Th>
-                  <Th>Ideal Output</Th>
-                  <Th isNumeric>multiply by</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td><Checkbox /></Td>
-                  <Td>inches</Td>
-                  <Td>millimetres (mm)</Td>
-                  <Td isNumeric>25.4</Td>
-                </Tr>
-                <Tr>
-                  <Td><Checkbox /></Td>
-                  <Td>feet</Td>
-                  <Td>centimetres (cm)</Td>
-                  <Td isNumeric>30.48</Td>
-                </Tr>
-                <Tr>
-                  <Td><Checkbox /></Td>
-                  <Td>yards</Td>
-                  <Td>metres (m)</Td>
-                  <Td isNumeric>0.91444</Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </GridItem>
-      </Grid>
+              <GridItem rowSpan={1} colSpan={2}>
+                <HStack mx={2}>
+                  <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
+                  <Spacer />
+                  <Spinner id='loadingSpinner' hidden />
+                  <IconButton variant='link' aria-label="Info on submit" icon={<InfoOutlineIcon/>} />
+                  <Button float='right' onClick={addInstance}>
+                    <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                    <Text>Add instance</Text>
+                  </Button>
+                  
+                </HStack>
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={2}>
+                <Progress value={progressPercent} />
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={2}>
+                <Accordion allowMultiple defaultIndex={[0,1]}>
+                  <AccordionItem>
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                          <Heading size='sm'>Method to evaluate</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
+                        {Object.values(ValidatorType).map((validatorType) => (
+                          <option key={validatorType} value={validatorType}>
+                            {validatorType}
+                          </option>
+                        ))}
+                      </Select>
+                    </AccordionPanel>
+                  </AccordionItem>
+                  <AccordionItem>
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                        <Heading size='sm'>Models to test</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <Wrap direction='column'>
+                        {Object.values(ModelName).map((modelName) => (
+                          <WrapItem key={modelName}>
+                            <Checkbox
+                              isChecked={models.includes(modelName)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setModels([...models, modelName]);
+                                } else {
+                                  setModels(models.filter((m) => m !== modelName));
+                                }
+                              }}
+                            >
+                              {modelName}
+                            </Checkbox>
+                          </WrapItem>
+                        ))}
+                      </Wrap>
+                    </AccordionPanel>
+                  </AccordionItem>
+                  <AccordionItem>
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                        <Heading size='sm'>Prompts</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <HStack>
+                        <VStack w='100%'>
+                          <Text>System Prompt (Recommended)</Text>
+                          <Textarea 
+                            placeholder='You are a mathematics professor at MIT.'
+                            value={systemPrompt}
+                            onChange={(e) => setSystemPrompt(e.target.value)}
+                          />
+                        </VStack>
+                        <VStack w='100%'>
+                          <Text>User Prompt (Optional)</Text>
+                          <Textarea
+                            placeholder='Solve linear algebra problems by responding with the numeric answer only.'
+                            value={userPrompt}
+                            onChange={(e) => setUserPrompt(e.target.value)}
+                          />
+                        </VStack>
+                      </HStack>
+                    </AccordionPanel>
+                  </AccordionItem>
+
+                </Accordion>
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={2}>
+                <Heading textAlign='center' size='sm'>Task instances</Heading>
+              </GridItem>
+              <GridItem rowSpan={4} colSpan={1}>
+                Input
+                <Textarea 
+                  placeholder='Derivative of x^2'
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  />
+              </GridItem>
+              <GridItem rowSpan={4} colSpan={1}>
+                Ideal Output
+                <Textarea 
+                  placeholder='2x'
+                  value={outputText}
+                  onChange={(e) => setOutputText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              </GridItem>
+            </Grid>
+          </Box>
+        </Panel>
+        <PanelResizeHandle />
+        <Panel collapsible={true} defaultSize={32} minSize={20}>
+          <Container 
+            border='1px'
+            borderColor='lightgray'
+            p={4}
+            borderRadius='md'
+            h='calc(100vh - 10rem)'
+            w='100%'
+            overflowY='auto'
+          >
+            <Tabs defaultIndex={1}>
+              <TabList>
+                <Tab>Feed</Tab>
+                <Tab>How to use</Tab>
+                <Tab>Task instances</Tab>
+                <Tab>Results</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel textAlign='center'>
+                  <Card variant="outline">
+                    <CardBody>
+                      <Text>Newest! Contribute to SWE-bench</Text>
+                      <Button mt={4}>Contribute</Button>
+                    </CardBody>
+                  </Card>
+                  <Heading size="md" pt={8}><i>Trending</i></Heading>
+                  <Results />
+                </TabPanel>
+                <TabPanel>
+                  How this works
+                </TabPanel>
+                <TabPanel>
+                  <TableContainer
+                  border='1px'
+                  borderRadius='md'
+                  borderColor='lightgray'>
+                    <Table>
+                      <Thead>
+                        <Tr>
+                          <Th>Public?</Th>
+                          <Th>Input</Th>
+                          <Th>Ideal Output</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {instances.map((instance, index) => (
+                          <Tr key={index}>
+                            <Td>
+                              <Checkbox 
+                                isChecked={instance.isPublic}
+                                onChange={(e) => {
+                                  const updatedInstances = [...instances];
+                                  updatedInstances[index].isPublic = e.target.checked;
+                                  setInstances(updatedInstances);
+                                }}
+                              />
+                            </Td>
+                            <Td>{instance.input}</Td>
+                            <Td>{instance.ideal}</Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </TableContainer>
+                </TabPanel>
+                <TabPanel>
+                  <RunResults runs={filteredEvalRuns} evalName={'Eval Name'}/>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Container>
+        </Panel>
+      </PanelGroup>
     </>
   )
 }
