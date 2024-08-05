@@ -1,13 +1,12 @@
 from enum import Enum
 
-from sqlalchemy import Boolean, Column
+from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import Float, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from backend.db import Base
 
-# Association table
 eval_authors = Table(
     "eval_authors",
     Base.metadata,
@@ -17,10 +16,10 @@ eval_authors = Table(
 
 
 class ValidatorType(Enum):
-    Match = "Match"
-    MultipleChoice = "MultipleChoice"
+    Includes = "Includes"
     ExactMatch = "ExactMatch"
     FuzzyMatch = "FuzzyMatch"
+    MultipleChoice = "MultipleChoice"
     ModelGraded = "ModelGraded"
     Custom = "Custom"
 
@@ -43,6 +42,7 @@ class Model(Base):
     model_developer = Column(String, nullable=False)
     model_name = Column(String, nullable=False)
     eval_runs = relationship("EvalRun", back_populates="model")
+    outputs = relationship("TaskInstanceOutput", back_populates="model")
 
 
 class Eval(Base):
@@ -73,14 +73,32 @@ class TaskInstance(Base):
 
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
     eval = relationship("Eval", back_populates="task_instances")
+    outputs = relationship("TaskInstanceOutput", back_populates="task_instance")
+
+
+class TaskInstanceOutput(Base):
+    __tablename__ = "task_instance_outputs"
+    id = Column(Integer, primary_key=True)
+    output = Column(String, nullable=False)
+    task_instance_id = Column(Integer, ForeignKey("task_instances.id"), nullable=False)
+    task_instance = relationship("TaskInstance", back_populates="outputs")
+    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    model = relationship("Model", back_populates="outputs")
+    num_tokens = Column(Integer, nullable=False)
+    eval_run_id = Column(Integer, ForeignKey("eval_runs.id"), nullable=False)
+    eval_run = relationship("EvalRun", back_populates="task_instance_outputs")
 
 
 class EvalRun(Base):
     __tablename__ = "eval_runs"
     id = Column(Integer, primary_key=True)
     score = Column(Float, nullable=False)
+    datetime = Column(DateTime, nullable=False)
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
     model = relationship("Model", back_populates="eval_runs")
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
     eval = relationship("Eval", back_populates="eval_runs")
+    task_instance_outputs = relationship(
+        "TaskInstanceOutput", back_populates="eval_run"
+    )

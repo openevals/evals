@@ -14,7 +14,7 @@ load_dotenv()
 
 config.set_main_option(
     "sqlalchemy.url",
-    f"postgresql+psycopg2://{os.getenv('POSTGRESQL_USERNAME')}:{os.getenv('POSTGRESQL_PASSWORD')}@{os.getenv('POSTGRESQL_HOST')}/{os.getenv('POSTGRESQL_DATABASE')}",
+    f"postgresql+psycopg2://{os.environ['POSTGRESQL_USERNAME']}:{os.environ['POSTGRESQL_PASSWORD']}@{os.environ['POSTGRESQL_HOST']}/{os.environ['POSTGRESQL_DATABASE']}",
 )
 
 # Interpret the config file for Python logging.
@@ -27,6 +27,8 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
+print("Tables in metadata:", Base.metadata.tables.keys())
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
