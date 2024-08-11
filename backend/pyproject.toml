@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Justin W. Lin <justin@lin.ai>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -16,6 +17,8 @@ google-generativeai = "^0.7.2"
 psycopg2-binary = "^2.9.9"
 pytest = "^8.3.2"
 tiktoken = "^0.7.0"
+fastapi = "^0.112.0"
+uvicorn = "^0.30.5"
 
 
 [build-system]
