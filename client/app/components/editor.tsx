@@ -4,13 +4,12 @@ import {
   Panel,
   PanelGroup,
   PanelResizeHandle,
+  ImperativePanelHandle
 } from "react-resizable-panels";
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Button, 
-  Grid, 
-  GridItem, 
   HStack, 
   Kbd,
   Table,
@@ -51,46 +50,51 @@ import {
 import RunResults from "./runResults";
 import Results from './results';
 
-import dummyData from '../utils/dummyData.json';
+import { getSupportedModels, postNewEval } from '@/app/utils/getEvalRun';
+
+import dummyData from '@/app/utils/dummyData.json';
 const { eval_runs } = dummyData;
 const filteredEvalRuns = eval_runs.map(({ model, score }) => ({ model, score }));
 
-import { InfoOutlineIcon } from '@chakra-ui/icons';
-import { MIN_EXAMPLES, MIN_INSTANCES, ValidatorType, ModelName, TaskInstanceInput } from '../lib/constants';
+import { MIN_EXAMPLES, MIN_INSTANCES, ModelSystem, ValidatorType, TaskInstance } from '@/app/lib/constants';
+
+interface Model {
+  id: number,
+  modelDeveloper: string,
+  modelName: string,
+  checked: boolean,
+};
 
 export default function Editor() {
-
+  // step 1 = enter meta info
+  // step 2 = add task instances
+  // step 3 = run results
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [name, setName] = useState('');
+  const [inputDescription, setInputDescription] = useState('');
+  const [outputDescription, setOutputDescription] = useState('');
   const [validator, setValidator] = useState<ValidatorType | ''>('');
-  const [models, setModels] = useState<ModelName[]>([ModelName.GPT_4]);
+  const [models, setModels] = useState<Model[]>([]);
   const [systemPrompt, setSystemPrompt] = useState('');
   const [userPrompt, setUserPrompt] = useState('');
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
-  const [instances, setInstances] = useState<TaskInstanceInput[]>([]);
-  const [progressPercent, setProgressPercent] = useState(0);
+  const [instances, setInstances] = useState<TaskInstance[]>([]);
 
-  // useEffect(() => {
-  //   // Calculate progress based on the completeness of the form
-  //   let progress = 0;
-  //   if (name) progress += 20;
-  //   if (validator) progress += 20;
-  //   if (models.length > 0) progress += 20;
-    
-  //   let instanceProgress = 0;
-  //   const incrementalProgress = 20 / MIN_INSTANCES;
-    
-  //   for (let i = 0; i < instances.length && i < MIN_INSTANCES; i++) {
-  //     instanceProgress += incrementalProgress;
-  //   }
-  //   progress += instanceProgress;
-    
-  //   const checkedExamples = instances.filter(instance => instance.input && instance.output).length;
-  //   if (checkedExamples >= MIN_EXAMPLES) progress += 20;
+  const panel1Ref = useRef<ImperativePanelHandle>(null);
+  const panel2Ref = useRef<ImperativePanelHandle>(null);
+  const panel3Ref = useRef<ImperativePanelHandle>(null);
 
-  //   // Update the progress bar
-  //   setProgressPercent(progress);
-  // }, [name, validator, models, instances]);
+  useEffect(() => {
+    const getModels = async () => {
+      const models = await getSupportedModels();
+      models.forEach((model: Omit<Model, 'checked'>) => {
+        (model as Model).checked = false;
+      });
+      setModels(models);
+    };
+    getModels();
+  }, []);
 
   const toggleSpinner = () => {
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -99,8 +103,26 @@ export default function Editor() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     toggleSpinner();
+    const checkedModels = models.filter((model) => model.checked);
+    const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
+      modelId: model.id,
+      systemPrompt: systemPrompt,
+      userPrompt: userPrompt,
+    }));
+    // TODO: error handling
+    if (validator === '') {
+      return;
+    }
+    await postNewEval({
+      name,
+      description: `Input: ${inputDescription}\nOutput: ${outputDescription}`,
+      validator,
+      modelSystems,
+      taskInstances: instances,
+    });
+    setStep(3);
     console.log('name:', name);
     console.log('validator:', validator);
     console.log('models:', models);
@@ -109,15 +131,13 @@ export default function Editor() {
     console.log('inputText:', inputText);
     console.log('outputText:', outputText);
     console.log('instances:', instances);
-    console.log('progressPercent:', progressPercent);
     
     // TODO: POSTs to (1) submit the eval with instances (2) get model results
-
   }
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
-      const newInstance: TaskInstanceInput = {
+      const newInstance: TaskInstance = {
         isPublic: false,
         input: inputText,
         ideal: outputText,
@@ -138,10 +158,18 @@ export default function Editor() {
     }
   };
 
+  useEffect(() => {
+    if (step === 2) {
+      panel1Ref.current?.resize(30);
+      panel2Ref.current?.resize(40);
+      panel3Ref.current?.resize(30);
+    }
+  }, [step]);
+
   return (
     <>
      <PanelGroup direction="horizontal">
-        <Panel defaultSize={64} minSize={60}>
+        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref}>
           <Box w='100%' border='1px'
               borderColor='lightgray'
               borderLeftRadius='md' 
@@ -154,11 +182,45 @@ export default function Editor() {
               <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
               <Spacer />
               <Spinner id='loadingSpinner' hidden />
-              <IconButton variant='link' aria-label="Info on submit" icon={<InfoOutlineIcon/>} />
-              <Button float='right'>Submit eval</Button>  
+              {step === 1 && (
+                <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>Next</Button>  
+              )}
             </HStack>
-            <Accordion allowMultiple defaultIndex={[0,1]}>
-              <AccordionItem>
+            <Accordion pt={2} allowMultiple defaultIndex={[0,1,2]}>
+              <AccordionItem py={2} border='none'>
+                <h2>
+                  <AccordionButton>
+                    <Box as='span' flex='1' textAlign='left'>
+                    <Heading size='sm'>Description</Heading>
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <HStack w='100%'>
+                    <VStack w='50%'>
+                      <Text>Input</Text>
+                      <Textarea 
+                        placeholder='Linear algebra equation in Latex'
+                        value={inputDescription}
+                        onChange={(e) => setInputDescription(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        />
+                    </VStack>
+                    <VStack w='50%'>
+                      <Text>Ideal Output</Text>
+                      <Textarea 
+                        placeholder='Answer only in Latex'
+                        value={outputDescription}
+                        onChange={(e) => setOutputDescription(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                      />
+                    </VStack>
+                  </HStack>
+            
+                </AccordionPanel>
+              </AccordionItem>
+              <AccordionItem py={2} >
                 <h2>
                   <AccordionButton>
                     <Box as='span' flex='1' textAlign='left'>
@@ -177,7 +239,7 @@ export default function Editor() {
                   </Select>
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem>
+              <AccordionItem py={2} >
                 <h2>
                   <AccordionButton>
                     <Box as='span' flex='1' textAlign='left'>
@@ -188,26 +250,27 @@ export default function Editor() {
                 </h2>
                 <AccordionPanel pb={4}>
                   <Wrap direction='column'>
-                    {Object.values(ModelName).map((modelName) => (
-                      <WrapItem key={modelName}>
+                    {models.map((model) => (
+                      <WrapItem key={model.modelName}>
                         <Checkbox
-                          isChecked={models.includes(modelName)}
+                          isChecked={model.checked}
                           onChange={(e) => {
-                            if (e.target.checked) {
-                              setModels([...models, modelName]);
-                            } else {
-                              setModels(models.filter((m) => m !== modelName));
-                            }
+                            model.checked = !model.checked;
+                            // if (e.target.checked) {
+                            //   setModels([...models, modelName]);
+                            // } else {
+                            //   setModels(models.filter((m) => m !== modelName));
+                            // }
                           }}
                         >
-                          {modelName}
+                          {model.modelName}
                         </Checkbox>
                       </WrapItem>
                     ))}
                   </Wrap>
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem>
+              <AccordionItem py={2} borderBottom='none' >
                 <h2>
                   <AccordionButton>
                     <Box as='span' flex='1' textAlign='left'>
@@ -237,56 +300,100 @@ export default function Editor() {
                   </HStack>
                 </AccordionPanel>
               </AccordionItem>
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
-                    <Heading size='sm'>Task instances</Heading>
-                    </Box>
-                    <Button ml='auto' onClick={addInstance}>
-                        <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                        <Text>Add task instance</Text>
-                      </Button>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <HStack w='100%'>
-                    <VStack w='50%'>
-                      <Text>Input</Text>
-                      <Textarea 
-                        placeholder='Derivative of x^2'
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        />
-                    </VStack>
-                    <VStack w='50%'>
-                      <Text>Ideal Output</Text>
-                      <Textarea 
-                        placeholder='2x'
-                        value={outputText}
-                        onChange={(e) => setOutputText(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                      />
-                    </VStack>
-                  </HStack>
-            
-                </AccordionPanel>
-              </AccordionItem>
-
             </Accordion>
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} defaultSize={32} minSize={20}>
+        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref}>
+          <Box w='100%' border='1px'
+              borderColor='lightgray'
+              gap={4}
+              p={4}
+              h='calc(100vh - 12rem)'
+              overflowY='auto'
+              >
+            <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
+              <Box as='span' flex='1' textAlign='left'>
+              <Heading size='sm'>Task instances</Heading>
+              </Box>
+              <Button variant='outline' ml='auto' onClick={addInstance}>
+                <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                <Text ml={2}>Add task instance</Text>
+              </Button>
+              <Button ml='auto' onClick={handleSubmit}>
+                <Text>Submit</Text>
+              </Button>
+            </HStack>
+            <HStack w='100%' pt={8}>
+              <VStack w='50%'>
+                <Text>Input</Text>
+                <Textarea 
+                  placeholder='\frac{d}{dx}x^2'
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  />
+              </VStack>
+              <VStack w='50%'>
+                <Text>Ideal Output</Text>
+                <Textarea 
+                  placeholder='2x'
+                  value={outputText}
+                  onChange={(e) => setOutputText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              </VStack>
+            </HStack>
+            <Box pt={4}>
+              {instances.length > 0 ? (
+                <TableContainer
+                border='1px'
+                borderRadius='md'
+                borderColor='lightgray'>
+                  <Table>
+                    <Thead>
+                      <Tr>
+                        <Th>Public?</Th>
+                        <Th>Input</Th>
+                        <Th>Ideal Output</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {instances.map((instance, index) => (
+                        <Tr key={index}>
+                          <Td>
+                            <Checkbox 
+                              isChecked={instance.isPublic}
+                              onChange={(e) => {
+                                const updatedInstances = [...instances];
+                                updatedInstances[index].isPublic = e.target.checked;
+                                setInstances(updatedInstances);
+                              }}
+                            />
+                          </Td>
+                          <Td>{instance.input}</Td>
+                          <Td>{instance.ideal}</Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Text pt={8} textAlign='center'>{`Add task instances! At least ${MIN_INSTANCES} examples, ideally more 🧪`}</Text>
+              )}
+
+            </Box>
+          </Box>
+        </Panel>
+        <PanelResizeHandle />
+        <Panel collapsible={true} collapsedSize={2} defaultSize={32} minSize={24} ref={panel3Ref}>
           <Box w='100%' border='1px'
               borderColor='lightgray'
               borderRightRadius='md' 
+              h='calc(100vh - 12rem)'
               gap={4}
               p={4}>
             <Container 
-              h='calc(100vh - 12rem)'
               w='100%'
               overflowY='auto'
             >
@@ -294,8 +401,10 @@ export default function Editor() {
                 <TabList position="sticky" top={0} zIndex={1} bg="white">
                   <Tab>Feed</Tab>
                   <Tab>How to use</Tab>
-                  <Tab>Task instances</Tab>
-                  <Tab>Results</Tab>
+                  <Tab>Test your model system</Tab>
+                  {step === 3 && (
+                    <Tab>Results</Tab>
+                  )}
                 </TabList>
                 <TabPanels>
                   <TabPanel textAlign='center'>
@@ -309,49 +418,17 @@ export default function Editor() {
                     <Results />
                   </TabPanel>
                   <TabPanel>
-                    How this works
+                    <Heading>OpenEvals: Community-owned AI model evaluations!</Heading>
+                    <p>Hello! This is an editor to help you create evals to get a better sense of how a specific AI model performs for your needs.</p>
+                    <ul>
+                      <li>Your data is default private</li>
+                    </ul>
                   </TabPanel>
-                  <TabPanel>
-                    {instances.length > 0 ? (
-                      <TableContainer
-                      border='1px'
-                      borderRadius='md'
-                      borderColor='lightgray'>
-                        <Table>
-                          <Thead>
-                            <Tr>
-                              <Th>Public?</Th>
-                              <Th>Input</Th>
-                              <Th>Ideal Output</Th>
-                            </Tr>
-                          </Thead>
-                          <Tbody>
-                            {instances.map((instance, index) => (
-                              <Tr key={index}>
-                                <Td>
-                                  <Checkbox 
-                                    isChecked={instance.isPublic}
-                                    onChange={(e) => {
-                                      const updatedInstances = [...instances];
-                                      updatedInstances[index].isPublic = e.target.checked;
-                                      setInstances(updatedInstances);
-                                    }}
-                                  />
-                                </Td>
-                                <Td>{instance.input}</Td>
-                                <Td>{instance.ideal}</Td>
-                              </Tr>
-                            ))}
-                          </Tbody>
-                        </Table>
-                      </TableContainer>
-                    ) : (
-                      <Text>Your added instances will appear here! ☺️</Text>
-                    )}
-                  </TabPanel>
+                  {step === 3 && (
                   <TabPanel>
                     <RunResults runs={filteredEvalRuns} evalName={'Eval Name'}/>
                   </TabPanel>
+                  )}
                 </TabPanels>
               </Tabs>
             </Container>

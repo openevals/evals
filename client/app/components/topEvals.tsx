@@ -4,7 +4,7 @@ import { Wrap, WrapItem } from '@chakra-ui/react';
 
 export default function TopEvals() {
   return (
-    <Wrap>
+    <Wrap w='50%'>
       {[...Array(20)].map((_, index) => (
         <WrapItem key={index}>
           <Card maxW='sm'>

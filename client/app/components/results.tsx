@@ -1,7 +1,8 @@
 import ResultItem from "./result";
 import dummyData from "../utils/dummyData.json";
+import { Box } from "@chakra-ui/react";
 
-const { evals, task_instances, eval_runs } = dummyData;
+const { evals } = dummyData;
 
 
 export default function Results() {
