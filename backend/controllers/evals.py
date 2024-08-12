@@ -35,6 +35,7 @@ def run_eval_task(eval_id):
 
                     # Iterate all task instances
                     valid_responses = 0
+                    num_task_instances = len(eval.task_instances)
                     for task_instance in eval.task_instances:
                         try:
                             # Call the model for the task instance
@@ -72,7 +73,7 @@ def run_eval_task(eval_id):
                         db.commit()
 
                     # Update the eval run object
-                    eval_run.score = valid_responses/len(eval.task_instances)
+                    eval_run.score = valid_responses/num_task_instances if num_task_instances > 0 else 0
                     eval_run.datetime = datetime.now()
                     eval_run.status = EvalRunStatus.Finished
                     db.commit()
