@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 from backend.db.db import get_db
-from backend.db.models import Eval, TaskInstance, EvalRun
+from backend.db.models import Eval, TaskInstance, EvalRun, EvalRunStatus
 from backend.validation_schemas.evals import EvalSchema, EvalResponseSchema
+from backend.controllers.evals import run_eval_task
 
 evals_router = APIRouter()
 
 
-@evals_router.post("/create/", response_model=EvalResponseSchema, status_code=200)
-def create_eval(eval: EvalSchema, db: Session = Depends(get_db)) -> dict:
+@evals_router.post("/create", response_model=EvalResponseSchema, status_code=200)
+def create_eval(background_tasks: BackgroundTasks, eval: EvalSchema, db: Session = Depends(get_db)) -> dict:
     """
     Create new evaluation
     """
@@ -32,20 +33,23 @@ def create_eval(eval: EvalSchema, db: Session = Depends(get_db)) -> dict:
             db.add(new_task_instance)
 
         # Register all associated runs per model
-        for model in eval.models:
+        for model in eval.model_system:
             new_eval_run = EvalRun(
                 score=0,
-                datetime=datetime.now,
-                system_prompt=model.system_prompt if model.system_prompt else eval.system_prompt,
-                user_prompt=model.user_prompt if model.user_prompt else eval.user_prompt,
-                validator_type=model.validator_type if model.validator_type else eval.validator_type,
+                datetime=datetime.now(),
+                system_prompt=model.system_prompt,
+                user_prompt=model.user_prompt,
+                validator_type=eval.validator_type,
+                status=EvalRunStatus.Queued,
                 model_id=model.model_id,
                 eval=new_eval
             )
             db.add(new_eval_run)
         db.commit()
+        background_tasks.add_task(run_eval_task, new_eval.id)
         return new_eval
     except Exception as e:
+        print(f"Error creating new eval: {e}")
         db.rollback()
         raise HTTPException(status_code=400, detail={
                             'error': 'eval-not-created'})

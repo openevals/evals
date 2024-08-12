@@ -245,9 +245,9 @@ class GoogleModels(ModelProvider):
 
 
 class ModelProviderType(Enum):
-    OPENAI = auto()
-    ANTHROPIC = auto()
-    GOOGLE = auto()
+    OPENAI = 'OpenAI'
+    ANTHROPIC = 'Anthropic'
+    GOOGLE = 'Google'
 
 
 MODEL_PROVIDER_MAP = {
