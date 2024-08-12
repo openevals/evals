@@ -1,5 +1,5 @@
-from pathlib import Path
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Include service routes
 from backend.routers.health import health_router
@@ -8,6 +8,15 @@ from backend.routers.evals import evals_router
 
 app = FastAPI(title="OpenEvals")
 
+# Configure CORS
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(health_router, prefix='/health')
 app.include_router(models_router, prefix='/models')
