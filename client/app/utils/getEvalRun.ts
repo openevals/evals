@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export async function postNewEval(body: {
   name: string;
   description: string;
-  validator: ValidatorType;
+  validatorType: ValidatorType;
   modelSystems: ModelSystem[];
   taskInstances: TaskInstance[];
 }) {
