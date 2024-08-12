@@ -86,6 +86,13 @@ class TaskInstanceOutput(Base):
     eval_run = relationship("EvalRun", back_populates="task_instance_outputs")
 
 
+class EvalRunStatus(Enum):
+    Queued = "Queued"
+    Running = "Running"
+    Failed = "Failed"
+    Finished = "Finished"
+
+
 class EvalRun(Base):
     __tablename__ = "eval_runs"
     id = Column(Integer, primary_key=True)
@@ -94,6 +101,7 @@ class EvalRun(Base):
     system_prompt = Column(String)
     user_prompt = Column(String)  # task-specific user prompt
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
+    status = Column(SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
     model = relationship("Model", back_populates="eval_runs")
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
