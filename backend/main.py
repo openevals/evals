@@ -2,12 +2,16 @@ from pathlib import Path
 from fastapi import FastAPI
 
 # Include service routes
-from routers.health import health_router
+from backend.routers.health import health_router
+from backend.routers.models import models_router
+from backend.routers.evals import evals_router
 
 app = FastAPI(title="OpenEvals")
 
 
 app.include_router(health_router, prefix='/health')
+app.include_router(models_router, prefix='/models')
+app.include_router(evals_router, prefix='/evals')
 app.include_router(health_router)
 
 # Only for debug purposes
