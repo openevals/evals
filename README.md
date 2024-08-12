@@ -48,10 +48,11 @@ In this case, the `PYTHONPATH` is set to the repository's root folder (`evals`),
 
 ### Installing dependencies
 
-To install dependencies, run the following command:
+To install dependencies and pre-commit hooks, run the following commands:
 
 ```bash
 poetry install
+poetry run pre-commit install
 ```
 
 ### Setting up the service
