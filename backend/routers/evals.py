@@ -33,7 +33,7 @@ def create_eval(background_tasks: BackgroundTasks, eval: EvalSchema, db: Session
             db.add(new_task_instance)
 
         # Register all associated runs per model
-        for model in eval.model_system:
+        for model in eval.model_systems:
             new_eval_run = EvalRun(
                 score=0,
                 datetime=datetime.now(),

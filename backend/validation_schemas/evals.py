@@ -23,7 +23,7 @@ class EvalSchema(BaseModel):
     validator_type: ValidatorType = Field(..., alias='validatorType')
     task_instances: List[TaskInstanceSchema] = Field(
         ..., alias='taskInstances')
-    model_system: List[ModelSystemSchema] = Field(..., alias='modelSystem')
+    model_systems: List[ModelSystemSchema] = Field(..., alias='modelSystems')
 
 
 class ModelSystemResponseSchema(BaseModel):
@@ -49,7 +49,7 @@ class EvalResponseSchema(BaseModel):
     task_instances: List[TaskInstanceResponseSchema] = Field(
         ..., serialization_alias='taskInstances')
     eval_runs: List[ModelSystemResponseSchema] = Field(
-        ..., serialization_alias='modelSystem')
+        ..., serialization_alias='modelSystems')
 
 
 class TaskInstanceOutputResponseSchema(BaseModel):
