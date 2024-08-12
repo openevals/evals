@@ -85,6 +85,12 @@ After configuring the environment variables, database migrations should be appli
 alembic upgrade head
 ```
 
+If you need to perform a migration (i.e. `models.py` was changed), you need to generate an upgrade migration.
+
+```bash
+alembic revision --autogenerate -m "<migration_message>"
+```
+
 If there are no new updates, the command will return without applying any changes.
 
 #### Running the service
