@@ -111,3 +111,14 @@ After running the service, API documentation can be viewed at [OpenEvals Backend
 #### Running the service with Docker
 
 ### Testing
+
+To run pytest, make sure `/backend` directory is in the PYTHONPATH.
+```bash
+cd backend
+poetry run pytest
+```
+
+To run tests in a single file, run
+```bash
+poetry run pytest <file-path>
+```
