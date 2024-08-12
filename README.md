@@ -94,7 +94,7 @@ To run the API service, use one of the following commands:
 ```bash
 uvicorn backend.main:app --host=0.0.0.0 --port=8000 --log-level=debug --reload
 # or
-pyhton main.py
+python main.py
 ```
 
 For development, the first option is most effective as it will reload the service if there are any changes in the project folder.
