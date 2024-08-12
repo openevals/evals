@@ -73,10 +73,18 @@ class TaskInstance(Base):
     outputs = relationship("TaskInstanceOutput", back_populates="task_instance")
 
 
+class EvalRunStatus(Enum):
+    Queued = "Queued"
+    Running = "Running"
+    Failed = "Failed"
+    Finished = "Finished"
+
+
 class TaskInstanceOutput(Base):
     __tablename__ = "task_instance_outputs"
     id = Column(Integer, primary_key=True)
     output = Column(String, nullable=False)
+    status = Column(SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued)
     task_instance_id = Column(Integer, ForeignKey("task_instances.id"), nullable=False)
     task_instance = relationship("TaskInstance", back_populates="outputs")
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
@@ -84,13 +92,6 @@ class TaskInstanceOutput(Base):
     num_tokens = Column(Integer, nullable=False)
     eval_run_id = Column(Integer, ForeignKey("eval_runs.id"), nullable=False)
     eval_run = relationship("EvalRun", back_populates="task_instance_outputs")
-
-
-class EvalRunStatus(Enum):
-    Queued = "Queued"
-    Running = "Running"
-    Failed = "Failed"
-    Finished = "Finished"
 
 
 class EvalRun(Base):
