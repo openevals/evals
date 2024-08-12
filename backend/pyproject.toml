@@ -20,6 +20,7 @@ tiktoken = "^0.7.0"
 fastapi = "^0.112.0"
 uvicorn = "^0.30.5"
 pydantic = "^2.8.2"
+fuzzywuzzy = "^0.18.0"
 
 
 [build-system]
