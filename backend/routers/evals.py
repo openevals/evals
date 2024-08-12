@@ -56,7 +56,7 @@ def create_eval(background_tasks: BackgroundTasks, eval: EvalSchema, db: Session
 
 
 @evals_router.get("/{eval_id}/get", response_model=EvalResponseSchema, status_code=200)
-def create_eval(eval_id: int, db: Session = Depends(get_db)) -> dict:
+def get_eval_details(eval_id: int, db: Session = Depends(get_db)) -> dict:
     """
     Get eval base details
     """
@@ -68,7 +68,7 @@ def create_eval(eval_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @evals_router.get("/{eval_id}/run/{eval_run_id}/get", response_model=EvalRunResponseSchema, status_code=200)
-def create_eval(eval_id: int, eval_run_id: int, db: Session = Depends(get_db)) -> dict:
+def get_eval_run_details(eval_id: int, eval_run_id: int, db: Session = Depends(get_db)) -> dict:
     """
     Get eval run result/status details
     """
