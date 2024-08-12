@@ -18,12 +18,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(health_router, prefix='/health')
-app.include_router(models_router, prefix='/models')
-app.include_router(evals_router, prefix='/evals')
+app.include_router(health_router, prefix="/health")
+app.include_router(models_router, prefix="/models")
+app.include_router(evals_router, prefix="/evals")
 app.include_router(health_router)
 
 # Only for debug purposes
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="debug")

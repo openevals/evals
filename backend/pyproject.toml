@@ -33,16 +33,18 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py310']
+target-version = ['py37']
 include = '\.pyi?$'
-extend-exclude = '''
+exclude = '''
 /(
-  \.eggs
+    \.eggs
   | \.git
   | \.hg
   | \.mypy_cache
   | \.tox
   | \.venv
+  | _build
+  | buck-out
   | build
   | dist
   | alembic/versions

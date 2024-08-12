@@ -1,12 +1,17 @@
 from datetime import datetime
 from backend.db.db import SessionLocal
 from backend.db.models import Eval, TaskInstanceOutput, EvalRunStatus
-from backend.models.model_provider import query, ModelQueryInput, ModelProviderType, ModelProvider
+from backend.models.model_provider import (
+    query,
+    ModelQueryInput,
+    ModelProviderType,
+    ModelProvider,
+)
 from backend.controllers.validation import validate_response
 
 
 def run_eval_task(eval_id):
-    ''' Run the eval as background task '''
+    """Run the eval as background task"""
     db = SessionLocal()
     try:
         # Look for the target eval
@@ -15,8 +20,9 @@ def run_eval_task(eval_id):
             # Iterate over all eval runs
             for eval_run in eval.eval_runs:
                 try:
-                    model_provider = ModelProviderType[eval_run.model.model_developer.upper(
-                    )]
+                    model_provider = ModelProviderType[
+                        eval_run.model.model_developer.upper()
+                    ]
                     model_query = ModelQueryInput(
                         model_provider=model_provider,
                         model_name=eval_run.model.model_name,
@@ -24,8 +30,7 @@ def run_eval_task(eval_id):
                         temperature=0,
                         max_tokens=4096,
                         stop_sequences=["<END>"],
-                        api_key=ModelProvider._api_key(
-                            model_provider=model_provider),
+                        api_key=ModelProvider._api_key(model_provider=model_provider),
                     )
 
                     # Update the eval run status
@@ -44,7 +49,10 @@ def run_eval_task(eval_id):
 
                             # Check if the response is valid
                             is_valid = validate_response(
-                                eval.validator_type, task_instance.ideal, output_data.value)
+                                eval.validator_type,
+                                task_instance.ideal,
+                                output_data.value,
+                            )
                             if is_valid:
                                 valid_responses += 1
 
@@ -54,8 +62,9 @@ def run_eval_task(eval_id):
                                 status=EvalRunStatus.Finished,
                                 task_instance_id=task_instance.id,
                                 model_id=eval_run.model.id,
-                                num_tokens=input_data.num_tokens + output_data.num_tokens,
-                                eval_run_id=eval_run.id
+                                num_tokens=input_data.num_tokens
+                                + output_data.num_tokens,
+                                eval_run_id=eval_run.id,
                             )
                         except Exception as e:
                             print(f"Error querying the model: {e}")
@@ -66,14 +75,18 @@ def run_eval_task(eval_id):
                                 task_instance_id=task_instance.id,
                                 model_id=eval_run.model.id,
                                 num_tokens=0,
-                                eval_run_id=eval_run.id
+                                eval_run_id=eval_run.id,
                             )
 
                         db.add(task_instance_output)
                         db.commit()
 
                     # Update the eval run object
-                    eval_run.score = valid_responses/num_task_instances if num_task_instances > 0 else 0
+                    eval_run.score = (
+                        valid_responses / num_task_instances
+                        if num_task_instances > 0
+                        else 0
+                    )
                     eval_run.datetime = datetime.now()
                     eval_run.status = EvalRunStatus.Finished
                     db.commit()
@@ -83,7 +96,7 @@ def run_eval_task(eval_id):
                     db.commit()
 
         else:
-            raise Exception('Eval object not found')
+            raise Exception("Eval object not found")
     except Exception as e:
         print(f"Error processing eval execution for ID={eval_id}: {e}")
     finally:
