@@ -1,6 +1,8 @@
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from backend.db.models import ValidatorType
+from backend.db.models import ValidatorType, EvalRunStatus
+from backend.validation_schemas.models import ModelSchema
 
 
 class ModelSystemSchema(BaseModel):
@@ -24,5 +26,51 @@ class EvalSchema(BaseModel):
     model_system: List[ModelSystemSchema] = Field(..., alias='modelSystem')
 
 
+class ModelSystemResponseSchema(BaseModel):
+    id: int
+    model_id: int = Field(..., serialization_alias='modelId')
+    system_prompt: Optional[str] = Field(...,
+                                         serialization_alias='systemPrompt')
+    user_prompt: Optional[str] = Field(..., serialization_alias='userPrompt')
+
+
+class TaskInstanceResponseSchema(BaseModel):
+    id: int
+    is_public: bool = Field(default=False, serialization_alias='isPublic')
+    input: str
+    ideal: str
+
+
 class EvalResponseSchema(BaseModel):
     id: int
+    description: Optional[str]
+    validator_type: ValidatorType = Field(...,
+                                          serialization_alias='validatorType')
+    task_instances: List[TaskInstanceResponseSchema] = Field(
+        ..., serialization_alias='taskInstances')
+    eval_runs: List[ModelSystemResponseSchema] = Field(
+        ..., serialization_alias='modelSystem')
+
+
+class TaskInstanceOutputResponseSchema(BaseModel):
+    id: int
+    output: str
+    status: EvalRunStatus
+    task_instance_id: int = Field(..., serialization_alias='taskInstanceId')
+    num_tokens: int
+
+
+class EvalRunResponseSchema(BaseModel):
+    id: int
+    model: ModelSchema
+    system_prompt: Optional[str] = Field(...,
+                                         serialization_alias='systemPrompt')
+    user_prompt: Optional[str] = Field(..., serialization_alias='userPrompt')
+    score: float
+    datetime: datetime
+    validator_type: ValidatorType = Field(...,
+                                          serialization_alias='validatorType')
+    status: EvalRunStatus
+    eval_id: int = Field(..., serialization_alias='evalId')
+    task_instance_outputs: List[TaskInstanceOutputResponseSchema] = Field(
+        ..., serialization_alias='taskInstanceOutputs')

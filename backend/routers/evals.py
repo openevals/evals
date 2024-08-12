@@ -4,7 +4,7 @@ from typing import List
 from datetime import datetime
 from backend.db.db import get_db
 from backend.db.models import Eval, TaskInstance, EvalRun, EvalRunStatus
-from backend.validation_schemas.evals import EvalSchema, EvalResponseSchema
+from backend.validation_schemas.evals import EvalSchema, EvalResponseSchema, EvalRunResponseSchema
 from backend.controllers.evals import run_eval_task
 
 evals_router = APIRouter()
@@ -53,3 +53,29 @@ def create_eval(background_tasks: BackgroundTasks, eval: EvalSchema, db: Session
         db.rollback()
         raise HTTPException(status_code=400, detail={
                             'error': 'eval-not-created'})
+
+
+@evals_router.get("/{eval_id}/get", response_model=EvalResponseSchema, status_code=200)
+def create_eval(eval_id: int, db: Session = Depends(get_db)) -> dict:
+    """
+    Get eval base details
+    """
+    # Look for the target eval
+    eval = db.query(Eval).filter(Eval.id == eval_id).first()
+    if eval:
+        return eval
+    raise HTTPException(status_code=404, detail={'error': 'eval-not-found'})
+
+
+@evals_router.get("/{eval_id}/run/{eval_run_id}/get", response_model=EvalRunResponseSchema, status_code=200)
+def create_eval(eval_id: int, eval_run_id: int, db: Session = Depends(get_db)) -> dict:
+    """
+    Get eval run result/status details
+    """
+    # Look for the target eval run
+    eval_run = db.query(EvalRun).filter(
+        EvalRun.id == eval_run_id, EvalRun.eval_id == eval_id).first()
+    if eval_run:
+        return eval_run
+    raise HTTPException(status_code=404, detail={
+                        'error': 'eval-run-not-found'})
