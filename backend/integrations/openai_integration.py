@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import Generator, List
 
@@ -9,6 +10,8 @@ from backend.db.models import Eval, TaskInstance, ValidatorType
 
 YAML_PATH = "/Users/justinwlin/Projects/research/openai/evals/evals/registry/evals"
 JSONL_DATA_PATH = "/Users/justinwlin/Projects/research/openai/evals/evals/registry/data"
+
+logger = logging.getLogger(__name__)
 
 
 class OpenAIIntegration:
@@ -119,37 +122,55 @@ class OpenAIIntegration:
 
     @staticmethod
     def main():
+        logging.basicConfig(level=logging.INFO)
         integration = OpenAIIntegration()
         with SessionLocal() as db:
             for yaml_file, jsonl_file in integration.get_openai_evals():
-                print(f"\nProcessing: {yaml_file.name} with {jsonl_file}")
+                logger.info(f"Processing: {yaml_file.name} with {jsonl_file}")
 
-                metadata = integration.parse_metadata(yaml_file)
-                samples = integration.parse_samples(jsonl_file)
+                try:
+                    metadata = integration.parse_metadata(yaml_file)
+                    samples = integration.parse_samples(jsonl_file)
 
-                eval_obj = integration.create_eval(metadata)
-                print(f"Eval: {eval_obj.name} (Type: {eval_obj.validator_type})")
-                print(f"Description: {eval_obj.description[:100]}...")
+                    eval_obj = integration.create_eval(metadata)
+                    logger.info(
+                        f"Eval: {eval_obj.name} (Type: {eval_obj.validator_type})"
+                    )
+                    logger.info(f"Description: {eval_obj.description[:100]}...")
 
-                db.add(eval_obj)
-                db.flush()
+                    db.add(eval_obj)
+                    db.flush()
+                    task_instances = integration.create_task_instances(
+                        eval_obj, samples
+                    )
+                    db.add_all(task_instances)
 
-                task_instances = integration.create_task_instances(eval_obj, samples)
-                db.add_all(task_instances)
+                    logger.info(f"Total TaskInstances: {len(task_instances)}")
+                    for i, task in enumerate(task_instances[:3], 1):
+                        logger.info(f"\nTaskInstance {i}:")
+                        logger.info(f"System Prompt: {task.system_prompt[:50]}...")
+                        logger.info(f"User Input: {task.input[:50]}...")
+                        logger.info(f"Ideal: {task.ideal[:50]}...")
 
-                print(f"Total TaskInstances: {len(task_instances)}")
-                for i, task in enumerate(task_instances[:3], 1):
-                    print(f"\nTaskInstance {i}:")
-                    print(f"System Prompt: {task.system_prompt[:50]}...")
-                    print(f"User Input: {task.input[:50]}...")
-                    print(f"Ideal: {task.ideal[:50]}...")
+                    if len(task_instances) > 3:
+                        logger.info("\n... (more TaskInstances)")
 
-                if len(task_instances) > 3:
-                    print("\n... (more TaskInstances)")
+                    try:
+                        db.commit()
+                        logger.info(
+                            f"Successfully added {yaml_file.name} to the database."
+                        )
+                    except Exception as e:
+                        db.rollback()
+                        logger.error(
+                            f"Error committing {yaml_file.name} to database: {str(e)}"
+                        )
+                        logger.error("Rolling back and continuing with next eval.")
+                except Exception as e:
+                    logger.error(f"Error processing {yaml_file.name}: {str(e)}")
+                    logger.error("Continuing with next eval.")
 
-                db.commit()
-
-        print("All data has been successfully added to the database.")
+        logger.info("Finished processing all evals.")
 
 
 if __name__ == "__main__":
