@@ -21,9 +21,9 @@ def run_eval_task(eval_id):
                         model_provider=model_provider,
                         model_name=eval_run.model.model_name,
                         input_message="",
-                        temperature=None,
-                        max_tokens=None,
-                        stop_sequences=None,
+                        temperature=0,
+                        max_tokens=4096,
+                        stop_sequences=["<END>"],
                         api_key=ModelProvider._api_key(
                             model_provider=model_provider),
                     )
@@ -35,6 +35,7 @@ def run_eval_task(eval_id):
 
                     # Iterate all task instances
                     valid_responses = 0
+                    num_task_instances = len(eval.task_instances)
                     for task_instance in eval.task_instances:
                         try:
                             # Call the model for the task instance
@@ -60,7 +61,7 @@ def run_eval_task(eval_id):
                             print(f"Error querying the model: {e}")
                             # Generate the output object with the error message
                             task_instance_output = TaskInstanceOutput(
-                                output=e,
+                                output=str(e),
                                 status=EvalRunStatus.Failed,
                                 task_instance_id=task_instance.id,
                                 model_id=eval_run.model.id,
@@ -72,7 +73,7 @@ def run_eval_task(eval_id):
                         db.commit()
 
                     # Update the eval run object
-                    eval_run.score = valid_responses/len(eval.task_instances)
+                    eval_run.score = valid_responses/num_task_instances if num_task_instances > 0 else 0
                     eval_run.datetime = datetime.now()
                     eval_run.status = EvalRunStatus.Finished
                     db.commit()
