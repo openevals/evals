@@ -19,15 +19,10 @@ export async function postNewEval(body: {
       },
       body: JSON.stringify(body)
     });
-
+    return await res.json()
   } catch (e) {
     console.error(e);
   }
-
-  return {
-    // TODO: what is returned?
-
-  };
 };
 
 // Wait for the given amount of milliseconds
