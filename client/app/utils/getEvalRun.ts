@@ -12,7 +12,7 @@ export async function postNewEval(body: {
   taskInstances: TaskInstance[];
 }) {
   try {
-    const res = await fetch(`${API_URL}/evals/create`, { 
+    const res = await fetch(`${API_URL}/evals/create`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -30,24 +30,27 @@ export async function postNewEval(body: {
   };
 };
 
+// Wait for the given amount of milliseconds
+export function waitMS(timeout: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout)
+  })
+}
+
 
 // This function will be Promise.all'd. It is called for every model system to test
-export async function getEvalRun(body: {
-  modelSystem: ModelSystem,
-  taskInstances: TaskInstance[]
-}) {
+export async function getEvalRun(evalId: number, evalRunId: number, latency = 1000) {
   try {
-    const res = await fetch('http://localhost:8000/eval-run', { // TODO: get proper route name
+    await waitMS(latency);
+    const res = await fetch(`${API_URL}/evals/${evalId}/run/${evalRunId}/get`, { // TODO: get proper route name
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify(body)
     });
-    const {
-      // TODO: figure out what response is
-    } = res.json();
-
+    return await res.json();
   } catch (e) {
     console.error(e);
   }
@@ -59,7 +62,7 @@ export async function getEvalRun(body: {
 
 export async function getSupportedModels() {
   try {
-    const res = await fetch(`${API_URL}/models/all`); 
+    const res = await fetch(`${API_URL}/models/all`);
     console.log(res);
     return await res.json();
   } catch (e) {
