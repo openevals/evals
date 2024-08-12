@@ -12,6 +12,11 @@ def validator_fuzzy_match(ideal_response, model_response):
     return fuzz.ratio(ideal_response, model_response) > 90
 
 
+def validator_includes(ideal_response, model_response):
+    """Return if the ideal response is included in the model response"""
+    return ideal_response in model_response
+
+
 def validate_response(validator_type, ideal_response, model_response):
     """Validate the given response based on the validator type"""
     if validator_type == ValidatorType.ExactMatch:
