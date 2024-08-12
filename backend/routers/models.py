@@ -8,7 +8,7 @@ from backend.validation_schemas.models import ModelSchema
 models_router = APIRouter()
 
 
-@models_router.get("/all/", response_model=List[ModelSchema], status_code=200)
+@models_router.get("/all", response_model=List[ModelSchema], status_code=200)
 def get_models(db: Session = Depends(get_db)) -> dict:
     """
     Return all registered models
