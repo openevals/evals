@@ -67,6 +67,8 @@ class TaskInstance(Base):
     ideal = Column(
         String, nullable=False
     )  # ideal output that will be validated against
+    system_prompt = Column(String, nullable=True)
+    user_prompt = Column(String, nullable=True)
 
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
     eval = relationship("Eval", back_populates="task_instances")
@@ -84,7 +86,9 @@ class TaskInstanceOutput(Base):
     __tablename__ = "task_instance_outputs"
     id = Column(Integer, primary_key=True)
     output = Column(String, nullable=False)
-    status = Column(SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued)
+    status = Column(
+        SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued
+    )
     task_instance_id = Column(Integer, ForeignKey("task_instances.id"), nullable=False)
     task_instance = relationship("TaskInstance", back_populates="outputs")
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
@@ -102,7 +106,9 @@ class EvalRun(Base):
     system_prompt = Column(String)
     user_prompt = Column(String)  # task-specific user prompt
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
-    status = Column(SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued)
+    status = Column(
+        SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued
+    )
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
     model = relationship("Model", back_populates="eval_runs")
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
