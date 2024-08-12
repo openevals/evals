@@ -1,35 +1,24 @@
-import { ValidatorType } from '../lib/constants';
+import { ValidatorType, TaskInstance, ModelSystem } from '../lib/constants';
 
-type ModelSystem = {
-  model: string;
-  userPrompt: string;
-  systemMessage: string;
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-type TaskInstance = {
-  input: string;
-  idealOutput: string;
-};
+
 
 export async function postNewEval(body: {
   name: string;
-  inputDescription: string;
-  outputDescription: string;
+  description: string;
   validator: ValidatorType;
   modelSystems: ModelSystem[];
   taskInstances: TaskInstance[];
 }) {
   try {
-    const res = await fetch('http://localhost:8000/eval-run', { // TODO: get proper route name
+    const res = await fetch(`${API_URL}/evals/create`, { 
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
       },
       body: JSON.stringify(body)
     });
-    const {
-      // TODO what is response? 
-    } = res.json();
 
   } catch (e) {
     console.error(e);
@@ -70,17 +59,12 @@ export async function getEvalRun(body: {
 
 export async function getSupportedModels() {
   try {
-    const res = await fetch('http://localhost:8000/supported-models'); // TODO: get proper route name
-    const {
-      // TODO: need response
-    } = res.json();
-
+    const res = await fetch(`${API_URL}/models/all`); 
+    console.log(res);
+    return await res.json();
   } catch (e) {
     console.error(e);
   }
 
-  return {
-    //  TODO: what is returned? 
-  };
 }
 
