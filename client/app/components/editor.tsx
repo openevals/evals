@@ -57,6 +57,7 @@ const { eval_runs } = dummyData;
 const filteredEvalRuns = eval_runs.map(({ model, score }) => ({ model, score }));
 
 import { MIN_EXAMPLES, MIN_INSTANCES, ModelSystem, ValidatorType, TaskInstance } from '@/app/lib/constants';
+import usePanels from "../lib/usePanels";
 
 interface Model {
   id: number,
@@ -81,9 +82,7 @@ export default function Editor() {
   const [outputText, setOutputText] = useState('');
   const [instances, setInstances] = useState<TaskInstance[]>([]);
 
-  const panel1Ref = useRef<ImperativePanelHandle>(null);
-  const panel2Ref = useRef<ImperativePanelHandle>(null);
-  const panel3Ref = useRef<ImperativePanelHandle>(null);
+  const [panel1Ref, panel2Ref, panel3Ref, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
 
   useEffect(() => {
     const getModels = async () => {
@@ -157,14 +156,6 @@ export default function Editor() {
       addInstance();
     }
   };
-
-  useEffect(() => {
-    if (step === 2) {
-      panel1Ref.current?.resize(30);
-      panel2Ref.current?.resize(40);
-      panel3Ref.current?.resize(30);
-    }
-  }, [step]);
 
   return (
     <>
@@ -256,11 +247,7 @@ export default function Editor() {
                           isChecked={model.checked}
                           onChange={(e) => {
                             model.checked = !model.checked;
-                            // if (e.target.checked) {
-                            //   setModels([...models, modelName]);
-                            // } else {
-                            //   setModels(models.filter((m) => m !== modelName));
-                            // }
+                            setModels([...models]);
                           }}
                         >
                           {model.modelName}
@@ -304,86 +291,90 @@ export default function Editor() {
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref}>
-          <Box w='100%' border='1px'
-              borderColor='lightgray'
-              gap={4}
-              p={4}
-              h='calc(100vh - 12rem)'
-              overflowY='auto'
-              >
-            <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
-              <Box as='span' flex='1' textAlign='left'>
-              <Heading size='sm'>Task instances</Heading>
-              </Box>
-              <Button variant='outline' ml='auto' onClick={addInstance}>
-                <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                <Text ml={2}>Add task instance</Text>
-              </Button>
-              <Button ml='auto' onClick={handleSubmit}>
-                <Text>Submit</Text>
-              </Button>
-            </HStack>
-            <HStack w='100%' pt={8}>
-              <VStack w='50%'>
-                <Text>Input</Text>
-                <Textarea 
-                  placeholder='\frac{d}{dx}x^2'
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  />
-              </VStack>
-              <VStack w='50%'>
-                <Text>Ideal Output</Text>
-                <Textarea 
-                  placeholder='2x'
-                  value={outputText}
-                  onChange={(e) => setOutputText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-              </VStack>
-            </HStack>
-            <Box pt={4}>
-              {instances.length > 0 ? (
-                <TableContainer
-                border='1px'
-                borderRadius='md'
-                borderColor='lightgray'>
-                  <Table>
-                    <Thead>
-                      <Tr>
-                        <Th>Public?</Th>
-                        <Th>Input</Th>
-                        <Th>Ideal Output</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {instances.map((instance, index) => (
-                        <Tr key={index}>
-                          <Td>
-                            <Checkbox 
-                              isChecked={instance.isPublic}
-                              onChange={(e) => {
-                                const updatedInstances = [...instances];
-                                updatedInstances[index].isPublic = e.target.checked;
-                                setInstances(updatedInstances);
-                              }}
-                            />
-                          </Td>
-                          <Td>{instance.input}</Td>
-                          <Td>{instance.ideal}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                </TableContainer>
-              ) : (
-                <Text pt={8} textAlign='center'>{`Add task instances! At least ${MIN_INSTANCES} examples, ideally more 🧪`}</Text>
-              )}
+        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false)}} onCollapse={() => { setPanel2Collapsed(true)}} >
+            <Box w='100%' border='1px'
+                borderColor='lightgray'
+                gap={4}
+                p={4}
+                h='calc(100vh - 12rem)'
+                overflowY='auto'
+                >
+              {!panel2Collapsed && (
+                <>
+                  <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
+                    <Box as='span' flex='1' textAlign='left'>
+                    <Heading size='sm'>Task instances</Heading>
+                    </Box>
+                    <Button variant='outline' ml='auto' onClick={addInstance}>
+                      <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                      <Text ml={2}>Add task instance</Text>
+                    </Button>
+                    <Button ml='auto' onClick={handleSubmit}>
+                      <Text>Submit</Text>
+                    </Button>
+                  </HStack>
+                  <HStack w='100%' pt={8}>
+                    <VStack w='50%'>
+                      <Text>Input</Text>
+                      <Textarea 
+                        placeholder='\frac{d}{dx}x^2'
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        />
+                    </VStack>
+                    <VStack w='50%'>
+                      <Text>Ideal Output</Text>
+                      <Textarea 
+                        placeholder='2x'
+                        value={outputText}
+                        onChange={(e) => setOutputText(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                      />
+                    </VStack>
+                  </HStack>
+                  <Box pt={4}>
+                    {instances.length > 0 ? (
+                      <TableContainer
+                      border='1px'
+                      borderRadius='md'
+                      borderColor='lightgray'>
+                        <Table>
+                          <Thead>
+                            <Tr>
+                              <Th>Public?</Th>
+                              <Th>Input</Th>
+                              <Th>Ideal Output</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {instances.map((instance, index) => (
+                              <Tr key={index}>
+                                <Td>
+                                  <Checkbox 
+                                    isChecked={instance.isPublic}
+                                    onChange={(e) => {
+                                      const updatedInstances = [...instances];
+                                      updatedInstances[index].isPublic = e.target.checked;
+                                      setInstances(updatedInstances);
+                                    }}
+                                  />
+                                </Td>
+                                <Td>{instance.input}</Td>
+                                <Td>{instance.ideal}</Td>
+                              </Tr>
+                            ))}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Text pt={8} textAlign='center'>{`Add task instances! At least ${MIN_INSTANCES} examples, ideally more 🧪`}</Text>
+                    )}
 
-            </Box>
-          </Box>
+                  </Box>
+                </>
+              )}
+            </Box>          
         </Panel>
         <PanelResizeHandle />
         <Panel collapsible={true} collapsedSize={2} defaultSize={32} minSize={24} ref={panel3Ref}>
