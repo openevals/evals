@@ -43,6 +43,7 @@ class TaskInstanceResponseSchema(BaseModel):
 
 class EvalResponseSchema(BaseModel):
     id: int
+    name: str
     description: Optional[str]
     validator_type: ValidatorType = Field(...,
                                           serialization_alias='validatorType')
