@@ -50,7 +50,6 @@ class Eval(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(String)
-    system_prompt = Column(String)
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
 
     authors = relationship(
@@ -65,8 +64,6 @@ class TaskInstance(Base):
     id = Column(Integer, primary_key=True)
     is_public = Column(Boolean, nullable=False, default=False)
     input = Column(String, nullable=False)
-    system_prompt = Column(String)  # overrides eval system prompt
-    user_prompt = Column(String)  # task-specific user prompt
     ideal = Column(
         String, nullable=False
     )  # ideal output that will be validated against
@@ -94,6 +91,8 @@ class EvalRun(Base):
     id = Column(Integer, primary_key=True)
     score = Column(Float, nullable=False)
     datetime = Column(DateTime, nullable=False)
+    system_prompt = Column(String)
+    user_prompt = Column(String)  # task-specific user prompt
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
     model = relationship("Model", back_populates="eval_runs")
