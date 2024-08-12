@@ -26,10 +26,10 @@ def upgrade() -> None:
     )
     op.bulk_insert(models_table,
         [
-            {'model_developer': 'OpenAI', 'model_name': 'GPT-4'},
+            {'model_developer': 'OpenAI', 'model_name': 'gpt-4'},
             {'model_developer': 'Google', 'model_name': 'Gemini-1.5-Pro-Exp-0801'},
-            {'model_developer': 'OpenAI', 'model_name': 'GPT-4o-2024-05-13'},
-            {'model_developer': 'OpenAI', 'model_name': 'GPT-4o-mini-2024-07-18'},
+            {'model_developer': 'OpenAI', 'model_name': 'gpt-4o-2024-05-13'},
+            {'model_developer': 'OpenAI', 'model_name': 'gpt-4o-mini-2024-07-18'},
             {'model_developer': 'Anthropic', 'model_name': 'claude-3-sonnet-20240620'},
             {'model_developer': 'Google', 'model_name': 'Gemini-Advanced-0514'},
             {'model_developer': 'Anthropic', 'model_name': 'claude-3-opus-20240229'},
