@@ -21,9 +21,9 @@ def run_eval_task(eval_id):
                         model_provider=model_provider,
                         model_name=eval_run.model.model_name,
                         input_message="",
-                        temperature=None,
-                        max_tokens=None,
-                        stop_sequences=None,
+                        temperature=0,
+                        max_tokens=4096,
+                        stop_sequences=["<END>"],
                         api_key=ModelProvider._api_key(
                             model_provider=model_provider),
                     )
@@ -61,7 +61,7 @@ def run_eval_task(eval_id):
                             print(f"Error querying the model: {e}")
                             # Generate the output object with the error message
                             task_instance_output = TaskInstanceOutput(
-                                output=e,
+                                output=str(e),
                                 status=EvalRunStatus.Failed,
                                 task_instance_id=task_instance.id,
                                 model_id=eval_run.model.id,
