@@ -13,7 +13,7 @@ To run the backend service, ensure the following tools are installed on your com
 To install the database server, check the following links:
 
 - [Microsoft Windows](https://www.postgresql.org/download/windows/)
-- [MaxOS](https://postgresapp.com/)
+- [MacOS](https://wiki.postgresql.org/wiki/Homebrew)
 - [GNU/Linux](https://www.postgresql.org/download/linux/)
 - [Docker Image](https://hub.docker.com/_/postgres)
 
