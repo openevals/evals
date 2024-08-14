@@ -23,4 +23,6 @@ def validate_response(validator_type, ideal_response, model_response):
         return validator_exact_match(ideal_response, model_response)
     if validator_type == ValidatorType.FuzzyMatch:
         return validator_fuzzy_match(ideal_response, model_response)
+    if validator_type == ValidatorType.Includes:
+        return validator_includes(ideal_response, model_response)
     raise Exception("Invalid validator")
