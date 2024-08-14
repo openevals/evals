@@ -18,9 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(health_router, prefix='/health')
-app.include_router(models_router, prefix='/models')
-app.include_router(evals_router, prefix='/evals')
+app.include_router(health_router, prefix="/health")
+app.include_router(models_router, prefix="/models")
+app.include_router(evals_router, prefix="/evals")
 app.include_router(health_router)
 
 # Only for debug purposes

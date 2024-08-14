@@ -6,13 +6,13 @@ from backend.validation_schemas.models import ModelSchema
 
 
 class ModelSystemSchema(BaseModel):
-    model_id: int = Field(..., alias='modelId')
-    system_prompt: Optional[str] = Field(..., alias='systemPrompt')
-    user_prompt: Optional[str] = Field(..., alias='userPrompt')
+    model_id: int = Field(..., alias="modelId")
+    system_prompt: Optional[str] = Field(..., alias="systemPrompt")
+    user_prompt: Optional[str] = Field(..., alias="userPrompt")
 
 
 class TaskInstanceSchema(BaseModel):
-    is_public: bool = Field(default=False, alias='isPublic')
+    is_public: bool = Field(default=False, alias="isPublic")
     input: str
     ideal: str
 
@@ -20,23 +20,21 @@ class TaskInstanceSchema(BaseModel):
 class EvalSchema(BaseModel):
     name: str
     description: Optional[str]
-    validator_type: ValidatorType = Field(..., alias='validatorType')
-    task_instances: List[TaskInstanceSchema] = Field(
-        ..., alias='taskInstances')
-    model_systems: List[ModelSystemSchema] = Field(..., alias='modelSystems')
+    validator_type: ValidatorType = Field(..., alias="validatorType")
+    task_instances: List[TaskInstanceSchema] = Field(..., alias="taskInstances")
+    model_systems: List[ModelSystemSchema] = Field(..., alias="modelSystems")
 
 
 class ModelSystemResponseSchema(BaseModel):
     id: int
-    model_id: int = Field(..., serialization_alias='modelId')
-    system_prompt: Optional[str] = Field(...,
-                                         serialization_alias='systemPrompt')
-    user_prompt: Optional[str] = Field(..., serialization_alias='userPrompt')
+    model_id: int = Field(..., serialization_alias="modelId")
+    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
+    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
 
 
 class TaskInstanceResponseSchema(BaseModel):
     id: int
-    is_public: bool = Field(default=False, serialization_alias='isPublic')
+    is_public: bool = Field(default=False, serialization_alias="isPublic")
     input: str
     ideal: str
 
@@ -45,33 +43,33 @@ class EvalResponseSchema(BaseModel):
     id: int
     name: str
     description: Optional[str]
-    validator_type: ValidatorType = Field(...,
-                                          serialization_alias='validatorType')
+    validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
     task_instances: List[TaskInstanceResponseSchema] = Field(
-        ..., serialization_alias='taskInstances')
+        ..., serialization_alias="taskInstances"
+    )
     eval_runs: List[ModelSystemResponseSchema] = Field(
-        ..., serialization_alias='modelSystems')
+        ..., serialization_alias="modelSystems"
+    )
 
 
 class TaskInstanceOutputResponseSchema(BaseModel):
     id: int
     output: str
     status: EvalRunStatus
-    task_instance_id: int = Field(..., serialization_alias='taskInstanceId')
+    task_instance_id: int = Field(..., serialization_alias="taskInstanceId")
     num_tokens: int
 
 
 class EvalRunResponseSchema(BaseModel):
     id: int
     model: ModelSchema
-    system_prompt: Optional[str] = Field(...,
-                                         serialization_alias='systemPrompt')
-    user_prompt: Optional[str] = Field(..., serialization_alias='userPrompt')
+    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
+    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
     score: float
     datetime: datetime
-    validator_type: ValidatorType = Field(...,
-                                          serialization_alias='validatorType')
+    validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
     status: EvalRunStatus
-    eval_id: int = Field(..., serialization_alias='evalId')
+    eval_id: int = Field(..., serialization_alias="evalId")
     task_instance_outputs: List[TaskInstanceOutputResponseSchema] = Field(
-        ..., serialization_alias='taskInstanceOutputs')
+        ..., serialization_alias="taskInstanceOutputs"
+    )

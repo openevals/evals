@@ -1,0 +1,10 @@
+repos:
+-   repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+    -   id: black
+        language: system
+        entry: bash -c 'cd backend && poetry run black .'
+        types: [python]
+        exclude: ^alembic/versions/
+        pass_filenames: true

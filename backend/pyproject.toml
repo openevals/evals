@@ -2,7 +2,7 @@
 name = "openevals"
 version = "0.1.0"
 description = ""
-authors = ["Justin W. Lin <justin@lin.ai>"]
+authors = ["Justin W. Lin <justin@lin.ai>", "Amy Deng <kexindeng2000@gmail.com>"]
 readme = "README.md"
 package-mode = false
 
@@ -23,6 +23,30 @@ pydantic = "^2.8.2"
 fuzzywuzzy = "^0.18.0"
 
 
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+pre-commit = "^3.8.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py37']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | alembic/versions
+)/
+'''
