@@ -1,6 +1,6 @@
 import os
 import base64
-from fastapi import FastAPI, HTTPException, Depends, Security
+from fastapi import FastAPI, Request, HTTPException, Depends, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -8,6 +8,7 @@ import jwt
 from jwt import PyJWTError, ExpiredSignatureError
 from backend.db.db import get_db
 from backend.db.models import User
+from backend.validation_schemas.oauth import RefreshTokenSchema
 
 # Get JWT private/public key
 private_key = base64.b64decode(os.getenv("PRIVATE_KEY")).decode()
@@ -86,3 +87,60 @@ def validate_token(
         )
 
     return {"payload": payload, "user": user}
+
+
+def validate_refresh_token(
+    refresh: RefreshTokenSchema,
+    http_auth: HTTPAuthorizationCredentials = Security(TOKEN_SECURITY),
+    db: Session = Depends(get_db),
+):
+    """Validate the refresh token to validate new tokens pair"""
+    try:
+        # Decode access token ignoring if the token is expired
+        access_payload = jwt.decode(
+            http_auth.credentials,
+            public_key,
+            algorithms=["RS256"],
+            audience=TOKEN_AUD_ISS,
+            issuer=TOKEN_AUD_ISS,
+            options={"verify_exp": False},
+        )
+    except PyJWTError as e:
+        print(f"Validation error: {e}")
+        raise HTTPException(status_code=401, detail={"error": "invalid-token"})
+
+    print(refresh)
+
+    try:
+        refresh_payload = jwt.decode(
+            refresh.refresh_token,
+            public_key,
+            algorithms=["RS256"],
+            audience=TOKEN_AUD_ISS,
+            issuer=TOKEN_AUD_ISS,
+        )
+        if (
+            refresh_payload["iat"] != access_payload["iat"]
+            or refresh_payload["sub"] != access_payload["sub"]
+        ):
+            raise Exception("Token mismatch")
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail={"error": "token-expired"})
+    except Exception as e:
+        print(f"Validation error: {e}")
+        raise HTTPException(status_code=401, detail={"error": "invalid-token"})
+
+    # Look for the associated user
+    user = (
+        db.query(User)
+        .filter(
+            User.id == refresh_payload["uid"], User.github_id == refresh_payload["sub"]
+        )
+        .first()
+    )
+    if not user:
+        raise HTTPException(
+            status_code=401, detail={"error": "invalid-user-credential"}
+        )
+
+    return {"payload": refresh_payload, "user": user}

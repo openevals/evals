@@ -14,7 +14,7 @@ from backend.controllers.github import (
     get_user_info,
     get_user_emails,
 )
-from backend.controllers.jwt import generate_tokens
+from backend.controllers.jwt import generate_tokens, validate_refresh_token
 
 oauth_router = APIRouter()
 
@@ -94,4 +94,20 @@ async def oauth_token(code: CodeExchangeSchema, db: Session = Depends(get_db)) -
         "access_token": access_token,
         "refresh_token": refresh_token,
         "profile": user,
+    }
+
+
+@oauth_router.post("/refresh", response_model=OAuthTokenResponseSchema, status_code=200)
+async def oauth_refresh(auth: dict = Depends(validate_refresh_token)) -> dict:
+    """
+    Refresh an access token for new access/refresh pair
+    """
+    # Generate the access/refresh tokens pair
+    print(auth)
+    (access_token, refresh_token) = generate_tokens(auth["user"])
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "profile": auth["user"],
     }
