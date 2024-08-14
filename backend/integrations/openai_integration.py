@@ -8,8 +8,8 @@ import yaml
 from backend.db.db import SessionLocal
 from backend.db.models import Eval, TaskInstance, ValidatorType
 
-YAML_PATH = "/Users/justinwlin/Projects/research/openai/evals/evals/registry/evals"
-JSONL_DATA_PATH = "/Users/justinwlin/Projects/research/openai/evals/evals/registry/data"
+JSONL_DATA_PATH = "/Users/amydeng/Documents/Projects/openai-evals/evals/registry/data"
+YAML_PATH = "/Users/amydeng/Documents/Projects/openai-evals/evals/registry/evals"
 
 logger = logging.getLogger(__name__)
 

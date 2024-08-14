@@ -253,7 +253,7 @@ export default function Editor() {
                 </h2>
                 <AccordionPanel pb={4}>
                   <Wrap direction='column'>
-                    {models.map((model) => (
+                    {models?.map((model) => (
                       <WrapItem key={model.modelName}>
                         <Checkbox
                           isChecked={model.checked}

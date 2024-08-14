@@ -99,7 +99,7 @@ If there are no new updates, the command will return without applying any change
 To run the API service, use one of the following commands:
 
 ```bash
-uvicorn backend.main:app --host=0.0.0.0 --port=8000 --log-level=debug --reload
+PYTHONPATH=../ poetry run uvicorn backend.main:app --host=0.0.0.0 --port=8000 --log-level=debug --reload
 # or
 python main.py
 ```
