@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function AuthenticationPage() {
   return (
-    <GithubLoginButton />
+    <GithubLoginButton text="Sign in with GitHub" />
   );
 }

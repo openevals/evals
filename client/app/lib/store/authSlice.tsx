@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { IUserProfile } from '@/app/lib/types';
+import { IUserProfileResponse } from '@/app/lib/types';
 
 const initialState: {
   token?: string;
   refresh?: string;
-  profile?: IUserProfile;
+  profile?: IUserProfileResponse;
   isAuthenticated: boolean;
 } = {
   token: undefined,
