@@ -78,6 +78,33 @@ The service currently supports the three major AI models providers. API keys for
 - `ANTHROPIC_API_KEY`: Anthropic API key for Claude models.
 - `GOOGLE_API_KEY`: Google API key for Genesis models.
 
+#### OAuth configuration
+
+This service utilizes GitHub OAuth for managing user accounts. To set this up, you need to configure the following GitHub client environment variables:
+
+- `GITHUB_CLIENT_ID`: The client ID obtained from your OAuth application on GitHub.
+- `GITHUB_CLIENT_SECRET`: The client secret associated with your OAuth application on GitHub.
+- `WEB_URL`: The base URL for the web client.
+
+Additionally, you must configure a pair of private/public keys to enable secure signing and verification of JWT tokens used in authenticating communications between the web client and backend service:
+
+- `PRIVATE_KEY`: A Base64-encoded string containing the private key, which is used to sign the JWT tokens.
+- `PUBLIC_KEY`: A Base64-encoded string containing the public key, which is used to verify the signatures of JWT tokens.
+
+Follow these commands to generate the necessary private/public keys:
+
+```bash
+# Generate the private key
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096
+# Extract the public key from the private key
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+
+# Convert the private key to a Base64 string
+cat private_key.pem | base64 | tr -d '\n'
+# Convert the public key to a Base64 string
+cat public_key.pem | base64 | tr -d '\n'
+```
+
 #### Running database migrations
 
 After configuring the environment variables, database migrations should be applied to ensure the service is working with the latest database version. Migrations can be applied with the following command:

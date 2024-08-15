@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.routers.health import health_router
 from backend.routers.models import models_router
 from backend.routers.evals import evals_router
+from backend.routers.oauth import oauth_router
+from backend.routers.account import account_router
 
 app = FastAPI(title="OpenEvals")
 
@@ -21,6 +23,8 @@ app.add_middleware(
 app.include_router(health_router, prefix="/health")
 app.include_router(models_router, prefix="/models")
 app.include_router(evals_router, prefix="/evals")
+app.include_router(oauth_router, prefix="/oauth")
+app.include_router(account_router, prefix="/account")
 app.include_router(health_router)
 
 # Only for debug purposes

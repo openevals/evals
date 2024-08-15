@@ -1,23 +1,26 @@
-import { ValidatorType, TaskInstance, ModelSystem, API_URL } from '../lib/constants';
+import { API_URL } from "@/app/lib/constants";
+import { ValidatorType, TaskInstance, ModelSystem, IModelResponse, IEvalResponse, IEvalRunResponse } from '@/app/lib/types';
 
-export async function postNewEval(body: {
+export async function postNewEval(accessToken: string, body: {
   name: string;
   description: string;
   validatorType: ValidatorType;
   modelSystems: ModelSystem[];
   taskInstances: TaskInstance[];
-}) {
+}): Promise<IEvalResponse> {
   try {
     const res = await fetch(`${API_URL}/evals/create`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${accessToken}`,
         'Content-type': 'application/json',
       },
       body: JSON.stringify(body)
     });
-    return await res.json()
+    return await res.json() as IEvalResponse
   } catch (e) {
     console.error(e);
+    throw e
   }
 };
 
@@ -32,7 +35,7 @@ export function waitMS(timeout: number): Promise<void> {
 
 
 // This function will be Promise.all'd. It is called for every model system to test
-export async function getEvalRun(evalId: number, evalRunId: number, latency = 1000) {
+export async function getEvalRun(evalId: number, evalRunId: number, latency = 1000): Promise<IEvalRunResponse> {
   try {
     await waitMS(latency);
     const res = await fetch(`${API_URL}/evals/${evalId}/run/${evalRunId}/get`, { // TODO: get proper route name
@@ -41,24 +44,20 @@ export async function getEvalRun(evalId: number, evalRunId: number, latency = 10
         'Content-type': 'application/json',
       },
     });
-    return await res.json();
+    return await res.json() as IEvalRunResponse;
   } catch (e) {
     console.error(e);
+    throw e
   }
-
-  return { // todo: fill in based on response
-    taskInstanceOutput: [] // series of strings that are the model system's output, in the same order as taskInstances
-  };
 }
 
-export async function getSupportedModels() {
+export async function getSupportedModels(): Promise<IModelResponse[]> {
   try {
     const res = await fetch(`${API_URL}/models/all`);
-    console.log(res);
-    return await res.json();
+    return await res.json() as IModelResponse[];
   } catch (e) {
     console.error(e);
+    throw e
   }
-
 }
 
