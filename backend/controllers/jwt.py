@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import jwt
 from jwt import PyJWTError, ExpiredSignatureError
-from backend.db.db import get_db
-from backend.db.models import User
-from backend.validation_schemas.oauth import RefreshTokenSchema
+from db.db import get_db
+from db.models import User
+from validation_schemas.oauth import RefreshTokenSchema
 
 # Get JWT private/public key
 private_key = base64.b64decode(os.getenv("PRIVATE_KEY")).decode()

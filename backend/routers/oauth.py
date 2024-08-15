@@ -2,19 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 import uuid
-from backend.db.db import get_db
-from backend.db.models import OAuth2Sates, User
-from backend.validation_schemas.oauth import (
+from db.db import get_db
+from db.models import OAuth2Sates, User
+from validation_schemas.oauth import (
     StateResponseSchema,
     CodeExchangeSchema,
     OAuthTokenResponseSchema,
 )
-from backend.controllers.github import (
+from controllers.github import (
     exchange_auth_code,
     get_user_info,
     get_user_emails,
 )
-from backend.controllers.jwt import generate_tokens, validate_refresh_token
+from controllers.jwt import generate_tokens, validate_refresh_token
 
 oauth_router = APIRouter()
 

@@ -38,14 +38,6 @@ poetry shell
 
 A new virtual environment will be created for the current project. If there is a pre-existing environment for the project, it will be activated.
 
-After creating or activating the environment, the `PYTHONPATH` environment variable should be set to establish the correct path for importing base project files.
-
-```bash
-export PYTHONPATH=../
-```
-
-In this case, the `PYTHONPATH` is set to the repository's root folder (`evals`), not the default value that points to the project root folder (`backend`). The current value is set as a relative path but can be set as an absolute path.
-
 ### Installing dependencies
 
 To install dependencies and pre-commit hooks, run the following commands:
@@ -126,7 +118,7 @@ If there are no new updates, the command will return without applying any change
 To run the API service, use one of the following commands:
 
 ```bash
-PYTHONPATH=../ poetry run uvicorn backend.main:app --host=0.0.0.0 --port=8000 --log-level=debug --reload
+poetry run uvicorn main:app --host=0.0.0.0 --port=8000 --log-level=debug --reload
 # or
 python main.py
 ```
@@ -139,13 +131,12 @@ After running the service, API documentation can be viewed at [OpenEvals Backend
 
 ### Testing
 
-To run pytest, make sure `/backend` directory is in the PYTHONPATH.
 ```bash
 cd backend
-poetry run pytest
+PYTHONPAT=. poetry run pytest
 ```
 
 To run tests in a single file, run
 ```bash
-poetry run pytest <file-path>
+PYTHONPAT=. poetry run pytest <file-path>
 ```

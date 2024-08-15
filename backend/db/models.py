@@ -5,7 +5,7 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
-from backend.db import Base
+from db import Base
 
 eval_authors = Table(
     "eval_authors",

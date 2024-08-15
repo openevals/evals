@@ -1,7 +1,7 @@
 import pytest
 import tiktoken
 
-from backend.models.model_provider import (
+from models.model_provider import (
     ModelInput,
     ModelProvider,
     ModelProviderType,

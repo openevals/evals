@@ -1,8 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from backend.db.models import ValidatorType, EvalRunStatus
-from backend.validation_schemas.models import ModelSchema
+from db.models import ValidatorType, EvalRunStatus
+from validation_schemas.models import ModelSchema
 
 
 class ModelSystemSchema(BaseModel):

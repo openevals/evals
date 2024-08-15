@@ -3,8 +3,8 @@ from sqlalchemy import update
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
-from backend.db.db import get_db
-from backend.db.models import (
+from db.db import get_db
+from db.models import (
     Eval,
     TaskInstance,
     EvalRun,
@@ -12,15 +12,15 @@ from backend.db.models import (
     eval_authors,
     EvalUpvote,
 )
-from backend.validation_schemas.evals import (
+from validation_schemas.evals import (
     EvalSchema,
     EvalResponseSchema,
     EvalRunResponseSchema,
     EvalListItemResponseSchema,
     EvalUpvotesResponseSchema,
 )
-from backend.controllers.evals import run_eval_task
-from backend.controllers.jwt import validate_token, validate_optional_token
+from controllers.evals import run_eval_task
+from controllers.jwt import validate_token, validate_optional_token
 
 evals_router = APIRouter()
 
