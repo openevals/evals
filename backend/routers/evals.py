@@ -1,14 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 from backend.db.db import get_db
-from backend.db.models import Eval, TaskInstance, EvalRun, EvalRunStatus, eval_authors
+from backend.db.models import (
+    Eval,
+    TaskInstance,
+    EvalRun,
+    EvalRunStatus,
+    eval_authors,
+    EvalUpvote,
+)
 from backend.validation_schemas.evals import (
     EvalSchema,
     EvalResponseSchema,
     EvalRunResponseSchema,
     EvalListItemResponseSchema,
+    EvalUpvotesResponseSchema,
 )
 from backend.controllers.evals import run_eval_task
 from backend.controllers.jwt import validate_token
@@ -116,19 +125,6 @@ def get_evals(db: Session = Depends(get_db)) -> dict:
     evals = db.query(Eval).all()
     if evals:
         return evals
-    raise HTTPException(status_code=404, detail={"error": "eval-run-not-found"})
-
-
-@evals_router.get(
-    "/all", response_model=List[EvalListItemResponseSchema], status_code=200
-)
-def get_evals(db: Session = Depends(get_db)) -> dict:
-    """
-    Get all evals
-    """
-    evals = db.query(Eval).all()
-    if evals:
-        return evals
     raise HTTPException(status_code=404, detail={"error": "evals-not-found"})
 
 
@@ -150,3 +146,44 @@ def search_evals(query: str, db: Session = Depends(get_db)) -> Optional[List[Eva
         }.values()
     )
     return evals
+
+
+@evals_router.get(
+    "/{eval_id}/upvote", response_model=EvalUpvotesResponseSchema, status_code=200
+)
+def eval_upvote(
+    eval_id: int, db: Session = Depends(get_db), auth: dict = Depends(validate_token)
+) -> dict:
+    """
+    Upvote an eval
+    """
+    # Look for the target eval
+    eval = db.query(Eval).filter(Eval.id == eval_id).first()
+    if not eval:
+        raise HTTPException(status_code=404, detail={"error": "eval-not-found"})
+
+    # Check if the user already has upvoted the eval
+    eval_upvote = (
+        db.query(EvalUpvote)
+        .filter(EvalUpvote.eval.id == eval_id, EvalUpvote.user_id == auth["user"].id)
+        .first()
+    )
+    if not eval_upvote:
+        # Register the new upvote
+        eval_upvote = EvalUpvote(
+            eval_id=eval_id,
+            user_id=auth["user"].id,
+        )
+        db.add(eval_upvote)
+        inc = 1
+    else:
+        db.delete(eval_upvote)
+        inc = -1
+
+        # Increment the eval upvotes number
+        db.execute(
+            update(Eval).where(Eval.id == eval_id).values(upvotes=Eval.upvotes + inc)
+        )
+    db.commit()
+
+    return eval

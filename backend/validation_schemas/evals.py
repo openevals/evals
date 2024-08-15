@@ -58,6 +58,7 @@ class EvalResponseSchema(BaseModel):
         ..., serialization_alias="modelSystems"
     )
     authors: List[EvalAuthorResponse]
+    upvotes: int
 
 
 class EvalListItemResponseSchema(BaseModel):
@@ -88,3 +89,7 @@ class EvalRunResponseSchema(BaseModel):
     task_instance_outputs: List[TaskInstanceOutputResponseSchema] = Field(
         ..., serialization_alias="taskInstanceOutputs"
     )
+
+
+class EvalUpvotesResponseSchema(BaseModel):
+    upvotes: int
