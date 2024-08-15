@@ -66,6 +66,8 @@ class EvalListItemResponseSchema(BaseModel):
     name: str
     description: Optional[str]
     validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
+    upvotes: int
+    upvoted: bool
 
 
 class TaskInstanceOutputResponseSchema(BaseModel):
@@ -93,3 +95,4 @@ class EvalRunResponseSchema(BaseModel):
 
 class EvalUpvotesResponseSchema(BaseModel):
     upvotes: int
+    upvoted: bool
