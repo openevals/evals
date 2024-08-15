@@ -1,13 +1,13 @@
 from datetime import datetime
-from backend.db.db import SessionLocal
-from backend.db.models import Eval, TaskInstanceOutput, EvalRunStatus
-from backend.models.model_provider import (
+from db.db import SessionLocal
+from db.models import Eval, TaskInstanceOutput, EvalRunStatus
+from models.model_provider import (
     query,
     ModelQueryInput,
     ModelProviderType,
     ModelProvider,
 )
-from backend.controllers.validation import validate_response
+from controllers.validation import validate_response
 
 
 def run_eval_task(eval_id):

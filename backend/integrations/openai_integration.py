@@ -5,8 +5,8 @@ from typing import Generator, List
 
 import yaml
 
-from backend.db.db import SessionLocal
-from backend.db.models import Eval, TaskInstance, ValidatorType
+from db.db import SessionLocal
+from db.models import Eval, TaskInstance, ValidatorType
 
 JSONL_DATA_PATH = "/Users/amydeng/Documents/Projects/openai-evals/evals/registry/data"
 YAML_PATH = "/Users/amydeng/Documents/Projects/openai-evals/evals/registry/evals"

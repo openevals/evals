@@ -1,5 +1,5 @@
 from fuzzywuzzy import fuzz
-from backend.db.models import ValidatorType
+from db.models import ValidatorType
 
 
 def validator_exact_match(ideal_response, model_response):

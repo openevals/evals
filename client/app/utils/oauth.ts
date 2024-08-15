@@ -13,9 +13,9 @@ export async function requestStateCode(): Promise<IStateResponse> {
         'Content-type': 'application/json',
       }
     });
-    return await res.json() as IStateResponse
+    return await res.json() as IStateResponse;
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
@@ -34,9 +34,9 @@ export async function exchangeOAuthCode(code: string, state: string): Promise<IA
       },
       body: JSON.stringify({ code, state })
     });
-    return await res.json() as IAuthResponse
+    return await res.json() as IAuthResponse;
   } catch (error) {
-    throw error
+    throw error;
   }
 };
 
@@ -57,8 +57,8 @@ export async function refreshToken(accessToken: string, refreshToken: string): P
       },
       body: JSON.stringify({ refreshToken })
     });
-    return await res.json() as IAuthResponse
+    return await res.json() as IAuthResponse;
   } catch (error) {
-    throw error
+    throw error;
   }
 };

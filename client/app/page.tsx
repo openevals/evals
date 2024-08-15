@@ -4,7 +4,7 @@ import {
   Input, HStack, Button, Heading, Spacer, Box, Link,
   Tabs, TabList, TabPanels, Tab, TabPanel, Avatar,
   Menu, MenuButton, MenuList, MenuItem, MenuDivider,
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 import Editor from "./components/editor";
 import Results from "./components/results";
 
@@ -29,10 +29,10 @@ export default function Home() {
     if (isAuthenticated) {
       getUserProfile(accessToken).then((value) => {
         dispatch(setUserProfile(value));
-      })
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
 
   return (

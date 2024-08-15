@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from backend.validation_schemas.account import UserProfileResponseSchema
+from validation_schemas.account import UserProfileResponseSchema
 
 
 class StateResponseSchema(BaseModel):

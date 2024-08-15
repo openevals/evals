@@ -17,7 +17,7 @@ import useEvalResults from "../lib/hooks/useEvalResults";
 
 
 export default function EvalRunResults({ evalId, evalRunIds, evalName }: { evalId: number, evalRunIds: number[], evalName: string }) {
-  const { evalRuns } = useEvalResults(evalId, evalRunIds)
+  const { evalRuns } = useEvalResults(evalId, evalRunIds);
 
   return (
     <>
@@ -45,5 +45,5 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName }: { evalI
         </TableContainer>
       </TabPanel>
     </>
-  )
+  );
 }

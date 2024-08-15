@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from backend.validation_schemas.account import UserProfileResponseSchema
-from backend.controllers.jwt import validate_token
+from validation_schemas.account import UserProfileResponseSchema
+from controllers.jwt import validate_token
 
 account_router = APIRouter()
 

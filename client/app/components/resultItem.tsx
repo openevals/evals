@@ -5,10 +5,16 @@ export default function ResultItem({
   name,
   description,
   validatorType,
+  upvotes,
+  upvoted,
+  onUpvote,
 }: {
   name: string;
   description: string;
   validatorType: string;
+  upvotes: number;
+  upvoted: boolean;
+  onUpvote: () => void;
 }) {
   return (
     <Card
@@ -38,8 +44,8 @@ export default function ResultItem({
         </CardFooter>
       </Stack>
       <Stack m={4} ml='auto'>
-        <VoteButton votes={Math.floor(Math.random() * 100)} />
+        <VoteButton votes={upvotes} upvoted={upvoted} onUpvote={() => onUpvote()} />
       </Stack>
     </Card>
-  )
+  );
 }

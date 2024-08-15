@@ -1,8 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from backend.db.models import ValidatorType, EvalRunStatus
-from backend.validation_schemas.models import ModelSchema
+from db.models import ValidatorType, EvalRunStatus
+from validation_schemas.models import ModelSchema
 
 
 class ModelSystemSchema(BaseModel):
@@ -58,6 +58,7 @@ class EvalResponseSchema(BaseModel):
         ..., serialization_alias="modelSystems"
     )
     authors: List[EvalAuthorResponse]
+    upvotes: int
 
 
 class EvalListItemResponseSchema(BaseModel):
@@ -65,6 +66,8 @@ class EvalListItemResponseSchema(BaseModel):
     name: str
     description: Optional[str]
     validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
+    upvotes: int
+    upvoted: bool
 
 
 class TaskInstanceOutputResponseSchema(BaseModel):
@@ -88,3 +91,8 @@ class EvalRunResponseSchema(BaseModel):
     task_instance_outputs: List[TaskInstanceOutputResponseSchema] = Field(
         ..., serialization_alias="taskInstanceOutputs"
     )
+
+
+class EvalUpvotesResponseSchema(BaseModel):
+    upvotes: int
+    upvoted: bool

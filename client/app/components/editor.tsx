@@ -141,13 +141,13 @@ export default function Editor() {
     });
 
     /* Show results and keep polling until eval run is finished */
-    setEvalName(newEval.name)
-    setEvalId(newEval.id)
-    console.log(newEval)
+    setEvalName(newEval.name);
+    setEvalId(newEval.id);
+    console.log(newEval);
     console.log(newEval.modelSystems.map((value: any) => value.id));
-    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id))
+    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
     setStep(3);
-  }
+  };
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
@@ -161,9 +161,9 @@ export default function Editor() {
       setOutputText('');
 
     } else {
-      console.error('Input text and output text must not be empty')
+      console.error('Input text and output text must not be empty');
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -309,7 +309,7 @@ export default function Editor() {
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false) }} onCollapse={() => { setPanel2Collapsed(true) }} >
+        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false); }} onCollapse={() => { setPanel2Collapsed(true); }} >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             gap={4}
@@ -428,5 +428,5 @@ export default function Editor() {
         </Panel>
       </PanelGroup>
     </>
-  )
+  );
 }
