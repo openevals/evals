@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 from backend.db.db import get_db
 from backend.db.models import Eval, TaskInstance, EvalRun, EvalRunStatus, eval_authors
@@ -105,20 +105,10 @@ def get_eval_run_details(
         return eval_run
     raise HTTPException(status_code=404, detail={"error": "eval-run-not-found"})
 
-@evals_router.get("/all",
-response_model=List[EvalListItemResponseSchema], status_code=200)
-def get_evals(db: Session = Depends(get_db)) -> dict:
-    """
-    Get all evals
-    """
-    evals = db.query(Eval).all()
-    if evals:
-        return evals
-    raise HTTPException(status_code=404, detail={
-                        'error': 'eval-run-not-found'})
 
-@evals_router.get("/all",
-response_model=List[EvalListItemResponseSchema], status_code=200)
+@evals_router.get(
+    "/all", response_model=List[EvalListItemResponseSchema], status_code=200
+)
 def get_evals(db: Session = Depends(get_db)) -> dict:
     """
     Get all evals
@@ -126,5 +116,37 @@ def get_evals(db: Session = Depends(get_db)) -> dict:
     evals = db.query(Eval).all()
     if evals:
         return evals
-    raise HTTPException(status_code=404, detail={
-                        'error': 'evals-not-found'})
+    raise HTTPException(status_code=404, detail={"error": "eval-run-not-found"})
+
+
+@evals_router.get(
+    "/all", response_model=List[EvalListItemResponseSchema], status_code=200
+)
+def get_evals(db: Session = Depends(get_db)) -> dict:
+    """
+    Get all evals
+    """
+    evals = db.query(Eval).all()
+    if evals:
+        return evals
+    raise HTTPException(status_code=404, detail={"error": "evals-not-found"})
+
+
+@evals_router.post(
+    "/search", response_model=List[EvalListItemResponseSchema], status_code=200
+)
+def search_evals(query: str, db: Session = Depends(get_db)) -> Optional[List[Eval]]:
+    """
+    Search evals by name and description. Evals with name matches are returned first.
+    """
+    name_matched_evals = db.query(Eval).filter(Eval.name.ilike(f"%{query}%")).all()
+    description_matched_evals = (
+        db.query(Eval).filter(Eval.description.ilike(f"%{query}%")).all()
+    )
+    # dedup the evals while preserving the order
+    evals = list(
+        {
+            eval.id: eval for eval in name_matched_evals + description_matched_evals
+        }.values()
+    )
+    return evals
