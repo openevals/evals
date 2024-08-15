@@ -38,6 +38,7 @@ class User(Base):
     authored_evals = relationship(
         "Eval", secondary=eval_authors, back_populates="authors"
     )
+    eval_upvotes = relationship("EvalUpvote", back_populates="user")
 
 
 class Model(Base):
@@ -55,12 +56,23 @@ class Eval(Base):
     name = Column(String, nullable=False)
     description = Column(String)
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
+    upvotes = Column(Integer, nullable=False, default=0)
 
     authors = relationship(
         "User", secondary=eval_authors, back_populates="authored_evals"
     )
     task_instances = relationship("TaskInstance", back_populates="eval")
     eval_runs = relationship("EvalRun", back_populates="eval")
+    user_upvotes = relationship("EvalUpvote", back_populates="eval")
+
+
+class EvalUpvote(Base):
+    __tablename__ = "evals_upvotes"
+    id = Column(Integer, primary_key=True)
+    eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
+    eval = relationship("Eval", back_populates="user_upvotes")
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User", back_populates="eval_upvotes")
 
 
 class TaskInstance(Base):
