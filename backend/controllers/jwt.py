@@ -75,6 +75,9 @@ def validate_token(
         print(f"Validation error: {e}")
         raise HTTPException(status_code=401, detail={"error": "invalid-token"})
 
+    if payload["type"] != "access":
+        raise HTTPException(status_code=401, detail={"error": "invalid-token"})
+
     # Look for the associated user
     user = (
         db.query(User)
@@ -109,7 +112,8 @@ def validate_refresh_token(
         print(f"Validation error: {e}")
         raise HTTPException(status_code=401, detail={"error": "invalid-token"})
 
-    print(refresh)
+    if access_payload["type"] != "access":
+        raise HTTPException(status_code=401, detail={"error": "invalid-token"})
 
     try:
         refresh_payload = jwt.decode(
@@ -120,7 +124,8 @@ def validate_refresh_token(
             issuer=TOKEN_AUD_ISS,
         )
         if (
-            refresh_payload["iat"] != access_payload["iat"]
+            refresh_payload["type"] != "refresh"
+            or refresh_payload["iat"] != access_payload["iat"]
             or refresh_payload["sub"] != access_payload["sub"]
         ):
             raise Exception("Token mismatch")
