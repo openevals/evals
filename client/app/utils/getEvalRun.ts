@@ -17,10 +17,10 @@ export async function postNewEval(accessToken: string, body: {
       },
       body: JSON.stringify(body)
     });
-    return await res.json() as IEvalResponse
+    return await res.json() as IEvalResponse;
   } catch (e) {
     console.error(e);
-    throw e
+    throw e;
   }
 };
 
@@ -29,8 +29,8 @@ export function waitMS(timeout: number): Promise<void> {
   return new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve();
-    }, timeout)
-  })
+    }, timeout);
+  });
 }
 
 
@@ -47,7 +47,7 @@ export async function getEvalRun(evalId: number, evalRunId: number, latency = 10
     return await res.json() as IEvalRunResponse;
   } catch (e) {
     console.error(e);
-    throw e
+    throw e;
   }
 }
 
@@ -57,7 +57,7 @@ export async function getSupportedModels(): Promise<IModelResponse[]> {
     return await res.json() as IModelResponse[];
   } catch (e) {
     console.error(e);
-    throw e
+    throw e;
   }
 }
 

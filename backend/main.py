@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Include service routes
-from backend.routers.health import health_router
-from backend.routers.models import models_router
-from backend.routers.evals import evals_router
-from backend.routers.oauth import oauth_router
-from backend.routers.account import account_router
+from routers.health import health_router
+from routers.models import models_router
+from routers.evals import evals_router
+from routers.oauth import oauth_router
+from routers.account import account_router
 
 app = FastAPI(title="OpenEvals")
 
@@ -31,6 +31,4 @@ app.include_router(health_router)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        "backend.main:app", host="0.0.0.0", port=8000, reload=True, log_level="debug"
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="debug")

@@ -1,7 +1,7 @@
 import pytest
 from fuzzywuzzy import fuzz
 
-from backend.controllers.validation import (
+from controllers.validation import (
     validator_exact_match,
     validator_fuzzy_match,
     validator_includes,

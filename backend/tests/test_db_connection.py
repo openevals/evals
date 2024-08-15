@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from backend.db.db import SessionLocal
+from db.db import SessionLocal
 
 
 def test_sync_db_connection():
