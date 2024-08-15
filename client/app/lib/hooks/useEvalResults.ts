@@ -5,13 +5,13 @@ import { getEvalRun } from '../../utils/getEvalRun';
 const FINISHED_STATUS = ['Failed', 'Finished'];
 
 const useEvalResults = (evalId: number, evalRunIds: number[]) => {
-  const [evalRuns, setEvalRuns] = useState<any[]>([])
-  const evalRunsRef = useRef<any[]>()
+  const [evalRuns, setEvalRuns] = useState<any[]>([]);
+  const evalRunsRef = useRef<any[]>();
 
   /* Keeps reference updated */
   useEffect(() => {
-    evalRunsRef.current = evalRuns
-  }, [evalRuns])
+    evalRunsRef.current = evalRuns;
+  }, [evalRuns]);
 
   /* Keep the object state updated */
   const updateObjState = (obj: any) => {
@@ -21,7 +21,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
       return (value.id === obj.id) ? obj : value;
     });
     setEvalRuns([...newObjs]);
-  }
+  };
 
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
     /* Poll the response of the eval run until the object get a finisehd status */
     const loadUntilFinished = async (evalRunId: number, latency: number) => {
       let itr = 0;
-      let obj = await getEvalRun(evalId, evalRunId, 0)
+      let obj = await getEvalRun(evalId, evalRunId, 0);
       let lastStatus = obj.status;
       updateObjState(obj);
       while (!FINISHED_STATUS.includes(lastStatus)) {
@@ -40,7 +40,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
         updateObjState(obj);
 
       }
-    }
+    };
 
     const newObjs = evalRunIds.map((evalRunId: number) => {
       return {
@@ -58,19 +58,19 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
         status: "",
         evalId: 0,
         taskInstanceOutputs: []
-      }
+      };
     });
     setEvalRuns(newObjs);
 
     evalRunIds.forEach((id: number, idx: number) => {
-      loadUntilFinished(id, 1000 * (idx + 1))
+      loadUntilFinished(id, 1000 * (idx + 1));
     });
 
-    return () => { }
-  }, [evalId, evalRunIds])
+    return () => { };
+  }, [evalId, evalRunIds]);
 
 
   return { evalRuns };
-}
+};
 
 export default useEvalResults;

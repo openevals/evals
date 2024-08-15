@@ -15,8 +15,8 @@ export async function getUserProfile(accessToken: string): Promise<IAuthResponse
         'Content-type': 'application/json',
       },
     });
-    return await res.json() as IAuthResponse
+    return await res.json() as IAuthResponse;
   } catch (error) {
-    throw error
+    throw error;
   }
 };

@@ -8,7 +8,7 @@ export async function getEvals(accessToken?: string): Promise<IEvalListItemRespo
       'Content-type': 'application/json',
     };
     if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`
+      headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
     const res = await fetch(`${API_URL}/evals/all`, {
@@ -18,6 +18,6 @@ export async function getEvals(accessToken?: string): Promise<IEvalListItemRespo
     return await res.json() as IEvalListItemResponse[];
   } catch (e) {
     console.error(e);
-    throw e
+    throw e;
   }
 }

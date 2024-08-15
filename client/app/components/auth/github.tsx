@@ -8,8 +8,8 @@ import { useState, useEffect } from "react";
 
 export default function GithubLoginButton({ text, height = 48 }: { text: string, height?: number }) {
   const [loading, setLoading] = useState(false);
-  const toast = useToast()
-  const router = useRouter()
+  const toast = useToast();
+  const router = useRouter();
 
   // Get error message added by next/auth in URL.
   const searchParams = useSearchParams();
@@ -35,11 +35,11 @@ export default function GithubLoginButton({ text, height = 48 }: { text: string,
     setLoading(true);
     try {
       /* Request an state code for oauth */
-      const response = await requestStateCode()
+      const response = await requestStateCode();
 
       /* Call Github OAuth flow to get authorization token */
       const link = `${GITHUB_AUTHORIZE_URL}?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&response_type=code&scope=${GITHUB_SCOPES.join(' ')}&redirect_uri=${process.env.NEXT_PUBLIC_WEB_URL}/auth/github&state=${response.state}`;
-      router.push(link)
+      router.push(link);
     } catch {
       toast({
         title: "Authentication failed",
@@ -49,7 +49,7 @@ export default function GithubLoginButton({ text, height = 48 }: { text: string,
         isClosable: true,
       });
     }
-  }
+  };
 
   return (
     <Button

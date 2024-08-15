@@ -47,5 +47,5 @@ export default function ResultItem({
         <VoteButton votes={upvotes} upvoted={upvoted} onUpvote={() => onUpvote()} />
       </Stack>
     </Card>
-  )
+  );
 }

@@ -11,9 +11,9 @@ export async function upvoteEval(accessToken: string, evalId: number): Promise<I
         'Content-type': 'application/json',
       }
     });
-    return await res.json() as IEvalUpvoteResponse
+    return await res.json() as IEvalUpvoteResponse;
   } catch (e) {
     console.error(e);
-    throw e
+    throw e;
   }
 }

@@ -8,10 +8,10 @@ import { useToast } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
 
 export default function Results() {
-  const singleCallRef = useRef(false)
+  const singleCallRef = useRef(false);
   const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
-  const toast = useToast()
+  const toast = useToast();
 
   useEffect(() => {
     if (singleCallRef.current) return;
@@ -21,19 +21,19 @@ export default function Results() {
       const ev = await getEvals(accessToken);
       setEvals(ev);
     };
-    retrieveEvals()
+    retrieveEvals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const callUpVoteEval = async (evalId: number) => {
     try {
-      const response = await upvoteEval(accessToken, evalId)
+      const response = await upvoteEval(accessToken, evalId);
       setEvals(evals.map((value: any) => {
         if (value.id !== evalId) return value;
         value.upvotes = response.upvotes;
         value.upvoted = response.upvoted;
-        return value
-      }))
+        return value;
+      }));
     } catch {
       toast({
         title: "Vote failed",
@@ -43,7 +43,7 @@ export default function Results() {
         isClosable: true,
       });
     }
-  }
+  };
 
   return (
     <>
@@ -61,5 +61,5 @@ export default function Results() {
         />
       ))}
     </>
-  )
+  );
 }
