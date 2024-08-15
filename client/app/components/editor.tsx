@@ -380,7 +380,7 @@ export default function Editor() {
             >
               <Tabs defaultIndex={1}>
                 <TabList position="sticky" top={0} zIndex={1} bg="white">
-                  <Tab>Feed</Tab>
+                  <Tab>News</Tab>
                   <Tab>How to use</Tab>
                   {step === 3 && (
                     <Tab>Results</Tab>
