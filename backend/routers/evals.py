@@ -214,3 +214,20 @@ def eval_upvote(
     db.commit()
 
     return {"upvotes": eval.upvotes, "upvoted": inc == 1}
+
+
+@evals_router.get(
+    "/trending", response_model=List[EvalListItemResponseSchema], status_code=200
+)
+def get_trending_evals(
+    db: Session = Depends(get_db),
+    auth: dict = Depends(validate_optional_token),
+    limit=20,
+) -> List[Eval]:
+    """
+    Get top 20 trending evals with the most votes
+    """
+    evals = db.query(Eval).order_by(Eval.upvotes.desc()).limit(limit).all()
+    if evals:
+        return get_evals_upvoted(evals, auth)
+    raise HTTPException(status_code=404, detail={"error": "evals-not-found"})
