@@ -14,6 +14,8 @@ from db.models import (
     eval_authors,
     EvalUpvote,
     Author,
+    ModelGradedConfig,
+    ValidatorType,
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -72,11 +74,23 @@ def create_eval(
         validator_type=eval.validator_type,
         owner_id=auth["user"].id,
     )
+    if eval.model_graded_config:
+        model_graded_config = ModelGradedConfig(**eval.model_graded_config)
+        db.add(model_graded_config)
+        db.flush()
+        new_eval.model_graded_config_id = model_graded_config.id
+    new_eval.validate()
+
     db.add(new_eval)
 
     try:
         # Register all associated task instances
         for task in eval.task_instances:
+            if eval.validator_type != ValidatorType.ModelGraded and task.ideal is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail={"error": "ideal-required-for-non-model-graded-evals"},
+                )
             new_task_instance = TaskInstance(
                 is_public=task.is_public,
                 input=task.input,

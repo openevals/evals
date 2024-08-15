@@ -1,5 +1,6 @@
 from datetime import datetime
 from db.db import SessionLocal
+import traceback
 from db.models import Eval, TaskInstanceOutput, EvalRunStatus
 from models.model_provider import (
     query,
@@ -54,11 +55,11 @@ def run_eval_task(eval_id, eval_run_ids=None):
                             # Check if the response is valid
                             is_valid = validate_response(
                                 eval.validator_type,
-                                task_instance.ideal,
+                                task_instance,
                                 output_data.value,
+                                eval.model_graded_config,
                             )
-                            if is_valid:
-                                valid_responses += 1
+                            valid_responses += float(is_valid)
 
                             # Generate the output object
                             task_instance_output = TaskInstanceOutput(
@@ -72,6 +73,7 @@ def run_eval_task(eval_id, eval_run_ids=None):
                             )
                         except Exception as e:
                             print(f"Error querying the model: {e}")
+                            traceback.print_exc()
                             # Generate the output object with the error message
                             task_instance_output = TaskInstanceOutput(
                                 output=str(e),

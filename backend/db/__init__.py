@@ -18,4 +18,5 @@ __all__ = [
     "EvalRun",
     "ValidatorType",
     "TaskInstanceOutput",
+    "ModelGradedConfig",
 ]

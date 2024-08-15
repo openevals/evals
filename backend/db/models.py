@@ -3,7 +3,7 @@ from enum import Enum
 from db import Base
 from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlalchemy import Float, ForeignKey, Integer, String, Table
+from sqlalchemy import Float, ForeignKey, Integer, String, Table, JSON, ARRAY
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -22,6 +22,20 @@ class ValidatorType(Enum):
     MultipleChoice = "MultipleChoice"
     ModelGraded = "ModelGraded"
     Custom = "Custom"
+
+
+class ModelGradedConfig(Base):
+    __tablename__ = "model_graded_configs"
+    id = Column(Integer, primary_key=True)
+    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    model = relationship("Model")
+    prompt = Column(String, nullable=False)
+    kwargs = Column(JSON, nullable=True)
+    choice_strings = Column(ARRAY(String), nullable=False)
+    choice_scores = Column(
+        JSON, nullable=False
+    )  # NOTE: openai evals makes this optional. If it's optional, model graded evals don't have a score.
+    model_grader_eval_type = Column(String, nullable=False, default="cot_classify")
 
 
 class User(Base):
@@ -75,6 +89,10 @@ class Eval(Base):
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     upvotes = Column(Integer, nullable=False, default=0)
     primary_author = Column(String, nullable=True)
+    model_graded_config_id = Column(
+        Integer, ForeignKey("model_graded_configs.id"), nullable=True
+    )
+
     authors = relationship(
         "Author", secondary=eval_authors, back_populates="authored_evals"
     )
@@ -85,6 +103,25 @@ class Eval(Base):
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     owner = relationship("User", back_populates="evals")
     created_at = Column(DateTime, server_default=func.now())
+    model_graded_config = relationship("ModelGradedConfig")
+
+    def validate(self):
+        # verify when validator_type is ModelGraded, model_graded_config_id is set
+        if (
+            self.validator_type == ValidatorType.ModelGraded
+            and not self.model_graded_config_id
+        ):
+            raise ValueError(
+                "model_graded_config_id must be set when validator_type is ModelGraded"
+            )
+        # verify when validator_type is not ModelGraded, model_graded_config_id is not set
+        elif (
+            self.validator_type != ValidatorType.ModelGraded
+            and self.model_graded_config_id
+        ):
+            raise ValueError(
+                "model_graded_config_id must not be set when validator_type is not ModelGraded"
+            )
 
 
 class EvalUpvote(Base):
@@ -102,9 +139,7 @@ class TaskInstance(Base):
     id = Column(Integer, primary_key=True)
     is_public = Column(Boolean, nullable=False, default=False)
     input = Column(String, nullable=False)
-    ideal = Column(
-        String, nullable=False
-    )  # ideal output that will be validated against
+    ideal = Column(String, nullable=True)  # ideal output that will be validated against
     system_prompt = Column(String, nullable=True)
     user_prompt = Column(String, nullable=True)
 

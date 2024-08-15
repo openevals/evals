@@ -14,7 +14,7 @@ class ModelSystemSchema(BaseModel):
 class TaskInstanceSchema(BaseModel):
     is_public: bool = Field(default=False, alias="isPublic")
     input: str
-    ideal: str
+    ideal: Optional[str]
 
 
 class EvalSchema(BaseModel):
@@ -23,6 +23,7 @@ class EvalSchema(BaseModel):
     validator_type: ValidatorType = Field(..., alias="validatorType")
     task_instances: List[TaskInstanceSchema] = Field(..., alias="taskInstances")
     model_systems: List[ModelSystemSchema] = Field(..., alias="modelSystems")
+    model_graded_config: Optional[dict] = Field(None, alias="modelGradedConfig")
 
 
 class ModelSystemResponseSchema(BaseModel):
