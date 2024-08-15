@@ -51,12 +51,13 @@ class EvalResponseSchema(BaseModel):
         ..., serialization_alias="modelSystems"
     )
 
+
 class EvalListItemResponseSchema(BaseModel):
     id: int
     name: str
     description: Optional[str]
-    validator_type: ValidatorType = Field(...,
-                                          serialization_alias='validatorType')
+    validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
+
 
 class TaskInstanceOutputResponseSchema(BaseModel):
     id: int
