@@ -3,7 +3,7 @@ import { getEvals } from "../utils/getEvals";
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
-import { upVoteEval } from "../utils/upVote";
+import { upvoteEval } from "../utils/upvote";
 import { useToast } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
 
@@ -27,7 +27,7 @@ export default function Results() {
 
   const callUpVoteEval = async (evalId: number) => {
     try {
-      const response = await upVoteEval(accessToken, evalId)
+      const response = await upvoteEval(accessToken, evalId)
       setEvals(evals.map((value: any) => {
         if (value.id !== evalId) return value;
         value.upvotes = response.upvotes;

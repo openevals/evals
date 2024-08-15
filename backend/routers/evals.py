@@ -20,7 +20,7 @@ from backend.validation_schemas.evals import (
     EvalUpvotesResponseSchema,
 )
 from backend.controllers.evals import run_eval_task
-from backend.controllers.jwt import validate_token, validate_optinal_token
+from backend.controllers.jwt import validate_token, validate_optional_token
 
 evals_router = APIRouter()
 
@@ -139,7 +139,7 @@ def get_evals_upvoted(evals, auth):
     "/all", response_model=List[EvalListItemResponseSchema], status_code=200
 )
 def get_evals(
-    db: Session = Depends(get_db), auth: dict = Depends(validate_optinal_token)
+    db: Session = Depends(get_db), auth: dict = Depends(validate_optional_token)
 ) -> dict:
     """
     Get all evals
@@ -157,7 +157,7 @@ def get_evals(
 def search_evals(
     query: str,
     db: Session = Depends(get_db),
-    auth: dict = Depends(validate_optinal_token),
+    auth: dict = Depends(validate_optional_token),
 ) -> Optional[List[Eval]]:
     """
     Search evals by name and description. Evals with name matches are returned first.

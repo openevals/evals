@@ -2,7 +2,7 @@
 import { API_URL } from '../lib/constants';
 import { IEvalUpvoteResponse } from '../lib/types';
 
-export async function upVoteEval(accessToken: string, evalId: number): Promise<IEvalUpvoteResponse> {
+export async function upvoteEval(accessToken: string, evalId: number): Promise<IEvalUpvoteResponse> {
   try {
     const res = await fetch(`${API_URL}/evals/${evalId}/upvote`, {
       method: 'POST',

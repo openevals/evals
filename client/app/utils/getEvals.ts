@@ -2,7 +2,7 @@
 import { API_URL } from '@/app/lib/constants';
 import { IEvalListItemResponse } from '@/app/lib/types';
 
-export async function getEvals(accessToken?: string): Promise<IEvalListItemResponse> {
+export async function getEvals(accessToken?: string): Promise<IEvalListItemResponse[]> {
   try {
     const headers: any = {
       'Content-type': 'application/json',
@@ -15,7 +15,7 @@ export async function getEvals(accessToken?: string): Promise<IEvalListItemRespo
       method: 'get',
       headers
     });
-    return await res.json() as IEvalListItemResponse;
+    return await res.json() as IEvalListItemResponse[];
   } catch (e) {
     console.error(e);
     throw e

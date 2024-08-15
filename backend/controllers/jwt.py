@@ -98,7 +98,7 @@ def validate_token(
     return check_access_token(http_auth.credentials, db)
 
 
-def validate_optinal_token(
+def validate_optional_token(
     http_auth: HTTPAuthorizationCredentials = Security(TOKEN_SECURITY_NO_ERR),
     db: Session = Depends(get_db),
 ):
