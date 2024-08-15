@@ -61,6 +61,13 @@ export interface IModelSystemResponse {
   userPrompt: string;
 }
 
+export interface IAuthorResponse {
+  username: string;
+  githubId: number;
+  githubLogin: string;
+  githubAvatar: string;
+}
+
 export interface IEvalResponse {
   id: number;
   name: string;
@@ -68,6 +75,7 @@ export interface IEvalResponse {
   validationToken: string;
   taskInstances: ITaskInstanceResponse[];
   modelSystems: IModelSystemResponse[];
+  authors: IAuthorResponse[];
 }
 
 export interface ITaskInstanceOutputResponse {
