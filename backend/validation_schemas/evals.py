@@ -64,7 +64,7 @@ class TaskInstanceOutputResponseSchema(BaseModel):
     output: str
     status: EvalRunStatus
     task_instance_id: int = Field(..., serialization_alias="taskInstanceId")
-    num_tokens: int
+    num_tokens: int = Field(..., serialization_alias="numTokens")
 
 
 class EvalRunResponseSchema(BaseModel):
