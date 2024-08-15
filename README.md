@@ -133,10 +133,10 @@ After running the service, API documentation can be viewed at [OpenEvals Backend
 
 ```bash
 cd backend
-PYTHONPAT=. poetry run pytest
+PYTHONPATH=. poetry run pytest
 ```
 
 To run tests in a single file, run
 ```bash
-PYTHONPAT=. poetry run pytest <file-path>
+PYTHONPATH=. poetry run pytest <file-path>
 ```
