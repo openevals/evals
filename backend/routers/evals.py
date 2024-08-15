@@ -8,6 +8,7 @@ from backend.validation_schemas.evals import (
     EvalSchema,
     EvalResponseSchema,
     EvalRunResponseSchema,
+    EvalListItemResponseSchema,
 )
 from backend.controllers.evals import run_eval_task
 
@@ -90,3 +91,27 @@ def get_eval_run_details(
     if eval_run:
         return eval_run
     raise HTTPException(status_code=404, detail={"error": "eval-run-not-found"})
+
+@evals_router.get("/all",
+response_model=List[EvalListItemResponseSchema], status_code=200)
+def get_evals(db: Session = Depends(get_db)) -> dict:
+    """
+    Get all evals
+    """
+    evals = db.query(Eval).all()
+    if evals:
+        return evals
+    raise HTTPException(status_code=404, detail={
+                        'error': 'eval-run-not-found'})
+
+@evals_router.get("/all",
+response_model=List[EvalListItemResponseSchema], status_code=200)
+def get_evals(db: Session = Depends(get_db)) -> dict:
+    """
+    Get all evals
+    """
+    evals = db.query(Eval).all()
+    if evals:
+        return evals
+    raise HTTPException(status_code=404, detail={
+                        'error': 'evals-not-found'})

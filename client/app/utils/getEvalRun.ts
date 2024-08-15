@@ -1,8 +1,4 @@
-import { ValidatorType, TaskInstance, ModelSystem } from '../lib/constants';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-
+import { ValidatorType, TaskInstance, ModelSystem, API_URL } from '../lib/constants';
 
 export async function postNewEval(body: {
   name: string;

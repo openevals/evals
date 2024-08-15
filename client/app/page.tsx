@@ -28,18 +28,17 @@ export default function Home() {
         </TabList>
         <TabPanels>
           <TabPanel>
+          </TabPanel>
+          <TabPanel>
+            <Editor />
+          </TabPanel>
+          <TabPanel>
+            <Editor />
+          </TabPanel>
+          <TabPanel>
             <Box w="50%">
               <Results />
             </Box>
-          </TabPanel>
-          <TabPanel>
-            <Editor />
-          </TabPanel>
-          <TabPanel>
-            <Editor />
-          </TabPanel>
-          <TabPanel>
-            <TopEvals />
           </TabPanel>
         </TabPanels>
       </Tabs>     

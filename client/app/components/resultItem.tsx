@@ -1,12 +1,14 @@
-import { Card, Stack, CardBody, Heading, Text, Button, CardFooter } from '@chakra-ui/react';
+import { Card, Stack, CardBody, Heading, Text, Button, CardFooter, Tag } from '@chakra-ui/react';
 import VoteButton from './voteButton';
 
 export default function ResultItem({
   name,
   description,
+  validatorType,
 }: {
   name: string;
   description: string;
+  validatorType: string;
 }) {
   return (
     <Card
@@ -23,6 +25,7 @@ export default function ResultItem({
           <Text py={2}>
             {description}
           </Text>
+          <Tag>{validatorType}</Tag>
         </CardBody>
 
         <CardFooter>

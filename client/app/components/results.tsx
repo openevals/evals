@@ -1,18 +1,28 @@
-import ResultItem from "./result";
-import dummyData from "../utils/dummyData.json";
-import { Box } from "@chakra-ui/react";
-
-const { evals } = dummyData;
-
+import ResultItem from "./resultItem";
+import { getEvals } from "../utils/getEvals";
+import { useState, useEffect } from "react";
 
 export default function Results() {
+  const [evals, setEvals] = useState([]);
+
+  useEffect(() => {
+    const retrieveEvals = async () => {
+      const ev = await getEvals();
+      setEvals(ev);
+    };
+    retrieveEvals()
+  }, []);
+
   return (
     <>
-      {evals.map((result, index) => (
+      {evals.map(({
+        name, description, validatorType
+      }) => (
         <ResultItem
-          key={index}
-          name={result.name}
-          description={result.description}
+          key={name}
+          name={name}
+          description={description}
+          validatorType={validatorType}
         />
       ))} 
     </>
