@@ -90,3 +90,17 @@ export interface IEvalRunResponse {
   evalId: number;
   taskInstanceOutputs: ITaskInstanceOutputResponse[];
 }
+
+export interface IEvalUpvoteResponse {
+  upvotes: number;
+  upvoted: boolean;
+}
+
+export interface IEvalListItemResponse {
+  id: number;
+  name: string;
+  description?: string;
+  validatorType: string;
+  upvotes: number;
+  upvoted: boolean;
+}
