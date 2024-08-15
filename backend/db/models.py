@@ -30,6 +30,10 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
     affiliation = Column(String)
+    github_access_token = Column(String, nullable=False)
+    github_id = Column(Integer, unique=True, nullable=False)
+    github_login = Column(String, nullable=False)
+    github_avatar = Column(String, nullable=True)
 
     authored_evals = relationship(
         "Eval", secondary=eval_authors, back_populates="authors"
@@ -116,3 +120,9 @@ class EvalRun(Base):
     task_instance_outputs = relationship(
         "TaskInstanceOutput", back_populates="eval_run"
     )
+
+
+class OAuth2Sates(Base):
+    __tablename__ = "oauth_states"
+    id = Column(Integer, primary_key=True)
+    state = Column(String, nullable=False)

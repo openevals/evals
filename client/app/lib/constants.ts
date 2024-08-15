@@ -4,26 +4,9 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const MIN_EXAMPLES = 10;
 export const MIN_INSTANCES = 5;
 
-// This matches ValidatorType in the backend
-export enum ValidatorType {
-  Includes = "Includes",
-  ExactMatch = "ExactMatch",
-  FuzzyMatch = "FuzzyMatch", 
-}
+export const GITHUB_AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
 
-export interface TaskInstance {
-  isPublic: boolean;
-  input: string;
-  ideal: string;
-}
-
-export interface ModelSystem {
-  modelId: number;
-  userPrompt: string;
-  systemPrompt: string;
-};
-
-export interface EvalRunOutput {
-  score: number,
-  model: ModelSystem,
-}
+export const GITHUB_SCOPES = [
+    "read:user",
+    "user:email"
+];

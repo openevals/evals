@@ -8,12 +8,9 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   const [evalRuns, setEvalRuns] = useState<any[]>([])
   const evalRunsRef = useRef<any[]>()
 
-  console.log("HOOK", evalId, evalRunIds)
-
   /* Keeps reference updated */
   useEffect(() => {
     evalRunsRef.current = evalRuns
-    console.log("Setting state")
   }, [evalRuns])
 
   /* Keep the object state updated */
@@ -35,7 +32,6 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
       let itr = 0;
       let obj = await getEvalRun(evalId, evalRunId, 0)
       let lastStatus = obj.status;
-      console.log(lastStatus);
       updateObjState(obj);
       while (!FINISHED_STATUS.includes(lastStatus)) {
         obj = await getEvalRun(evalId, evalRunId, latency + 1000 * itr);

@@ -39,6 +39,13 @@ class TaskInstanceResponseSchema(BaseModel):
     ideal: str
 
 
+class EvalAuthorResponse(BaseModel):
+    username: str
+    github_id: int = Field(..., serialization_alias="githubId")
+    github_login: str = Field(..., serialization_alias="githubLogin")
+    github_avatar: str = Field(..., serialization_alias="githubAvatar")
+
+
 class EvalResponseSchema(BaseModel):
     id: int
     name: str
@@ -50,6 +57,7 @@ class EvalResponseSchema(BaseModel):
     eval_runs: List[ModelSystemResponseSchema] = Field(
         ..., serialization_alias="modelSystems"
     )
+    authors: List[EvalAuthorResponse]
 
 class EvalListItemResponseSchema(BaseModel):
     id: int
@@ -63,7 +71,7 @@ class TaskInstanceOutputResponseSchema(BaseModel):
     output: str
     status: EvalRunStatus
     task_instance_id: int = Field(..., serialization_alias="taskInstanceId")
-    num_tokens: int
+    num_tokens: int = Field(..., serialization_alias="numTokens")
 
 
 class EvalRunResponseSchema(BaseModel):
