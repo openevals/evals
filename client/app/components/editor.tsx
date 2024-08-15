@@ -12,14 +12,6 @@ import {
   Button,
   HStack,
   Kbd,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  TableCaption,
   Heading,
   Accordion,
   AccordionItem,
@@ -37,7 +29,6 @@ import {
   WrapItem,
   Select,
   Spinner,
-  IconButton,
   Container,
   Tabs,
   TabList,
@@ -53,7 +44,6 @@ import Results from './results';
 import { getSupportedModels, postNewEval } from '@/app/utils/getEvalRun';
 
 import dummyData from '@/app/utils/dummyData.json';
-const { eval_runs } = dummyData;
 
 import { MIN_EXAMPLES, MIN_INSTANCES } from '@/app/lib/constants';
 import { ModelSystem, ValidatorType, TaskInstance, IModelResponse } from '@/app/lib/types';
@@ -63,6 +53,8 @@ import useEvalResults from "../lib/hooks/useEvalResults";
 import EvalRunResults from "./evalRunResults";
 import { IRootState } from "../lib/store";
 import { useSelector } from "react-redux";
+import InstancesTable from "./instancesTable";
+import InstanceOutputResults from "./instanceOutputResults";
 
 
 export default function Editor() {
@@ -197,7 +189,10 @@ export default function Editor() {
               <Spacer />
               <Spinner id='loadingSpinner' hidden />
               {step === 1 && (
-                <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>Next</Button>
+                <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>
+                  <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                  <Text ml={2}>Next</Text>
+                </Button>
               )}
             </HStack>
             <Accordion pt={2} allowMultiple defaultIndex={[0, 1, 2]}>
@@ -358,40 +353,12 @@ export default function Editor() {
                 </HStack>
                 <Box pt={4}>
                   {instances.length > 0 ? (
-                    <TableContainer
-                      border='1px'
-                      borderRadius='md'
-                      borderColor='lightgray'>
-                      <Table>
-                        <Thead>
-                          <Tr>
-                            <Th>Public?</Th>
-                            <Th>Input</Th>
-                            <Th>Ideal Output</Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          {instances.map((instance, index) => (
-                            <Tr key={index}>
-                              <Td>
-                                <Checkbox
-                                  isChecked={instance.isPublic}
-                                  onChange={(e) => {
-                                    const updatedInstances = [...instances];
-                                    updatedInstances[index].isPublic = e.target.checked;
-                                    setInstances(updatedInstances);
-                                  }}
-                                />
-                              </Td>
-                              <Td>{instance.input}</Td>
-                              <Td>{instance.ideal}</Td>
-                            </Tr>
-                          ))}
-                        </Tbody>
-                      </Table>
-                    </TableContainer>
+                    <InstancesTable
+                      instances={instances}
+                      setInstances={setInstances}
+                    />
                   ) : (
-                    <Text pt={8} textAlign='center'>{`Add task instances! At least ${MIN_INSTANCES} examples, ideally more 🧪`}</Text>
+                    <Text pt={8} textAlign='center'>{`Add task instances! At least ${MIN_INSTANCES}, ideally more 🧪`}</Text>
                   )}
 
                 </Box>
@@ -433,7 +400,7 @@ export default function Editor() {
                   <TabPanel>
                     <Card variant='outline'>
                       <CardBody>
-                        <Heading size='md'>OpenEvals: Community-owned AI model evaluations!</Heading>
+                        <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
                         <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
                         <Heading size='md'>How to use this editor:</Heading>
                         <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
@@ -442,15 +409,18 @@ export default function Editor() {
                         <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
                         <Text my={4}>2. Compare results for at least 3 models.</Text>
                         <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text>
-                        <Text my={4}>4. Add at least 15 task instances.</Text>
+                        <Text my={4}>4. Add at least {MIN_INSTANCES} task instances.</Text>
                         <Text>5. Double check ideal outputs for task instances.</Text>
                         <Text my={4}>Have fun!</Text>
                       </CardBody>
                     </Card>
                   </TabPanel>
-                  {/* {step === 3 && ( */}
-                  <EvalRunResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
-                  {/* )} */}
+                  {step === 3 && (
+                    <TabPanel>
+                      <EvalRunResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
+                      <InstanceOutputResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
+                    </TabPanel>
+                  )}
                 </TabPanels>
               </Tabs>
             </Container>

@@ -38,7 +38,7 @@ export function waitMS(timeout: number): Promise<void> {
 export async function getEvalRun(evalId: number, evalRunId: number, latency = 1000): Promise<IEvalRunResponse> {
   try {
     await waitMS(latency);
-    const res = await fetch(`${API_URL}/evals/${evalId}/run/${evalRunId}/get`, { // TODO: get proper route name
+    const res = await fetch(`${API_URL}/evals/${evalId}/run/${evalRunId}/get`, { 
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
