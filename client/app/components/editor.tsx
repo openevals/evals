@@ -54,18 +54,13 @@ import { getSupportedModels, postNewEval } from '@/app/utils/getEvalRun';
 import dummyData from '@/app/utils/dummyData.json';
 const { eval_runs } = dummyData;
 
-import { MIN_EXAMPLES, MIN_INSTANCES, ModelSystem, ValidatorType, TaskInstance } from '@/app/lib/constants';
+import { MIN_EXAMPLES, MIN_INSTANCES } from '@/app/lib/constants';
+import { ModelSystem, ValidatorType, TaskInstance, IModelResponse } from '@/app/lib/types';
 import usePanels from "../lib/usePanels";
 
 import useEvalResults from "../lib/hooks/useEvalResults";
 import EvalRunResults from "./evalRunResults";
 
-interface Model {
-  id: number,
-  modelDeveloper: string,
-  modelName: string,
-  checked: boolean,
-};
 
 export default function Editor() {
   // step 1 = enter meta info
@@ -76,7 +71,7 @@ export default function Editor() {
   const [inputDescription, setInputDescription] = useState('');
   const [outputDescription, setOutputDescription] = useState('');
   const [validator, setValidator] = useState<ValidatorType | ''>('');
-  const [models, setModels] = useState<Model[]>([]);
+  const [models, setModels] = useState<IModelResponse[]>([]);
   const [systemPrompt, setSystemPrompt] = useState('');
   const [userPrompt, setUserPrompt] = useState('');
   const [inputText, setInputText] = useState('');
@@ -92,8 +87,8 @@ export default function Editor() {
   useEffect(() => {
     const getModels = async () => {
       const models = await getSupportedModels();
-      models.forEach((model: Omit<Model, 'checked'>) => {
-        (model as Model).checked = false;
+      models.forEach((model: Omit<IModelResponse, 'checked'>) => {
+        (model as IModelResponse).checked = false;
       });
       setModels(models);
     };
