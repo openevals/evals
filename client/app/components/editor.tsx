@@ -45,7 +45,8 @@ import {
   TabPanels,
   TabPanel,
   Card,
-  CardBody
+  CardBody,
+  useToast
 } from '@chakra-ui/react';
 import Results from './results';
 
@@ -60,6 +61,8 @@ import usePanels from "../lib/usePanels";
 
 import useEvalResults from "../lib/hooks/useEvalResults";
 import EvalRunResults from "./evalRunResults";
+import { IRootState } from "../lib/store";
+import { useSelector } from "react-redux";
 
 
 export default function Editor() {
@@ -80,6 +83,9 @@ export default function Editor() {
   const [evalName, setEvalName] = useState<string>('');
   const [evalId, setEvalId] = useState<number>(0);
   const [evalRunIds, setEvalRunIds] = useState<number[]>([]);
+  const toast = useToast();
+  const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
+  const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
 
 
   const [panel1Ref, panel2Ref, panel3Ref, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
@@ -103,6 +109,16 @@ export default function Editor() {
   };
 
   const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Not authorized",
+        description: "You should authenticate with your account first to create new evaluations.",
+        status: "error",
+        isClosable: true,
+        duration: 9000,
+      });
+      return;
+    }
     toggleSpinner();
     const checkedModels = models.filter((model) => model.checked);
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
@@ -124,7 +140,7 @@ export default function Editor() {
     console.log('inputText:', inputText);
     console.log('outputText:', outputText);
     console.log('instances:', instances);
-    const newEval = await postNewEval({
+    const newEval = await postNewEval(accessToken, {
       name,
       description: `Input: ${inputDescription}\nOutput: ${outputDescription}`,
       validatorType: validator,

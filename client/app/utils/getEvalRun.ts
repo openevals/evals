@@ -1,7 +1,7 @@
 import { API_URL } from "@/app/lib/constants";
 import { ValidatorType, TaskInstance, ModelSystem, IModelResponse, IEvalResponse, IEvalRunResponse } from '@/app/lib/types';
 
-export async function postNewEval(body: {
+export async function postNewEval(accessToken: string, body: {
   name: string;
   description: string;
   validatorType: ValidatorType;
@@ -12,6 +12,7 @@ export async function postNewEval(body: {
     const res = await fetch(`${API_URL}/evals/create`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${accessToken}`,
         'Content-type': 'application/json',
       },
       body: JSON.stringify(body)

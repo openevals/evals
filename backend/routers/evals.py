@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 from backend.db.db import get_db
-from backend.db.models import Eval, TaskInstance, EvalRun, EvalRunStatus
+from backend.db.models import Eval, TaskInstance, EvalRun, EvalRunStatus, eval_authors
 from backend.validation_schemas.evals import (
     EvalSchema,
     EvalResponseSchema,
@@ -11,13 +11,17 @@ from backend.validation_schemas.evals import (
     EvalListItemResponseSchema,
 )
 from backend.controllers.evals import run_eval_task
+from backend.controllers.jwt import validate_token
 
 evals_router = APIRouter()
 
 
 @evals_router.post("/create", response_model=EvalResponseSchema, status_code=200)
 def create_eval(
-    background_tasks: BackgroundTasks, eval: EvalSchema, db: Session = Depends(get_db)
+    background_tasks: BackgroundTasks,
+    eval: EvalSchema,
+    db: Session = Depends(get_db),
+    auth: dict = Depends(validate_token),
 ) -> dict:
     """
     Create new evaluation
@@ -26,6 +30,7 @@ def create_eval(
         name=eval.name, description=eval.description, validator_type=eval.validator_type
     )
     db.add(new_eval)
+
     try:
         # Register all associated task instances
         for task in eval.task_instances:
@@ -51,6 +56,14 @@ def create_eval(
             )
             db.add(new_eval_run)
         db.commit()
+
+        # Add user/eval relationship
+        new_author_eval = eval_authors.insert().values(
+            user_id=auth["user"].id, eval_id=new_eval.id
+        )
+        db.execute(new_author_eval)
+        db.commit()
+
         background_tasks.add_task(run_eval_task, new_eval.id)
         return new_eval
     except Exception as e:
