@@ -103,7 +103,6 @@ async def oauth_refresh(auth: dict = Depends(validate_refresh_token)) -> dict:
     Refresh an access token for new access/refresh pair
     """
     # Generate the access/refresh tokens pair
-    print(auth)
     (access_token, refresh_token) = generate_tokens(auth["user"])
 
     return {

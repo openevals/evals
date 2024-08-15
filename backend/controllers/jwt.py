@@ -20,6 +20,7 @@ TOKEN_AUDIENCE = os.getenv("WEB_URL")
 ACCESS_TOKEN_TTL = 7
 REFRESH_TOKEN_TTL = 30
 TOKEN_SECURITY = HTTPBearer()
+TOKEN_SECURITY_NO_ERR = HTTPBearer(auto_error=False)
 
 
 def generate_tokens(user):
@@ -56,14 +57,11 @@ def generate_tokens(user):
     return (access_token, refresh_token)
 
 
-def validate_token(
-    http_auth: HTTPAuthorizationCredentials = Security(TOKEN_SECURITY),
-    db: Session = Depends(get_db),
-):
-    """Validate the access token"""
+def check_access_token(token, db):
+    """Decode the access token and ensure is valid"""
     try:
         payload = jwt.decode(
-            http_auth.credentials,
+            token,
             public_key,
             algorithms=["RS256"],
             audience=TOKEN_AUD_ISS,
@@ -90,6 +88,26 @@ def validate_token(
         )
 
     return {"payload": payload, "user": user}
+
+
+def validate_token(
+    http_auth: HTTPAuthorizationCredentials = Security(TOKEN_SECURITY),
+    db: Session = Depends(get_db),
+):
+    """Validate the access token as required"""
+    return check_access_token(http_auth.credentials, db)
+
+
+def validate_optinal_token(
+    http_auth: HTTPAuthorizationCredentials = Security(TOKEN_SECURITY_NO_ERR),
+    db: Session = Depends(get_db),
+):
+    """Validate the access token as optional"""
+
+    if not http_auth or not http_auth.credentials:
+        return {}
+
+    return check_access_token(http_auth.credentials, db)
 
 
 def validate_refresh_token(
