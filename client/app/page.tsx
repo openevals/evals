@@ -16,6 +16,7 @@ import { IUserProfileResponse } from './lib/types';
 import { useEffect } from 'react';
 import { getUserProfile } from './utils/account';
 import { setUserProfile, logoutUser } from '@/app/lib/store/authSlice';
+import ItemDetails from './components/itemDetails';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -66,6 +67,7 @@ export default function Home() {
         </TabList>
         <TabPanels>
           <TabPanel>
+            <ItemDetails />
           </TabPanel>
           <TabPanel>
             <Editor />
