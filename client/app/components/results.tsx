@@ -1,39 +1,24 @@
-import ResultItem from "./resultItem";
-import { getEvals } from "../utils/getEvals";
-import { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { IRootState } from "@/app/lib/store";
-import { upvoteEval } from "../utils/upvote";
-import { useToast } from "@chakra-ui/react";
-import { IEvalListItemResponse } from "../lib/types";
+'use client';
 
-export default function Results() {
-  const singleCallRef = useRef(false);
-  const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);
+import ResultItem from "./resultItem";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../lib/store";
+import { upvoteEval } from "../utils/upvote";
+import { Box, useToast } from "@chakra-ui/react";
+import { IEvalListItemResponse } from "../lib/types";
+import { setUpvotedEval } from "../lib/store/dataSlice";
+
+export default function Results({ evals, onUpvote }: { evals: IEvalListItemResponse[], onUpvote?: (payload: any) => void }) {
+  const dispatch = useDispatch();
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
   const toast = useToast();
-
-  useEffect(() => {
-    if (singleCallRef.current) return;
-    singleCallRef.current = true;
-
-    const retrieveEvals = async () => {
-      const ev = await getEvals(accessToken);
-      setEvals(ev);
-    };
-    retrieveEvals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const callUpVoteEval = async (evalId: number) => {
     try {
       const response = await upvoteEval(accessToken, evalId);
-      setEvals(evals.map((value: any) => {
-        if (value.id !== evalId) return value;
-        value.upvotes = response.upvotes;
-        value.upvoted = response.upvoted;
-        return value;
-      }));
+      const payload = { id: evalId, upvotes: response.upvotes, upvoted: response.upvoted };
+      dispatch(setUpvotedEval(payload));
+      if (onUpvote) onUpvote(payload);
     } catch {
       toast({
         title: "Vote failed",
@@ -46,12 +31,13 @@ export default function Results() {
   };
 
   return (
-    <>
+    <Box w="50%">
       {evals.map(({
         id, name, description, validatorType, upvotes, upvoted
       }) => (
         <ResultItem
-          key={name}
+          key={`eval-${id}`}
+          id={id}
           name={name}
           description={description ?? ''}
           validatorType={validatorType}
@@ -60,6 +46,6 @@ export default function Results() {
           onUpvote={() => callUpVoteEval(id)}
         />
       ))}
-    </>
+    </Box>
   );
 }
