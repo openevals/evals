@@ -53,3 +53,25 @@ export async function getUserUpvotedEvals(accessToken: string): Promise<IEvalLis
     throw e;
   }
 }
+
+
+
+export async function getTopEvals(accessToken?: string): Promise<IEvalListItemResponse[]> {
+  try {
+    const headers: any = {
+      'Content-type': 'application/json',
+    };
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(`${API_URL}/evals/trending`, {
+      method: 'get',
+      headers
+    });
+    return await res.json() as IEvalListItemResponse[];
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}

@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import List, Optional
+
+from db.models import EvalRunStatus, ValidatorType
 from pydantic import BaseModel, Field
-from typing import Optional, List
-from db.models import ValidatorType, EvalRunStatus
 from validation_schemas.models import ModelSchema
 
 
@@ -28,8 +29,6 @@ class EvalSchema(BaseModel):
 class ModelSystemResponseSchema(BaseModel):
     id: int
     model_id: int = Field(..., serialization_alias="modelId")
-    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
-    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
 
 
 class TaskInstanceResponseSchema(BaseModel):
@@ -37,6 +36,8 @@ class TaskInstanceResponseSchema(BaseModel):
     is_public: bool = Field(default=False, serialization_alias="isPublic")
     input: str
     ideal: str
+    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
+    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
 
 
 class EvalAuthorResponse(BaseModel):
@@ -44,6 +45,12 @@ class EvalAuthorResponse(BaseModel):
     github_id: int = Field(..., serialization_alias="githubId")
     github_login: str = Field(..., serialization_alias="githubLogin")
     github_avatar: str = Field(..., serialization_alias="githubAvatar")
+
+
+class EvalUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    validator_type: Optional[ValidatorType] = None
 
 
 class EvalResponseSchema(BaseModel):
@@ -81,8 +88,6 @@ class TaskInstanceOutputResponseSchema(BaseModel):
 class EvalRunResponseSchema(BaseModel):
     id: int
     model: ModelSchema
-    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
-    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
     score: float
     datetime: datetime
     validator_type: ValidatorType = Field(..., serialization_alias="validatorType")

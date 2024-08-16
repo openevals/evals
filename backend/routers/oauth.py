@@ -66,10 +66,13 @@ async def oauth_token(code: CodeExchangeSchema, db: Session = Depends(get_db)) -
 
     # Search user by Github user ID
     user = db.query(User).filter(User.github_id == user_info.get("id")).first()
+    username = user_info.get("name")
+    if not username or len(username) == 0:
+        username = user_info.get("login")
     if not user:
         # User don't exists, new one is created
         user = User(
-            username=user_info.get("name"),
+            username=username,
             email=primary_email.get("email"),
             github_access_token=response.get("access_token"),
             github_id=user_info.get("id"),
@@ -78,7 +81,7 @@ async def oauth_token(code: CodeExchangeSchema, db: Session = Depends(get_db)) -
         )
         db.add(user)
     else:
-        user.username = user_info.get("name")
+        user.username = username
         user.email = primary_email.get("email")
         user.github_access_token = response.get("access_token")
         user.github_login = user_info.get("login")

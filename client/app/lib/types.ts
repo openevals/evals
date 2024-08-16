@@ -53,13 +53,13 @@ export interface ITaskInstanceResponse {
   isPublic: boolean;
   input: string;
   ideal: string;
+  systemPrompt: string;
+  userPrompt: string;
 }
 
 export interface IModelSystemResponse {
   id: number;
   modelId: number;
-  systemPrompt: string;
-  userPrompt: string;
 }
 
 export interface IAuthorResponse {
@@ -90,8 +90,6 @@ export interface ITaskInstanceOutputResponse {
 export interface IEvalRunResponse {
   id: number;
   model: IModelResponse;
-  systemPrompt: string;
-  userPrompt: string;
   score: number;
   datetime: string;
   validatorType: string;

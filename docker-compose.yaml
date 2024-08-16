@@ -1,0 +1,12 @@
+version: '3'
+services:
+  pgdb:
+    image: postgres:14.0
+    volumes:
+      - /Users/belindamo/Apps/Docker/PostgreSQL/data-db:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=openevals
+      - POSTGRES_PASSWORD=openevals
+      - POSTGRES_USER=belindamo
+    ports:
+      - "5432:5432"

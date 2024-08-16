@@ -5,6 +5,7 @@ export default function usePanels(step: number) {
   const panel1Ref = useRef<ImperativePanelHandle>(null);
   const panel2Ref = useRef<ImperativePanelHandle>(null);
   const panel3Ref = useRef<ImperativePanelHandle>(null);
+  const [panel1Collapsed, setPanel1Collapsed] = useState<boolean>(false);
   const [panel2Collapsed, setPanel2Collapsed] = useState<boolean>(false);
 
   useEffect(() => {
@@ -16,6 +17,6 @@ export default function usePanels(step: number) {
   }, [step]);
 
 
-  return [panel1Ref, panel2Ref, panel3Ref, panel2Collapsed, setPanel2Collapsed];
+  return [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed];
 
 }
