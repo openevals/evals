@@ -61,7 +61,7 @@ async def oauth_token(code: CodeExchangeSchema, db: Session = Depends(get_db)) -
             primary_email = user_emails[0]
         else:
             raise HTTPException(
-                status_code=401, detail={"error": "user-dont-have-email"}
+                status_code=401, detail={"error": "user-does-not-have-email"}
             )
 
     # Search user by Github user ID
