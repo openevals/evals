@@ -11,12 +11,15 @@ import {
   StackDivider,
   Box,
   Tag,
+  Flex,
+  Wrap,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
 import InstancesTable from './instancesTable';
 import { IEvalRunResponse, ValidatorType } from '../lib/types';
 import EvalRunResults from './evalRunResults';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 const defaultEvalItem = {
   id: 0,
@@ -45,100 +48,76 @@ export default function ItemDetails() {
 
   return (
     <>
-      <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(30%, 1fr))'>
-        <Stack direction={['column']}>
-          <Card variant="outline">
-            <CardHeader>
-              <Heading size='lg'>{evalItem.name}</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing='4'>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    <Stack direction={['row']}>
-                      <Text>Method to evaluate: </Text>
-                      <Tag>{evalItem.validatorType}</Tag>
-                    </Stack>
-                  </Heading>
-                </Box>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    Description:
-                  </Heading>
-                  <Text pt='2' fontSize='sm'>
-                    {evalItem.description}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    Models tested: (TODO)
-                  </Heading>
-                  <Text pt='2' fontSize='sm'>
-                    {evalItem.modelSystems.map((ms) => (
-                      <Tag>{ms.modelId}</Tag>
-                    ))}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    Prompts used: 
-                  </Heading>
-                  <Text pt='2' fontSize='sm'>
-                    {/* TODO: Right now this only queries the first */}
-                    {evalItem.modelSystems.length > 0 && (
-                      <>
-                        {evalItem.modelSystems[0].systemPrompt && (
-                          <Text>System prompt: {evalItem.modelSystems[0].systemPrompt}</Text>
-                        )}
-                        {evalItem.modelSystems[0].userPrompt && (
-                          <Text>User prompt: {evalItem.modelSystems[0].userPrompt}</Text>
-                        )}
-                      </>
+      <Wrap>
+        <Box p={4} w='400px'>
+          <Heading size='lg'>{evalItem.name}</Heading>
+          <Stack divider={<StackDivider />} spacing='4'>
+            <Box>
+              <Heading size='xs'>
+                <Stack direction={['row']}>
+                  <Text>Method to evaluate: </Text>
+                  <Tag>{evalItem.validatorType}</Tag>
+                </Stack>
+              </Heading>
+            </Box>
+            <Box>
+              <Heading size='xs'>
+                Description:
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {evalItem.description}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size='xs'>
+                Models tested: (TODO)
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {evalItem.modelSystems.map((ms) => (
+                  <Tag>{ms.modelId}</Tag>
+                ))}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size='xs'>
+                Prompts used: 
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {/* TODO: Right now this only queries the first */}
+                {evalItem.modelSystems.length > 0 && (
+                  <>
+                    {evalItem.modelSystems[0].systemPrompt && (
+                      <Text>System prompt: {evalItem.modelSystems[0].systemPrompt}</Text>
                     )}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    Authors:
-                  </Heading>
-                  <Text pt='2' fontSize='sm'>
-                    {evalItem.authors.map((a) => (
-                      <Text>{a.username}</Text>
-                    ))}
-                    OpenAI
-                  </Text>
-                </Box>
-              </Stack>
-            </CardBody>
-          </Card>
-        </Stack>
-        <Stack>
-          <Card variant="outline">
-            <CardHeader>
-              <Heading size='lg'>Task instances</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing='4'>
-                <InstancesTable
-                  instances={evalItem.taskInstances}
-                />
-              </Stack>
-            </CardBody>
-          </Card>
-        </Stack>
-        <Card variant="outline">
-          <CardBody>
-            <EvalRunResults 
-              evalId={evalItem.id}
-              evalName={evalItem.name}
-              evalRunIds={runIds}
-            />
-          </CardBody>
-          <CardFooter>
-            <Button>TODO: Try it out</Button>
-          </CardFooter>
-        </Card>
-      </SimpleGrid>
+                    {evalItem.modelSystems[0].userPrompt && (
+                      <Text>User prompt: {evalItem.modelSystems[0].userPrompt}</Text>
+                    )}
+                  </>
+                )}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size='xs'>
+                Authors:
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {evalItem.authors.map((a) => (
+                  <Text>{a.username}</Text>
+                ))}
+                OpenAI
+              </Text>
+            </Box>
+          </Stack>
+        </Box>
+        <Box p={4} minW='70%'>
+          <EvalRunResults 
+            evalId={evalItem.id}
+            evalName={evalItem.name}
+            evalRunIds={runIds}
+          />
+          <Button>TODO: Try it out</Button>
+        </Box>
+      </Wrap>
     </>
   )
 }
