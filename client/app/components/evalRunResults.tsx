@@ -11,6 +11,7 @@ import {
   TableContainer,
   TableCaption,
   TabPanel,
+  Heading
 } from '@chakra-ui/react';
 
 import useEvalResults from "../lib/hooks/useEvalResults";
@@ -21,29 +22,61 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName }: { evalI
 
   return (
     <>
-      <TabPanel>
-        <TableContainer>
-          <Table variant='simple'>
-            <TableCaption>{evalName}</TableCaption>
-            <Thead>
-              <Tr>
-                <Th>Model</Th>
-                <Th>Score</Th>
-                <Th>Status</Th>
+      <Heading size='md'>Aggregate Results</Heading>
+      <TableContainer>
+        <Table variant='simple'>
+          <TableCaption>{'Model results for ' + evalName}</TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Model</Th>
+              <Th>Score</Th>
+              <Th>Status</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {evalRuns.map((run) => (
+              <Tr key={`eval-run-result-${run.id}`}>
+                <Td>{run.model.modelName}</Td>
+                <Td>{run.score}</Td>
+                <Td>{run.status}</Td>
               </Tr>
-            </Thead>
-            <Tbody>
-              {evalRuns.map((run) => (
-                <Tr key={`eval-run-result-${run.id}`}>
-                  <Td>{run.model.modelName}</Td>
-                  <Td>{run.score}</Td>
-                  <Td>{run.status}</Td>
-                </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <Heading size='md'>Model Results</Heading>
+      <TableContainer>
+        <Table variant='simple'>
+          <TableCaption>{'Model outputs for ' + evalName}</TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Model</Th>
+              {evalRuns[0]?.taskInstanceOutputs.map((_, index) => (
+                <Th key={`input-${index}`}>Input {index + 1}</Th>
               ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </TabPanel>
+              <Th>Correct Outputs</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>Ideal Output</Td>
+              {evalRuns[0]?.taskInstanceOutputs.map((output, index) => (
+                <Td key={`ideal-${index}`}>{output.idealOutput}</Td>
+              ))}
+              <Td>N/A</Td>
+            </Tr>
+            {evalRuns.map((run) => (
+              <Tr key={`eval-run-result-${run.id}`}>
+                <Td>{run.model.modelName}</Td>
+                {run.taskInstanceOutputs.map((output, index) => (
+                  <Td key={`output-${run.id}-${index}`}>{output.output}</Td>
+                ))}
+                <Td>{run.taskInstanceOutputs.filter(output => output.output === output.idealOutput).length}</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
     </>
   );
 }

@@ -17,7 +17,6 @@ import { getEvalItem } from '../utils/getEvalItem';
 import InstancesTable from './instancesTable';
 import { IEvalRunResponse, ValidatorType } from '../lib/types';
 import EvalRunResults from './evalRunResults';
-import InstanceOutputResults from './instanceOutputResults';
 
 const defaultEvalItem = {
   id: 0,
@@ -126,28 +125,10 @@ export default function ItemDetails() {
               </Stack>
             </CardBody>
           </Card>
-          <Card variant="outline">
-            <CardHeader>
-              <Heading size='md'>Aggregate Results</Heading>
-            </CardHeader>
-            <CardBody>
-              <EvalRunResults
-                evalId={evalItem.id}
-                evalName={evalItem.name}
-                evalRunIds={runIds}
-              />
-            </CardBody>
-            <CardFooter>
-              <Button>TODO: Try it out</Button>
-            </CardFooter>
-          </Card>
         </Stack>
         <Card variant="outline">
-          <CardHeader>
-            <Heading size='md'>Model Results</Heading>
-          </CardHeader>
           <CardBody>
-            <InstanceOutputResults 
+            <EvalRunResults 
               evalId={evalItem.id}
               evalName={evalItem.name}
               evalRunIds={runIds}
