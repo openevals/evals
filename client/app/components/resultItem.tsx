@@ -1,7 +1,9 @@
 import { Card, Stack, CardBody, Heading, Text, Button, CardFooter, Tag, HStack, VStack, Avatar } from '@chakra-ui/react';
 import VoteButton from './voteButton';
+import { useRouter } from 'next/navigation';
 
 export default function ResultItem({
+  id,
   name,
   description,
   validatorType,
@@ -9,6 +11,7 @@ export default function ResultItem({
   upvoted,
   onUpvote,
 }: {
+  id: number;
   name: string;
   description: string;
   validatorType: string;
@@ -16,6 +19,12 @@ export default function ResultItem({
   upvoted: boolean;
   onUpvote: () => void;
 }) {
+  const router = useRouter();
+
+  const viewDetails = () => {
+    router.push(`/evals/${id}`);
+  };
+
   return (
     <>
       <Stack

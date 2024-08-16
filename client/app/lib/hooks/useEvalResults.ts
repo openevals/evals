@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { getEvalRun } from '../../utils/getEvalRun';
+import { IEvalRunResponse } from '../types';
 
 
 const FINISHED_STATUS = ['Failed', 'Finished'];
 
 const useEvalResults = (evalId: number, evalRunIds: number[]) => {
-  const [evalRuns, setEvalRuns] = useState<any[]>([]);
+  const [evalRuns, setEvalRuns] = useState<IEvalRunResponse[]>([]);
   const evalRunsRef = useRef<any[]>();
 
   /* Keeps reference updated */
