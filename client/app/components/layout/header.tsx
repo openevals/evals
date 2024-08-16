@@ -121,9 +121,13 @@ export default function HeaderComponent() {
     }
   };
 
+  const gotoHome = () => {
+    router.push('/');
+  };
+
   return (
     <HStack my={4} mx={8}>
-      <Heading size='md'>OpenEvals</Heading>
+      <Heading size='md' cursor='pointer' onClick={gotoHome}>OpenEvals</Heading>
       <Popover isOpen={isOpen && suggestions.length > 0} onClose={() => setIsOpen(false)} initialFocusRef={inputRef} placement="bottom-start">
         <PopoverTrigger>
           <Input
