@@ -25,7 +25,7 @@ export default function Results() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const callUpVoteEval = async (evalId: number) => {
+  const callUpvoteEval = async (evalId: number) => {
     try {
       const response = await upvoteEval(accessToken, evalId);
       setEvals(evals.map((value: any) => {
@@ -57,7 +57,7 @@ export default function Results() {
           validatorType={validatorType}
           upvotes={upvotes}
           upvoted={upvoted}
-          onUpvote={() => callUpVoteEval(id)}
+          onUpvote={() => callUpvoteEval(id)}
         />
       ))}
     </>
