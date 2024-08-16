@@ -4,6 +4,7 @@ import {
   Input, HStack, Button, Heading, Spacer, Box, Link,
   Tabs, TabList, TabPanels, Tab, TabPanel, Avatar,
   Menu, MenuButton, MenuList, MenuItem, MenuDivider,
+  Divider,
 } from '@chakra-ui/react';
 import Editor from "./components/editor";
 import Results from "./components/results";
@@ -42,18 +43,21 @@ export default function Home() {
         <Input ml={4} maxW={756} placeholder='Search OpenEvals' variant='outline' />
         <Button>Search</Button>
         <Spacer />
-        <Button ml={16} mr={2} variant="link">About</Button>
+        <Button ml={16} mr={4} variant="link">About</Button>
         {isAuthenticated && profile ? (
-          <Menu>
-            <MenuButton as={Avatar} name={profile.username} src={profile.githubAvatar} h="32px" w="32px" cursor="pointer" />
-            <MenuList zIndex={999}>
-              <MenuItem>Reinier Millo<br />reinier.millo88@gmail.com</MenuItem>
-              <MenuItem as={Box} onClick={() => window.open(`https://www.github.com/${profile.githubLogin}`, "_blank")} cursor="pointer">Github profile</MenuItem>
-              <MenuItem>User profile</MenuItem>
-              <MenuDivider />
-              <MenuItem as={Box} onClick={() => dispatch(logoutUser())} cursor="pointer">Logout</MenuItem>
-            </MenuList>
-          </Menu>
+          <>
+            <Button mr={4} variant="link">My Evals</Button>
+            <Menu>
+              <MenuButton as={Avatar} name={profile.username} src={profile.githubAvatar} h="32px" w="32px" cursor="pointer" />
+              <MenuList zIndex={999}>
+                <MenuItem>{profile.username}<br />{profile.email}</MenuItem>
+                <MenuDivider />
+                <MenuItem as={Box} onClick={() => window.open(`https://www.github.com/${profile.githubLogin}`, "_blank")} cursor="pointer">Github profile</MenuItem>
+                <MenuDivider />
+                <MenuItem as={Box} onClick={() => dispatch(logoutUser())} cursor="pointer">Logout</MenuItem>
+              </MenuList>
+            </Menu>
+          </>
         ) : (
           <GithubLoginButton text="Connect with Github" height={32} />
         )}
