@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Button,
   HStack,
+  Stack,
   Kbd,
   Heading,
   Accordion,
@@ -67,7 +68,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const [validator, setValidator] = useState<ValidatorType | ''>('');
   const [models, setModels] = useState<IModelResponse[]>([]);
   const [systemPrompt, setSystemPrompt] = useState('');
-  const [userPrompt, setUserPrompt] = useState('');
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [instances, setInstances] = useState<TaskInstance[]>([]);
@@ -77,6 +77,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const toast = useToast();
   const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
+  const instanceInputRef = useRef<HTMLTextAreaElement>(null);
 
 
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
@@ -115,7 +116,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
       modelId: model.id,
       systemPrompt: systemPrompt,
-      userPrompt: userPrompt,
     }));
     // TODO: error handling
     if (validator === '') {
@@ -126,7 +126,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     console.log('validator:', validator);
     console.log('models:', models);
     console.log('systemPrompt:', systemPrompt);
-    console.log('userPrompt:', userPrompt);
     console.log('inputText:', inputText);
     console.log('outputText:', outputText);
     console.log('instances:', instances);
@@ -157,6 +156,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       setInstances([...instances, newInstance]);
       setInputText('');
       setOutputText('');
+
+      // Set focus to the inputText field after adding an instance
+      if (instanceInputRef.current) {
+        instanceInputRef.current.focus();
+      }
 
     } else {
       console.error('Input text and output text must not be empty')
@@ -189,10 +193,9 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           >
             {!panel1Collapsed && (
               <>
-                <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
+                <HStack mx={2} top={0}>
                   <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
                   <Spacer />
-                  <Spinner id='loadingSpinner' hidden />
                   {step === 1 && panel2Collapsed && (
                     <Button float='right' onClick={() => { if (step === 1) setStep(2) }} minW='180px'>
                       <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
@@ -273,30 +276,19 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                     <h2>
                       <AccordionButton>
                         <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Prompts</Heading>
+                          <Heading size='sm'>System Prompt (Recommended)</Heading>
                         </Box>
                         <AccordionIcon />
                       </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                      <HStack>
-                        <VStack w='100%'>
-                          <Text>System Prompt (Recommended)</Text>
-                          <Textarea
-                            placeholder='You are a mathematics professor at MIT.'
-                            value={systemPrompt}
-                            onChange={(e) => setSystemPrompt(e.target.value)}
-                          />
-                        </VStack>
-                        <VStack w='100%'>
-                          <Text>User Prompt (Optional)</Text>
-                          <Textarea
-                            placeholder='Solve linear algebra problems by responding with the numeric answer only.'
-                            value={userPrompt}
-                            onChange={(e) => setUserPrompt(e.target.value)}
-                          />
-                        </VStack>
-                      </HStack>
+                      <Stack w='100%'>
+                        <Textarea
+                          placeholder='You are a mathematics professor at MIT.'
+                          value={systemPrompt}
+                          onChange={(e) => setSystemPrompt(e.target.value)}
+                        />
+                      </Stack>
                     </AccordionPanel>
                   </AccordionItem>
                 </Accordion>
@@ -334,6 +326,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                     <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                     <Text ml={2}>Add task instance</Text>
                   </Button>
+                  <Spinner id='loadingSpinner' hidden />
                   <Button ml='auto' onClick={handleSubmit} minW='150px'>
                     <Text>Submit</Text>
                   </Button>
@@ -346,6 +339,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={handleKeyDown}
+                      ref={instanceInputRef}
                     />
                   </VStack>
                   <VStack w='50%'>
