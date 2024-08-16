@@ -1,11 +1,10 @@
 from enum import Enum
 
+from db import Base
 from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
-
-from db import Base
 
 eval_authors = Table(
     "eval_authors",
@@ -29,10 +28,10 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    affiliation = Column(String)
-    github_access_token = Column(String, nullable=False)
-    github_id = Column(Integer, unique=True, nullable=False)
-    github_login = Column(String, nullable=False)
+    affiliation = Column(String, nullable=True)
+    github_access_token = Column(String, nullable=True)
+    github_id = Column(Integer, unique=True, nullable=True)
+    github_login = Column(String, nullable=True)
     github_avatar = Column(String, nullable=True)
 
     authored_evals = relationship(
@@ -57,7 +56,7 @@ class Eval(Base):
     description = Column(String)
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     upvotes = Column(Integer, nullable=False, default=0)
-
+    primary_author = Column(String, nullable=True)
     authors = relationship(
         "User", secondary=eval_authors, back_populates="authored_evals"
     )
@@ -119,8 +118,6 @@ class EvalRun(Base):
     id = Column(Integer, primary_key=True)
     score = Column(Float, nullable=False)
     datetime = Column(DateTime, nullable=False)
-    system_prompt = Column(String)
-    user_prompt = Column(String)  # task-specific user prompt
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     status = Column(
         SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued
