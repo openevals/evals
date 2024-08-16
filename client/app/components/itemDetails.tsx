@@ -1,25 +1,23 @@
-import { 
-  SimpleGrid,
-  Card,
-  CardHeader,
+'use client';
+
+import {
   Heading,
   Text,
-  CardBody,
-  CardFooter,
   Button,
   Stack,
   StackDivider,
   Box,
   Tag,
-  Flex,
   Wrap,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
-import InstancesTable from './instancesTable';
-import { IEvalRunResponse, ValidatorType } from '../lib/types';
+import { IEvalResponse, IModelResponse, ValidatorType } from '../lib/types';
 import EvalRunResults from './evalRunResults';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { useParams } from 'next/navigation';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { IRootState } from '../lib/store';
 
 const defaultEvalItem = {
   id: 0,
@@ -29,20 +27,40 @@ const defaultEvalItem = {
   taskInstances: [],
   modelSystems: [],
   authors: []
-}
+};
 
-export default function ItemDetails({evalId}: {evalId: number}) {
-  const [evalItem, setEvalItem] = useState(defaultEvalItem);
+
+export default function ItemDetails() {
+  const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
+  const models = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
+  const [modelMap, setModelMap] = useState<Record<number, string>>({});
   const [runIds, setRunIds] = useState<number[]>([]);
+  const params: { id: string } = useParams();
 
   useEffect(() => {
+    /* Get the id parameter */
+    const id = parseInt(params.id, 10);
+    if (!Number.isInteger(id)) {
+      return;
+    }
+
+    /* Load the eval details by the given ID */
     const getEvalInfo = async () => {
-      const e = await getEvalItem(evalId); // TODO
+      const e = await getEvalItem(id);
       setEvalItem(e);
       setRunIds(e.modelSystems.map((value: any) => value.id));
-    }
+    };
     getEvalInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const map: Record<number, string> = {};
+    models.forEach((model) => {
+      map[model.id] = model.modelName;
+    });
+    setModelMap(map);
+  }, [models]);
 
   return (
     <>
@@ -71,24 +89,24 @@ export default function ItemDetails({evalId}: {evalId: number}) {
                 Models tested: (TODO)
               </Heading>
               <Text pt='2' fontSize='sm'>
-                {evalItem.modelSystems.map((ms) => (
-                  <Tag>{ms.modelId}</Tag>
+                {evalItem.modelSystems.map((ms: any) => (
+                  <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>{modelMap[ms.modelId]}</Tag>
                 ))}
               </Text>
             </Box>
             <Box>
               <Heading size='xs'>
-                Prompts used: 
+                Prompts used:
               </Heading>
               <Text pt='2' fontSize='sm'>
                 {/* TODO: Right now this only queries the first */}
                 {evalItem.modelSystems.length > 0 && (
                   <>
-                    {evalItem.modelSystems[0].systemPrompt && (
-                      <Text>System prompt: {evalItem.modelSystems[0].systemPrompt}</Text>
+                    {evalItem.taskInstances[0].systemPrompt && (
+                      <Text>System prompt: {evalItem.taskInstances[0].systemPrompt}</Text>
                     )}
-                    {evalItem.modelSystems[0].userPrompt && (
-                      <Text>User prompt: {evalItem.modelSystems[0].userPrompt}</Text>
+                    {evalItem.taskInstances[0].userPrompt && (
+                      <Text>User prompt: {evalItem.taskInstances[0].userPrompt}</Text>
                     )}
                   </>
                 )}
@@ -99,8 +117,8 @@ export default function ItemDetails({evalId}: {evalId: number}) {
                 Authors:
               </Heading>
               <Text pt='2' fontSize='sm'>
-                {evalItem.authors.map((a) => (
-                  <Text>{a.username}</Text>
+                {evalItem.authors.map((a, idx) => (
+                  <Text key={`author-item-${idx}`}>{a.username}</Text>
                 ))}
                 OpenAI
               </Text>
@@ -108,7 +126,7 @@ export default function ItemDetails({evalId}: {evalId: number}) {
           </Stack>
         </Box>
         <Box p={4} minW='70%'>
-          <EvalRunResults 
+          <EvalRunResults
             evalId={evalItem.id}
             evalName={evalItem.name}
             evalRunIds={runIds}
@@ -118,5 +136,5 @@ export default function ItemDetails({evalId}: {evalId: number}) {
         </Box>
       </Wrap>
     </>
-  )
+  );
 }
