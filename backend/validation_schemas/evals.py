@@ -28,8 +28,6 @@ class EvalSchema(BaseModel):
 class ModelSystemResponseSchema(BaseModel):
     id: int
     model_id: int = Field(..., serialization_alias="modelId")
-    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
-    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
 
 
 class TaskInstanceResponseSchema(BaseModel):
@@ -37,6 +35,8 @@ class TaskInstanceResponseSchema(BaseModel):
     is_public: bool = Field(default=False, serialization_alias="isPublic")
     input: str
     ideal: str
+    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
+    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
 
 
 class EvalAuthorResponse(BaseModel):
@@ -81,8 +81,6 @@ class TaskInstanceOutputResponseSchema(BaseModel):
 class EvalRunResponseSchema(BaseModel):
     id: int
     model: ModelSchema
-    system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
-    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
     score: float
     datetime: datetime
     validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
