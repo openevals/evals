@@ -12,6 +12,8 @@ from db.models import (
     TaskInstance,
     TaskInstanceOutput,
     eval_authors,
+    EvalUpvote,
+    User
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -139,6 +141,31 @@ def get_evals_upvoted(evals, auth):
     ]
     return results
 
+@evals_router.get(
+    "/created",
+    response_model=List[EvalListItemResponseSchema],
+    status_code=200,
+)
+def get_user_evals(
+    db: Session = Depends(get_db), auth: dict = Depends(validate_token)
+) -> dict:  
+    """
+    Get evals that a user has created
+    """
+    return auth['user'].authored_evals
+
+@evals_router.get(
+    "/upvoted",
+    response_model=List[EvalListItemResponseSchema],
+    status_code=200,
+)
+def get_user_evals(
+    db: Session = Depends(get_db), auth: dict = Depends(validate_token)
+) -> dict:  
+    """
+    Get evals that a user has upvoted
+    """
+    return auth['user'].eval_upvotes
 
 @evals_router.get(
     "/all", response_model=List[EvalListItemResponseSchema], status_code=200
