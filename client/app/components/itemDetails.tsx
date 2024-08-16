@@ -31,17 +31,15 @@ const defaultEvalItem = {
   authors: []
 }
 
-export default function ItemDetails() {
+export default function ItemDetails({evalId}: {evalId: number}) {
   const [evalItem, setEvalItem] = useState(defaultEvalItem);
   const [runIds, setRunIds] = useState<number[]>([]);
 
   useEffect(() => {
     const getEvalInfo = async () => {
-      const e = await getEvalItem(1); // TODO
+      const e = await getEvalItem(evalId); // TODO
       setEvalItem(e);
-
       setRunIds(e.modelSystems.map((value: any) => value.id));
-
     }
     getEvalInfo();
   }, []);
@@ -115,7 +113,8 @@ export default function ItemDetails() {
             evalName={evalItem.name}
             evalRunIds={runIds}
           />
-          <Button>TODO: Try it out</Button>
+          <Button mr={4}>Details</Button>
+          <Button>Try Eval</Button>
         </Box>
       </Wrap>
     </>

@@ -71,7 +71,7 @@ export default function Home() {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <ItemDetails />
+            <ItemDetails evalId={1} />
           </TabPanel>
           <TabPanel>
             <Editor />
@@ -80,9 +80,7 @@ export default function Home() {
             <Editor />
           </TabPanel>
           <TabPanel>
-            <Box w="50%">
-              <Results />
-            </Box>
+            <Results />
           </TabPanel>
         </TabPanels>
       </Tabs>
