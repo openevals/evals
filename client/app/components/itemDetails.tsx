@@ -35,7 +35,7 @@ export default function ItemDetails() {
 
   useEffect(() => {
     const getEvalInfo = async () => {
-      const e = await getEvalItem(288); // TODO
+      const e = await getEvalItem(1); // TODO
       setEvalItem(e);
 
       setRunIds(e.modelSystems.map((value: any) => value.id));
