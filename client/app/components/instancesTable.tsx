@@ -53,5 +53,5 @@ export default function InstancesTable({
         </Tbody>
       </Table>
     </TableContainer>
-  )
+  );
 }
