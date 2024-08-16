@@ -64,10 +64,29 @@ export async function getTopEvals(accessToken?: string): Promise<IEvalListItemRe
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
-
     const res = await fetch(`${API_URL}/evals/trending`, {
       method: 'get',
       headers
+    });
+    return await res.json() as IEvalListItemResponse[];
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
+
+export async function searchEvals(accessToken?: string, searchText?: string): Promise<IEvalListItemResponse[]> {
+  try {
+    const headers: any = {
+      'Content-type': 'application/json',
+    };
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    const params = new URLSearchParams({ query: searchText ?? '' });
+    const res = await fetch(`${API_URL}/evals/search?${params.toString()}`, {
+      method: 'post',
+      headers,
     });
     return await res.json() as IEvalListItemResponse[];
   } catch (e) {

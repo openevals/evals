@@ -1,41 +1,28 @@
 import ResultItem from "./resultItem";
 import { getEvals } from "../utils/getEvals";
 import { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
 import { upvoteEval } from "../utils/upvote";
 import { Box, Divider, useToast, Flex, CardBody, Card, Spacer } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
 import ItemDetails from "./itemDetails";
+import { setUpvotedEval } from "../lib/store/dataSlice";
 
-export default function Results() {
-  const singleCallRef = useRef(false);
-  const [evalId, setEvalId] = useState<number|null>(null);
-  const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);
+
+export default function Results({ evals, onUpvote }: { evals: IEvalListItemResponse[], onUpvote?: (payload: any) => void }) {
+  const [evalId, setEvalId] = useState<number | null>(null);
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
   const toast = useToast();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (singleCallRef.current) return;
-    singleCallRef.current = true;
-
-    const retrieveEvals = async () => {
-      const ev = await getEvals(accessToken);
-      setEvals(ev);
-    };
-    retrieveEvals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const callUpvoteEval = async (evalId: number) => {
     try {
       const response = await upvoteEval(accessToken, evalId);
-      setEvals(evals.map((value: any) => {
-        if (value.id !== evalId) return value;
-        value.upvotes = response.upvotes;
-        value.upvoted = response.upvoted;
-        return value;
-      }));
+      const payload = { id: evalId, upvotes: response.upvotes, upvoted: response.upvoted };
+      dispatch(setUpvotedEval(payload));
+      if (onUpvote) onUpvote(payload);
     } catch {
       toast({
         title: "Vote failed",
@@ -53,24 +40,28 @@ export default function Results() {
 
   return (
     <Flex>
-      <Box w="50%">
-        {evals.map(({
-          id, name, description, validatorType, upvotes, upvoted
-        }) => (
-          <Box onClick={() => {openEvalView(id)}}>
-            <ResultItem
-              key={name}
-              name={name}
-              description={description ?? ''}
-              validatorType={validatorType}
-              upvotes={upvotes}
-              upvoted={upvoted}
-              onUpvote={() => callUpvoteEval(id)}
-            />
-            <Divider />
-          </Box>
-        ))}
-      </Box>
+      {evals.length == 0 ? (
+        <Box w="100%"><Text size="lg" textAlign="center">No evals found</Text></Box>
+      ) : (
+        <Box w="50%">
+          {evals.map(({
+            id, name, description, validatorType, upvotes, upvoted
+          }) => (
+            <Box key={`eval-${id}`} onClick={() => { openEvalView(id) }}>
+              <ResultItem
+                id={id}
+                name={name}
+                description={description ?? ''}
+                validatorType={validatorType}
+                upvotes={upvotes}
+                upvoted={upvoted}
+                onUpvote={() => callUpvoteEval(id)}
+              />
+              <Divider />
+            </Box>
+          ))}
+        </Box>
+      )}
       <Spacer></Spacer>
       {evalId && (
         <Box w="40%" right={16} position='fixed' >
@@ -81,6 +72,7 @@ export default function Results() {
           </Card>
         </Box>
       )}
+
     </Flex>
   );
 }

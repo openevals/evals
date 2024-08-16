@@ -73,7 +73,7 @@ export interface IEvalResponse {
   id: number;
   name: string;
   description: string;
-  validationToken: string;
+  validatorType: string;
   taskInstances: ITaskInstanceResponse[];
   modelSystems: IModelSystemResponse[];
   authors: IAuthorResponse[];

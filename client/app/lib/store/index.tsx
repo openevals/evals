@@ -6,6 +6,7 @@ import {
   FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE
 } from 'reduxjs-toolkit-persist/es/constants';
 import authSlice from '@/app/lib/store/authSlice';
+import dataSlice from '@/app/lib/store/dataSlice';
 
 const persistConfig = {
   key: 'openevals',
@@ -17,6 +18,7 @@ const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
     auth: authSlice,
+    data: dataSlice
   })
 );
 
