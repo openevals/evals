@@ -28,10 +28,10 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    affiliation = Column(String)
-    github_access_token = Column(String, nullable=False)
-    github_id = Column(Integer, unique=True, nullable=False)
-    github_login = Column(String, nullable=False)
+    affiliation = Column(String, nullable=True)
+    github_access_token = Column(String, nullable=True)
+    github_id = Column(Integer, unique=True, nullable=True)
+    github_login = Column(String, nullable=True)
     github_avatar = Column(String, nullable=True)
 
     authored_evals = relationship(
