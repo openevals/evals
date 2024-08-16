@@ -13,7 +13,7 @@ function VoteButton({ votes, upvoted, onUpvote }: { votes: number, upvoted: bool
       variant='outline'
       p={0}
       onClick={isAuthenticated ? () => onUpvote() : () => { }}
-      backgroundColor={upvoted ? 'var(--chakra-colors-gray-100)' : 'white'}
+      backgroundColor={upvoted ? 'var(--chakra-colors-gray-200)' : ''}
     >
       <Box as="span" ml={2}>
         <TriangleUpIcon />

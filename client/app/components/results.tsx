@@ -4,11 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
 import { upvoteEval } from "../utils/upvote";
-import { useToast } from "@chakra-ui/react";
+import { Box, Divider, useToast, Flex, CardBody, Card, Spacer } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
+import ItemDetails from "./itemDetails";
 
 export default function Results() {
   const singleCallRef = useRef(false);
+  const [evalId, setEvalId] = useState<number|null>(null);
   const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
   const toast = useToast();
@@ -45,21 +47,40 @@ export default function Results() {
     }
   };
 
+  const openEvalView = (id: number) => {
+    setEvalId(id);
+  }
+
   return (
-    <>
-      {evals.map(({
-        id, name, description, validatorType, upvotes, upvoted
-      }) => (
-        <ResultItem
-          key={name}
-          name={name}
-          description={description ?? ''}
-          validatorType={validatorType}
-          upvotes={upvotes}
-          upvoted={upvoted}
-          onUpvote={() => callUpVoteEval(id)}
-        />
-      ))}
-    </>
+    <Flex>
+      <Box w="50%">
+        {evals.map(({
+          id, name, description, validatorType, upvotes, upvoted
+        }) => (
+          <Box onClick={() => {openEvalView(id)}}>
+            <ResultItem
+              key={name}
+              name={name}
+              description={description ?? ''}
+              validatorType={validatorType}
+              upvotes={upvotes}
+              upvoted={upvoted}
+              onUpvote={() => callUpVoteEval(id)}
+            />
+            <Divider />
+          </Box>
+        ))}
+      </Box>
+      <Spacer></Spacer>
+      {evalId && (
+        <Box w="40%" right={16} position='fixed' >
+          <Card variant="outline">
+            <CardBody>
+              <ItemDetails evalId={evalId} />
+            </CardBody>
+          </Card>
+        </Box>
+      )}
+    </Flex>
   );
 }
