@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
 import { upvoteEval } from "../utils/upvote";
-import { useToast } from "@chakra-ui/react";
+import { Divider, useToast } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
 
 export default function Results() {
@@ -50,15 +50,18 @@ export default function Results() {
       {evals.map(({
         id, name, description, validatorType, upvotes, upvoted
       }) => (
-        <ResultItem
-          key={name}
-          name={name}
-          description={description ?? ''}
-          validatorType={validatorType}
-          upvotes={upvotes}
-          upvoted={upvoted}
-          onUpvote={() => callUpVoteEval(id)}
-        />
+        <>
+          <ResultItem
+            key={name}
+            name={name}
+            description={description ?? ''}
+            validatorType={validatorType}
+            upvotes={upvotes}
+            upvoted={upvoted}
+            onUpvote={() => callUpVoteEval(id)}
+          />
+          <Divider />
+        </>
       ))}
     </>
   );
