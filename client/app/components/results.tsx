@@ -4,7 +4,7 @@ import ResultItem from "./resultItem";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../lib/store";
 import { upvoteEval } from "../utils/upvote";
-import { Box, useToast } from "@chakra-ui/react";
+import { Box, Text, useToast } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
 import { setUpvotedEval } from "../lib/store/dataSlice";
 
@@ -31,21 +31,27 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
   };
 
   return (
-    <Box w="50%">
-      {evals.map(({
-        id, name, description, validatorType, upvotes, upvoted
-      }) => (
-        <ResultItem
-          key={`eval-${id}`}
-          id={id}
-          name={name}
-          description={description ?? ''}
-          validatorType={validatorType}
-          upvotes={upvotes}
-          upvoted={upvoted}
-          onUpvote={() => callUpVoteEval(id)}
-        />
-      ))}
-    </Box>
+    <>
+      {evals.length == 0 ? (
+        <Box w="100%"><Text size="lg" textAlign="center">No evals found</Text></Box>
+      ) : (
+        <Box w="50%">
+          {evals.map(({
+            id, name, description, validatorType, upvotes, upvoted
+          }) => (
+            <ResultItem
+              key={`eval-${id}`}
+              id={id}
+              name={name}
+              description={description ?? ''}
+              validatorType={validatorType}
+              upvotes={upvotes}
+              upvoted={upvoted}
+              onUpvote={() => callUpVoteEval(id)}
+            />
+          ))}
+        </Box>
+      )}
+    </>
   );
 }
