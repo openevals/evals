@@ -373,51 +373,47 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             borderColor='lightgray'
             borderRightRadius='md'
             h='calc(100vh - 12rem)'
+            overflowY='auto'
             gap={4}
             p={4}>
-            <Container
-              w='100%'
-              overflowY='auto'
-            >
-              <Tabs defaultIndex={1}>
-                <TabList position="sticky" top={0} zIndex={1} bg="white">
-                  <Tab>Try an eval</Tab>
-                  <Tab>How to use</Tab>
-                  {step === 3 && (
-                    <Tab>Results</Tab>
-                  )}
-                </TabList>
-                <TabPanels>
-                  <TabPanel textAlign='left'>
-                    <Heading size="md" pt={4}>Try out an eval</Heading>
-                    <Trending />
-                  </TabPanel>
+            <Tabs defaultIndex={1}>
+              <TabList>
+                <Tab>Try an eval</Tab>
+                <Tab>How to use</Tab>
+                {step === 3 && (
+                  <Tab>Results</Tab>
+                )}
+              </TabList>
+              <TabPanels>
+                <TabPanel textAlign='left'>
+                  <Heading size="md" pt={4}>Try out an eval</Heading>
+                  <Trending />
+                </TabPanel>
+                <TabPanel>
+                  <Card variant='outline'>
+                    <CardBody>
+                      <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
+                      <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
+                      <Heading size='md'>How to use this editor:</Heading>
+                      <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
+                      <Text>We welcome your submissions to OpenEvals! Once you contribute, your evaluation <i>results</i> are public for anyone to search, while <i>task instances</i> remain private and owned by you.</Text>
+                      <Heading size='md' my={4}>Tips for submission:</Heading>
+                      <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
+                      <Text my={4}>2. Compare results for at least 3 models.</Text>
+                      {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
+                      <Text my={4}>3. Add at least {MIN_INSTANCES} task instances. Mark at least 1 as a public example.</Text>
+                      <Text>4. Double check ideal outputs for task instances.</Text>
+                      <Text my={4}>Have fun!</Text>
+                    </CardBody>
+                  </Card>
+                </TabPanel>
+                {step === 3 && (
                   <TabPanel>
-                    <Card variant='outline'>
-                      <CardBody>
-                        <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
-                        <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
-                        <Heading size='md'>How to use this editor:</Heading>
-                        <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
-                        <Text>We welcome your submissions to OpenEvals! Once you contribute, your evaluation <i>results</i> are public for anyone to search, while <i>task instances</i> remain private and owned by you.</Text>
-                        <Heading size='md' my={4}>Tips for submission:</Heading>
-                        <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
-                        <Text my={4}>2. Compare results for at least 3 models.</Text>
-                        {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
-                        <Text my={4}>3. Add at least {MIN_INSTANCES} task instances. Mark at least 1 as a public example.</Text>
-                        <Text>4. Double check ideal outputs for task instances.</Text>
-                        <Text my={4}>Have fun!</Text>
-                      </CardBody>
-                    </Card>
+                    <EvalRunResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
                   </TabPanel>
-                  {step === 3 && (
-                    <TabPanel>
-                      <EvalRunResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
-                    </TabPanel>
-                  )}
-                </TabPanels>
-              </Tabs>
-            </Container>
+                )}
+              </TabPanels>
+            </Tabs>
           </Box>
         </Panel>
       </PanelGroup>
