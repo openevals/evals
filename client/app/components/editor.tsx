@@ -63,8 +63,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   // step 3 = run results
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [name, setName] = useState('');
-  const [inputDescription, setInputDescription] = useState('');
-  const [outputDescription, setOutputDescription] = useState('');
+  const [description, setDescription] = useState('');
   const [validator, setValidator] = useState<ValidatorType | ''>('');
   const [models, setModels] = useState<IModelResponse[]>([]);
   const [systemPrompt, setSystemPrompt] = useState('');
@@ -134,7 +133,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     console.log('instances:', instances);
     const newEval = await postNewEval(accessToken, {
       name,
-      description: `Input: ${inputDescription}\nOutput: ${outputDescription}`,
+      description,
       validatorType: validator,
       modelSystems,
       taskInstances: instances,
@@ -209,24 +208,12 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                     </h2>
                     <AccordionPanel pb={4}>
                       <HStack w='100%'>
-                        <VStack w='50%'>
-                          <Text>Input</Text>
-                          <Textarea
-                            placeholder='Linear algebra equation in Latex'
-                            value={inputDescription}
-                            onChange={(e) => setInputDescription(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                          />
-                        </VStack>
-                        <VStack w='50%'>
-                          <Text>Ideal Output</Text>
-                          <Textarea
-                            placeholder='Answer only in Latex'
-                            value={outputDescription}
-                            onChange={(e) => setOutputDescription(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                          />
-                        </VStack>
+                        <Textarea
+                          placeholder='Linear algebra equations in Latex. Output is the answer only in Latex.'
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                        />
                       </HStack>
 
                     </AccordionPanel>
