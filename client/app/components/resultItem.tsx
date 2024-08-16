@@ -41,6 +41,7 @@ export default function ResultItem({
         <HStack>
           <VoteButton votes={upvotes} upvoted={upvoted} onUpvote={() => onUpvote()} />
           <Button variant='outline'>Share</Button>
+          <Button variant="outline">Try</Button>
         </HStack>
       </Stack>
     </>

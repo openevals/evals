@@ -54,8 +54,8 @@ import EvalRunResults from "./evalRunResults";
 import { IRootState } from "../lib/store";
 import { useSelector } from "react-redux";
 import InstancesTable from "./instancesTable";
-import InstanceOutputResults from "./instanceOutputResults";
 
+import Trending from "./trending";
 
 export default function Editor({ initialEval }: { initialEval?: IEvalResponse }) {
   // step 1 = enter meta info
@@ -384,22 +384,16 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             >
               <Tabs defaultIndex={1}>
                 <TabList position="sticky" top={0} zIndex={1} bg="white">
-                  <Tab>News</Tab>
+                  <Tab>Try an eval</Tab>
                   <Tab>How to use</Tab>
                   {step === 3 && (
                     <Tab>Results</Tab>
                   )}
                 </TabList>
                 <TabPanels>
-                  <TabPanel textAlign='center'>
-                    <Card variant="outline">
-                      <CardBody>
-                        <Text>Newest! Contribute to SWE-bench</Text>
-                        <Button mt={4}>Contribute</Button>
-                      </CardBody>
-                    </Card>
-                    <Heading size="md" pt={8}><i>Trending</i></Heading>
-                    <Results />
+                  <TabPanel textAlign='left'>
+                    <Heading size="md" pt={4}>Try out an eval</Heading>
+                    <Trending />
                   </TabPanel>
                   <TabPanel>
                     <Card variant='outline'>
