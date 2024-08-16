@@ -56,7 +56,7 @@ class Eval(Base):
     description = Column(String)
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     upvotes = Column(Integer, nullable=False, default=0)
-
+    primary_author = Column(String, nullable=True)
     authors = relationship(
         "User", secondary=eval_authors, back_populates="authored_evals"
     )
