@@ -189,7 +189,7 @@ export default function Editor() {
               <Spacer />
               <Spinner id='loadingSpinner' hidden />
               {step === 1 && (
-                <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>
+                <Button float='right' onClick={() => { if (step === 1) setStep(2); }}>
                   <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                   <Text ml={2}>Next</Text>
                 </Button>
@@ -395,7 +395,7 @@ export default function Editor() {
                       </CardBody>
                     </Card>
                     <Heading size="md" pt={8}><i>Trending</i></Heading>
-                    <Results />
+                    <Results evals={[]} />
                   </TabPanel>
                   <TabPanel>
                     <Card variant='outline'>
