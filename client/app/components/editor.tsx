@@ -403,7 +403,7 @@ export default function Editor() {
                         <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
                         <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
                         <Heading size='md'>How to use this editor:</Heading>
-                        <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
+                        <Text my={4}>This is an editor to create, edit, and submit evals to learn how a specific AI model performs for your needs.</Text>
                         <Text>We welcome your submissions to OpenEvals! Once you contribute, your evaluation <i>results</i> are public for anyone to search, while <i>task instances</i> remain private and owned by you.</Text>
                         <Heading size='md' my={4}>Tips for submission:</Heading>
                         <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
