@@ -1,15 +1,20 @@
 import json
 import logging
+import os
+import subprocess
+from collections import defaultdict
 from pathlib import Path
 from typing import Generator, List
 
 import yaml
-
 from db.db import SessionLocal
-from db.models import Eval, TaskInstance, ValidatorType
+from db.models import Eval, TaskInstance, User, ValidatorType
+from dotenv import load_dotenv
 
-JSONL_DATA_PATH = "/Users/amydeng/Documents/Projects/openai-evals/evals/registry/data"
-YAML_PATH = "/Users/amydeng/Documents/Projects/openai-evals/evals/registry/evals"
+load_dotenv(dotenv_path="../.env")
+
+JSONL_DATA_PATH = os.getenv(key="JSONL_DATA_PATH")
+YAML_PATH = os.getenv(key="YAML_PATH")
 
 logger = logging.getLogger(__name__)
 
@@ -92,12 +97,16 @@ class OpenAIIntegration:
             system_prompt = system_prompt.strip()
             user_input = user_input.strip()
 
+            ideal = sample.get("ideal", "")
+            if isinstance(ideal, list):
+                ideal = json.dumps(ideal)
+
             task_instances.append(
                 TaskInstance(
                     eval=eval,
                     input=user_input,
                     system_prompt=system_prompt,
-                    ideal=sample.get("ideal", ""),
+                    ideal=ideal,
                     is_public=True,
                 )
             )
@@ -120,52 +129,124 @@ class OpenAIIntegration:
             else:
                 print(f"Warning: No matching samples.jsonl file found for {yaml_file}")
 
+    def get_primary_author(self, file_path: Path) -> tuple[str, str]:
+        if not file_path.exists():
+            return "Unknown", ""
+        try:
+            result = subprocess.run(
+                [
+                    "git",
+                    "blame",
+                    "-w",
+                    "-M",
+                    "-C",
+                    "-C",
+                    "--line-porcelain",
+                    str(file_path),
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=os.path.dirname(file_path),
+            )
+            authors = defaultdict(int)
+            emails = {}
+            for line in result.stdout.split("\n"):
+                if line.startswith("author "):
+                    author = line.split("author ", 1)[1]
+                    authors[author] += 1
+                elif line.startswith("author-mail "):
+                    email = line.split("author-mail ", 1)[1].strip("<>")
+                    emails[author] = email
+            primary_author = max(authors, key=authors.get) if authors else "Unknown"
+            return primary_author, emails.get(primary_author, "")
+        except subprocess.CalledProcessError:
+            return "Unknown", ""
+
+    def get_or_create_user(self, db: SessionLocal, name: str, email: str) -> User:
+        if email.endswith("@users.noreply.github.com"):
+            # For GitHub private emails, use the name as username
+            user = db.query(User).filter(User.username == name).first()
+            if not user:
+                user = User(username=name, email=email)
+                db.add(user)
+                db.flush()
+        else:
+            user = db.query(User).filter(User.email == email).first()
+            if not user:
+                user = User(username=name, email=email)
+                db.add(user)
+                db.flush()
+        return user
+
     @staticmethod
-    def main():
+    def main(dry_run: bool = True):
         logging.basicConfig(level=logging.INFO)
         integration = OpenAIIntegration()
         with SessionLocal() as db:
             for yaml_file, jsonl_file in integration.get_openai_evals():
-                logger.info(f"Processing: {yaml_file.name} with {jsonl_file}")
+                logger.info(f"Processing: {yaml_file.name}")
 
                 try:
                     metadata = integration.parse_metadata(yaml_file)
-                    samples = integration.parse_samples(jsonl_file)
+                    primary_author, author_email = integration.get_primary_author(
+                        yaml_file
+                    )
 
                     eval_obj = integration.create_eval(metadata)
+
+                    if author_email:
+                        user = integration.get_or_create_user(
+                            db, primary_author, author_email
+                        )
+                        eval_obj.user_id = user.id
+                        eval_obj.primary_author = user.username or user.email
+                    else:
+                        eval_obj.primary_author = primary_author
+
                     logger.info(
                         f"Eval: {eval_obj.name} (Type: {eval_obj.validator_type})"
                     )
+                    logger.info(f"Primary Author: {eval_obj.primary_author}")
                     logger.info(f"Description: {eval_obj.description[:100]}...")
 
-                    db.add(eval_obj)
-                    db.flush()
-                    task_instances = integration.create_task_instances(
-                        eval_obj, samples
-                    )
-                    db.add_all(task_instances)
-
-                    logger.info(f"Total TaskInstances: {len(task_instances)}")
-                    for i, task in enumerate(task_instances[:3], 1):
-                        logger.info(f"\nTaskInstance {i}:")
-                        logger.info(f"System Prompt: {task.system_prompt[:50]}...")
-                        logger.info(f"User Input: {task.input[:50]}...")
-                        logger.info(f"Ideal: {task.ideal[:50]}...")
-
-                    if len(task_instances) > 3:
-                        logger.info("\n... (more TaskInstances)")
-
-                    try:
-                        db.commit()
-                        logger.info(
-                            f"Successfully added {yaml_file.name} to the database."
+                    if jsonl_file:
+                        samples = integration.parse_samples(jsonl_file)
+                        task_instances = integration.create_task_instances(
+                            eval_obj, samples
                         )
-                    except Exception as e:
-                        db.rollback()
-                        logger.error(
-                            f"Error committing {yaml_file.name} to database: {str(e)}"
-                        )
-                        logger.error("Rolling back and continuing with next eval.")
+
+                        logger.info(f"Total TaskInstances: {len(task_instances)}")
+                        for i, task in enumerate(task_instances[:3], 1):
+                            logger.info(f"\nTaskInstance {i}:")
+                            logger.info(f"System Prompt: {task.system_prompt[:50]}...")
+                            logger.info(f"User Input: {task.input[:50]}...")
+                            logger.info(f"Ideal: {task.ideal[:50]}...")
+
+                        if len(task_instances) > 3:
+                            logger.info("\n... (more TaskInstances)")
+                    else:
+                        logger.info("No JSONL file found. Skipping task instances.")
+
+                    if not dry_run:
+                        db.add(eval_obj)
+                        db.flush()
+                        if jsonl_file:
+                            db.add_all(task_instances)
+                        try:
+                            db.commit()
+                            logger.info(
+                                f"Successfully added {yaml_file.name} to the database."
+                            )
+                        except Exception as e:
+                            db.rollback()
+                            logger.error(
+                                f"Error committing {yaml_file.name} to database: {str(e)}"
+                            )
+                            logger.error("Rolling back and continuing with next eval.")
+                    else:
+                        logger.info("Dry run: Not committing to database.")
+
                 except Exception as e:
                     logger.error(f"Error processing {yaml_file.name}: {str(e)}")
                     logger.error("Continuing with next eval.")
@@ -174,4 +255,6 @@ class OpenAIIntegration:
 
 
 if __name__ == "__main__":
-    OpenAIIntegration.main()
+    OpenAIIntegration.main(
+        dry_run=False
+    )  # Set to False to actually commit to the database
