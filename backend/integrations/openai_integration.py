@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import subprocess
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Generator, List
@@ -17,6 +18,17 @@ JSONL_DATA_PATH = os.getenv(key="JSONL_DATA_PATH")
 YAML_PATH = os.getenv(key="YAML_PATH")
 
 logger = logging.getLogger(__name__)
+
+TO_UPPER = ["svg", "3d", "hsl", "2d", "fcc", "ab", "nfl", "ph"]
+
+
+def word_prettifier(word):
+    return word.upper() if word in TO_UPPER else word.capitalize()
+
+
+def name_prettifier(name):
+    words = re.split("[-_]", name)
+    return " ".join(word_prettifier(word) for word in words)
 
 
 class OpenAIIntegration:
@@ -55,7 +67,7 @@ class OpenAIIntegration:
         validator_type = self.map_class_to_validator_type(eval_class)
 
         return Eval(
-            name=eval_key,
+            name=name_prettifier(eval_key),
             description=eval_data.get("description", ""),
             validator_type=validator_type,
         )
