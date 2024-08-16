@@ -27,6 +27,7 @@ export interface IStateResponse {
 }
 
 export interface IUserProfileResponse {
+  id: number;
   username: string;
   email: string;
   affiliation: string | null;
