@@ -122,7 +122,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       return;
     }
 
-
     console.log('name:', name);
     console.log('validator:', validator);
     console.log('models:', models);
@@ -167,7 +166,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
-      addInstance();
+      if (step === 1) {
+        setStep(2);
+      } else {
+        addInstance();
+      }
     }
   };
 
@@ -182,6 +185,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             p={4}
             h='calc(100vh - 12rem)'
             overflowY='auto'
+            onKeyDown={handleKeyDown}
           >
             {!panel1Collapsed && (
               <>
@@ -189,10 +193,12 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
                   <Spacer />
                   <Spinner id='loadingSpinner' hidden />
-                  {step === 1 && (
-                    <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>
+                  {step === 1 && panel2Collapsed && (
+                    <Button float='right' onClick={() => { if (step === 1) setStep(2) }} minW='180px'>
                       <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                      <Text ml={2}>Next</Text>
+                      <Text ml={2}>
+                        Next
+                      </Text>
                     </Button>
                   )}
                 </HStack>
@@ -212,7 +218,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                           placeholder='Linear algebra equations in Latex. Output is the answer only in Latex.'
                           value={description}
                           onChange={(e) => setDescription(e.target.value)}
-                          onKeyDown={handleKeyDown}
                         />
                       </HStack>
 
@@ -300,7 +305,18 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false) }} onCollapse={() => { setPanel2Collapsed(true) }} >
+        <Panel 
+          collapsible={true} 
+          collapsedSize={2} 
+          defaultSize={2} 
+          minSize={24} 
+          ref={panel2Ref} 
+          onExpand={() => { 
+            setPanel2Collapsed(false);
+            if (step == 1) setStep(2);
+          }} 
+          onCollapse={() => { setPanel2Collapsed(true) }} 
+        >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             gap={4}
@@ -314,11 +330,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   <Box as='span' flex='1' textAlign='left'>
                     <Heading size='sm'>Task instances</Heading>
                   </Box>
-                  <Button variant='outline' ml='auto' onClick={addInstance}>
+                  <Button variant='outline' ml='auto' onClick={addInstance}  minW='300px'>
                     <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                     <Text ml={2}>Add task instance</Text>
                   </Button>
-                  <Button ml='auto' onClick={handleSubmit}>
+                  <Button ml='auto' onClick={handleSubmit} minW='150px'>
                     <Text>Submit</Text>
                   </Button>
                 </HStack>
@@ -393,9 +409,9 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                         <Heading size='md' my={4}>Tips for submission:</Heading>
                         <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
                         <Text my={4}>2. Compare results for at least 3 models.</Text>
-                        <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text>
-                        <Text my={4}>4. Add at least {MIN_INSTANCES} task instances.</Text>
-                        <Text>5. Double check ideal outputs for task instances.</Text>
+                        {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
+                        <Text my={4}>3. Add at least {MIN_INSTANCES} task instances. Mark at least 1 as a public example.</Text>
+                        <Text>4. Double check ideal outputs for task instances.</Text>
                         <Text my={4}>Have fun!</Text>
                       </CardBody>
                     </Card>
