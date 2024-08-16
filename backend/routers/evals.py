@@ -11,13 +11,10 @@ from db.models import (
     EvalUpvote,
     TaskInstance,
     TaskInstanceOutput,
-    User,
-    ValidatorType,
     eval_authors,
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
@@ -26,15 +23,9 @@ from validation_schemas.evals import (
     EvalResponseSchema,
     EvalRunResponseSchema,
     EvalSchema,
+    EvalUpdateSchema,
     EvalUpvotesResponseSchema,
 )
-
-
-class EvalUpdateSchema(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    validator_type: Optional[ValidatorType] = None
-
 
 evals_router = APIRouter()
 

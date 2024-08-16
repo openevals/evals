@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import List, Optional
+
+from db.models import EvalRunStatus, ValidatorType
 from pydantic import BaseModel, Field
-from typing import Optional, List
-from db.models import ValidatorType, EvalRunStatus
 from validation_schemas.models import ModelSchema
 
 
@@ -44,6 +45,12 @@ class EvalAuthorResponse(BaseModel):
     github_id: int = Field(..., serialization_alias="githubId")
     github_login: str = Field(..., serialization_alias="githubLogin")
     github_avatar: str = Field(..., serialization_alias="githubAvatar")
+
+
+class EvalUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    validator_type: Optional[ValidatorType] = None
 
 
 class EvalResponseSchema(BaseModel):
