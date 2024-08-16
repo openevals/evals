@@ -120,7 +120,7 @@ export default function ItemDetails() {
                 {evalItem.authors.map((a, idx) => (
                   <Text key={`author-item-${idx}`}>{a.username}</Text>
                 ))}
-                OpenAI
+                {evalItem.authors.length ===0 && <span>OpenAI</span>}
               </Text>
             </Box>
           </Stack>

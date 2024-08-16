@@ -13,7 +13,7 @@ from db.models import (
     TaskInstanceOutput,
     eval_authors,
     EvalUpvote,
-    User
+    User,
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -54,6 +54,8 @@ def create_eval(
                 is_public=task.is_public,
                 input=task.input,
                 ideal=task.ideal,
+                system_prompt=eval.model_systems[0].system_prompt,
+                user_prompt=eval.model_systems[0].user_prompt,
                 eval=new_eval,
             )
             db.add(new_task_instance)
@@ -63,8 +65,6 @@ def create_eval(
             new_eval_run = EvalRun(
                 score=0,
                 datetime=datetime.now(),
-                system_prompt=model.system_prompt,
-                user_prompt=model.user_prompt,
                 validator_type=eval.validator_type,
                 status=EvalRunStatus.Queued,
                 model_id=model.model_id,
@@ -141,6 +141,7 @@ def get_evals_upvoted(evals, auth):
     ]
     return results
 
+
 @evals_router.get(
     "/created",
     response_model=List[EvalListItemResponseSchema],
@@ -148,11 +149,12 @@ def get_evals_upvoted(evals, auth):
 )
 def get_user_evals(
     db: Session = Depends(get_db), auth: dict = Depends(validate_token)
-) -> dict:  
+) -> dict:
     """
     Get evals that a user has created
     """
-    return auth['user'].authored_evals
+    return auth["user"].authored_evals
+
 
 @evals_router.get(
     "/upvoted",
@@ -161,11 +163,12 @@ def get_user_evals(
 )
 def get_user_evals(
     db: Session = Depends(get_db), auth: dict = Depends(validate_token)
-) -> dict:  
+) -> dict:
     """
     Get evals that a user has upvoted
     """
-    return auth['user'].eval_upvotes
+    return auth["user"].eval_upvotes
+
 
 @evals_router.get(
     "/all", response_model=List[EvalListItemResponseSchema], status_code=200
