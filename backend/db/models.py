@@ -1,11 +1,10 @@
 from enum import Enum
 
+from db import Base
 from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
-
-from db import Base
 
 eval_authors = Table(
     "eval_authors",
@@ -119,8 +118,6 @@ class EvalRun(Base):
     id = Column(Integer, primary_key=True)
     score = Column(Float, nullable=False)
     datetime = Column(DateTime, nullable=False)
-    system_prompt = Column(String)
-    user_prompt = Column(String)  # task-specific user prompt
     validator_type = Column(SQLAlchemyEnum(ValidatorType), nullable=False)
     status = Column(
         SQLAlchemyEnum(EvalRunStatus), nullable=False, default=EvalRunStatus.Queued
