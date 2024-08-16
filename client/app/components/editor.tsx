@@ -80,7 +80,7 @@ export default function Editor() {
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
 
 
-  const [panel1Ref, panel2Ref, panel3Ref, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
+  const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
 
   useEffect(() => {
     const getModels = async () => {
@@ -141,13 +141,13 @@ export default function Editor() {
     });
 
     /* Show results and keep polling until eval run is finished */
-    setEvalName(newEval.name);
-    setEvalId(newEval.id);
-    console.log(newEval);
+    setEvalName(newEval.name)
+    setEvalId(newEval.id)
+    console.log(newEval)
     console.log(newEval.modelSystems.map((value: any) => value.id));
-    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
+    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id))
     setStep(3);
-  };
+  }
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
@@ -161,9 +161,9 @@ export default function Editor() {
       setOutputText('');
 
     } else {
-      console.error('Input text and output text must not be empty');
+      console.error('Input text and output text must not be empty')
     }
-  };
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -175,7 +175,7 @@ export default function Editor() {
   return (
     <>
       <PanelGroup direction="horizontal">
-        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref}>
+        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref} onExpand={() => { setPanel1Collapsed(false) }} onCollapse={() => { setPanel1Collapsed(true) }}>
           <Box w='100%' border='1px'
             borderColor='lightgray'
             borderLeftRadius='md'
@@ -184,132 +184,136 @@ export default function Editor() {
             h='calc(100vh - 12rem)'
             overflowY='auto'
           >
-            <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
-              <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
-              <Spacer />
-              <Spinner id='loadingSpinner' hidden />
-              {step === 1 && (
-                <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>
-                  <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                  <Text ml={2}>Next</Text>
-                </Button>
-              )}
-            </HStack>
-            <Accordion pt={2} allowMultiple defaultIndex={[0, 1, 2]}>
-              <AccordionItem py={2} border='none'>
-                <h2>
-                  <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
-                      <Heading size='sm'>Description</Heading>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <HStack w='100%'>
-                    <VStack w='50%'>
-                      <Text>Input</Text>
-                      <Textarea
-                        placeholder='Linear algebra equation in Latex'
-                        value={inputDescription}
-                        onChange={(e) => setInputDescription(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                      />
-                    </VStack>
-                    <VStack w='50%'>
-                      <Text>Ideal Output</Text>
-                      <Textarea
-                        placeholder='Answer only in Latex'
-                        value={outputDescription}
-                        onChange={(e) => setOutputDescription(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                      />
-                    </VStack>
-                  </HStack>
+            {!panel1Collapsed && (
+              <>
+                <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
+                  <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
+                  <Spacer />
+                  <Spinner id='loadingSpinner' hidden />
+                  {step === 1 && (
+                    <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>
+                      <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                      <Text ml={2}>Next</Text>
+                    </Button>
+                  )}
+                </HStack>
+                <Accordion pt={2} allowMultiple defaultIndex={[0, 1, 2]}>
+                  <AccordionItem py={2} border='none'>
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                          <Heading size='sm'>Description</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <HStack w='100%'>
+                        <VStack w='50%'>
+                          <Text>Input</Text>
+                          <Textarea
+                            placeholder='Linear algebra equation in Latex'
+                            value={inputDescription}
+                            onChange={(e) => setInputDescription(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                          />
+                        </VStack>
+                        <VStack w='50%'>
+                          <Text>Ideal Output</Text>
+                          <Textarea
+                            placeholder='Answer only in Latex'
+                            value={outputDescription}
+                            onChange={(e) => setOutputDescription(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                          />
+                        </VStack>
+                      </HStack>
 
-                </AccordionPanel>
-              </AccordionItem>
-              <AccordionItem py={2} >
-                <h2>
-                  <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
-                      <Heading size='sm'>Method to evaluate</Heading>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
-                    {Object.values(ValidatorType).map((validatorType) => (
-                      <option key={validatorType} value={validatorType}>
-                        {validatorType}
-                      </option>
-                    ))}
-                  </Select>
-                </AccordionPanel>
-              </AccordionItem>
-              <AccordionItem py={2} >
-                <h2>
-                  <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
-                      <Heading size='sm'>Models to test</Heading>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <Wrap direction='column'>
-                    {models?.map((model) => (
-                      <WrapItem key={model.modelName}>
-                        <Checkbox
-                          isChecked={model.checked}
-                          onChange={(e) => {
-                            model.checked = !model.checked;
-                            setModels([...models]);
-                          }}
-                        >
-                          {model.modelName}
-                        </Checkbox>
-                      </WrapItem>
-                    ))}
-                  </Wrap>
-                </AccordionPanel>
-              </AccordionItem>
-              <AccordionItem py={2} borderBottom='none' >
-                <h2>
-                  <AccordionButton>
-                    <Box as='span' flex='1' textAlign='left'>
-                      <Heading size='sm'>Prompts</Heading>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <HStack>
-                    <VStack w='100%'>
-                      <Text>System Prompt (Recommended)</Text>
-                      <Textarea
-                        placeholder='You are a mathematics professor at MIT.'
-                        value={systemPrompt}
-                        onChange={(e) => setSystemPrompt(e.target.value)}
-                      />
-                    </VStack>
-                    <VStack w='100%'>
-                      <Text>User Prompt (Optional)</Text>
-                      <Textarea
-                        placeholder='Solve linear algebra problems by responding with the numeric answer only.'
-                        value={userPrompt}
-                        onChange={(e) => setUserPrompt(e.target.value)}
-                      />
-                    </VStack>
-                  </HStack>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
+                    </AccordionPanel>
+                  </AccordionItem>
+                  <AccordionItem py={2} >
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                          <Heading size='sm'>Method to evaluate</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
+                        {Object.values(ValidatorType).map((validatorType) => (
+                          <option key={validatorType} value={validatorType}>
+                            {validatorType}
+                          </option>
+                        ))}
+                      </Select>
+                    </AccordionPanel>
+                  </AccordionItem>
+                  <AccordionItem py={2} >
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                          <Heading size='sm'>Models to test</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <Wrap direction='column'>
+                        {models?.map((model) => (
+                          <WrapItem key={model.modelName}>
+                            <Checkbox
+                              isChecked={model.checked}
+                              onChange={(e) => {
+                                model.checked = !model.checked;
+                                setModels([...models]);
+                              }}
+                            >
+                              {model.modelName}
+                            </Checkbox>
+                          </WrapItem>
+                        ))}
+                      </Wrap>
+                    </AccordionPanel>
+                  </AccordionItem>
+                  <AccordionItem py={2} borderBottom='none' >
+                    <h2>
+                      <AccordionButton>
+                        <Box as='span' flex='1' textAlign='left'>
+                          <Heading size='sm'>Prompts</Heading>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <HStack>
+                        <VStack w='100%'>
+                          <Text>System Prompt (Recommended)</Text>
+                          <Textarea
+                            placeholder='You are a mathematics professor at MIT.'
+                            value={systemPrompt}
+                            onChange={(e) => setSystemPrompt(e.target.value)}
+                          />
+                        </VStack>
+                        <VStack w='100%'>
+                          <Text>User Prompt (Optional)</Text>
+                          <Textarea
+                            placeholder='Solve linear algebra problems by responding with the numeric answer only.'
+                            value={userPrompt}
+                            onChange={(e) => setUserPrompt(e.target.value)}
+                          />
+                        </VStack>
+                      </HStack>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </Accordion>
+              </>
+            )}
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false); }} onCollapse={() => { setPanel2Collapsed(true); }} >
+        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false) }} onCollapse={() => { setPanel2Collapsed(true) }} >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             gap={4}
@@ -403,7 +407,7 @@ export default function Editor() {
                         <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
                         <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
                         <Heading size='md'>How to use this editor:</Heading>
-                        <Text my={4}>This is an editor to create, edit, and submit evals to learn how a specific AI model performs for your needs.</Text>
+                        <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
                         <Text>We welcome your submissions to OpenEvals! Once you contribute, your evaluation <i>results</i> are public for anyone to search, while <i>task instances</i> remain private and owned by you.</Text>
                         <Heading size='md' my={4}>Tips for submission:</Heading>
                         <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
