@@ -40,23 +40,28 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
 
   return (
     <Flex>
-      <Box w="50%">
-        {evals.map(({
-          id, name, description, validatorType, upvotes, upvoted
-        }) => (
-          <Box key={`eval-${id}`} onClick={() => { openEvalView(id) }}>
-            <ResultItem
-              name={name}
-              description={description ?? ''}
-              validatorType={validatorType}
-              upvotes={upvotes}
-              upvoted={upvoted}
-              onUpvote={() => callUpvoteEval(id)}
-            />
-            <Divider />
-          </Box>
-        ))}
-      </Box>
+      {evals.length == 0 ? (
+        <Box w="100%"><Text size="lg" textAlign="center">No evals found</Text></Box>
+      ) : (
+        <Box w="50%">
+          {evals.map(({
+            id, name, description, validatorType, upvotes, upvoted
+          }) => (
+            <Box key={`eval-${id}`} onClick={() => { openEvalView(id) }}>
+              <ResultItem
+                id={id}
+                name={name}
+                description={description ?? ''}
+                validatorType={validatorType}
+                upvotes={upvotes}
+                upvoted={upvoted}
+                onUpvote={() => callUpvoteEval(id)}
+              />
+              <Divider />
+            </Box>
+          ))}
+        </Box>
+      )}
       <Spacer></Spacer>
       {evalId && (
         <Box w="40%" right={16} position='fixed' >
@@ -67,6 +72,7 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
           </Card>
         </Box>
       )}
+
     </Flex>
   );
 }
