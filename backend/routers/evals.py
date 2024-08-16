@@ -1,26 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy import update
-from sqlalchemy.orm import Session
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
+from controllers.evals import run_eval_task
+from controllers.jwt import validate_optional_token, validate_token
 from db.db import get_db
 from db.models import (
     Eval,
-    TaskInstance,
     EvalRun,
     EvalRunStatus,
-    eval_authors,
     EvalUpvote,
+    TaskInstance,
+    TaskInstanceOutput,
+    User,
+    ValidatorType,
+    eval_authors,
 )
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from sqlalchemy import update
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, joinedload
 from validation_schemas.evals import (
-    EvalSchema,
+    EvalListItemResponseSchema,
     EvalResponseSchema,
     EvalRunResponseSchema,
-    EvalListItemResponseSchema,
+    EvalSchema,
     EvalUpvotesResponseSchema,
 )
-from controllers.evals import run_eval_task
-from controllers.jwt import validate_token, validate_optional_token
+
+
+class EvalUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    validator_type: Optional[ValidatorType] = None
+
 
 evals_router = APIRouter()
 
@@ -231,3 +245,104 @@ def get_trending_evals(
     if evals:
         return get_evals_upvoted(evals, auth)
     raise HTTPException(status_code=404, detail={"error": "evals-not-found"})
+
+
+@evals_router.delete("/{eval_id}")
+def delete_eval(
+    eval_id: int,
+    db: Session = Depends(get_db),
+    auth: dict = Depends(validate_token),
+) -> JSONResponse:
+    """
+    Delete an evaluation and its associated data if the current user is an author
+    """
+    eval = (
+        db.query(Eval)
+        .options(
+            joinedload(Eval.task_instances),
+            joinedload(Eval.eval_runs),
+            joinedload(Eval.authors),
+        )
+        .filter(Eval.id == eval_id)
+        .first()
+    )
+
+    if not eval:
+        raise HTTPException(status_code=404, detail={"error": "eval-not-found"})
+
+    if auth["user"] not in eval.authors:
+        raise HTTPException(status_code=403, detail={"error": "not-authorized"})
+
+    try:
+        for task_instance in eval.task_instances:
+            db.query(TaskInstanceOutput).filter(
+                TaskInstanceOutput.task_instance_id == task_instance.id
+            ).delete()
+        db.query(TaskInstance).filter(TaskInstance.eval_id == eval_id).delete()
+
+        for eval_run in eval.eval_runs:
+            db.query(TaskInstanceOutput).filter(
+                TaskInstanceOutput.eval_run_id == eval_run.id
+            ).delete()
+        db.query(EvalRun).filter(EvalRun.eval_id == eval_id).delete()
+
+        db.query(EvalUpvote).filter(EvalUpvote.eval_id == eval_id).delete()
+
+        db.delete(eval)
+        db.commit()
+    except IntegrityError as error:
+        db.rollback()
+        raise HTTPException(
+            status_code=400, detail={"error": "eval-delete-failed"}
+        ) from error
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "message": f"Eval {eval_id} has been successfully deleted",
+        },
+        status_code=200,
+    )
+
+
+@evals_router.put("/{eval_id}", response_model=EvalResponseSchema)
+def update_eval(
+    eval_id: int,
+    eval_update: EvalUpdateSchema,
+    db: Session = Depends(get_db),
+    auth: dict = Depends(validate_token),
+) -> Eval:
+    """
+    Update an evaluation if the current user is an author
+    """
+    eval = (
+        db.query(Eval)
+        .options(joinedload(Eval.authors))
+        .filter(Eval.id == eval_id)
+        .first()
+    )
+
+    if not eval:
+        raise HTTPException(status_code=404, detail={"error": "eval-not-found"})
+
+    if auth["user"] not in eval.authors:
+        raise HTTPException(status_code=403, detail={"error": "not-authorized"})
+
+    # Update fields if provided
+    if eval_update.name is not None:
+        eval.name = eval_update.name
+    if eval_update.description is not None:
+        eval.description = eval_update.description
+    if eval_update.validator_type is not None:
+        eval.validator_type = eval_update.validator_type
+
+    try:
+        db.commit()
+        db.refresh(eval)
+    except IntegrityError as error:
+        db.rollback()
+        raise HTTPException(
+            status_code=400, detail={"error": "eval-update-failed"}
+        ) from error
+
+    return eval
