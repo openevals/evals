@@ -1,4 +1,5 @@
 import uvicorn
+import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +13,9 @@ from routers.health import health_router
 from routers.models import models_router
 from routers.oauth import oauth_router
 
-app = FastAPI(title="OpenEvals")
+docs_url = "/docs" if os.getenv("ENV") != "production" else None
+redoc_url = "/redoc" if os.getenv("ENV") != "production" else None
+app = FastAPI(title="OpenEvals", docs_url=docs_url, redoc_url=redoc_url)
 
 # Configure CORS
 origins = ["*"]
