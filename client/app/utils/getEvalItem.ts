@@ -7,6 +7,7 @@ export async function getEvalItem(id: number) {
     const response = await res.json() as IEvalResponse;
     response.modelSystems = response.modelSystems.sort((a, b) => a.modelId - b.modelId);
     response.taskInstances = response.taskInstances.sort((a, b) => a.id - b.id);
+    response.authors = response.authors.sort((a, b) => a.id - b.id);
     return response;
   } catch (e) {
     console.error(e);
