@@ -47,7 +47,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     };
     getEvalInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [evalId]);
 
   useEffect(() => {
     const map: Record<number, string> = {};
