@@ -19,6 +19,8 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Divider,
+  Link,
   Box,
   Textarea,
   VStack,
@@ -387,7 +389,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             <Tabs defaultIndex={1} variant='enclosed'>
               <TabList>
                 <Tab>Try an eval</Tab>
-                <Tab>How to use</Tab>
+                <Tab>How to contribute</Tab>
                 <Tab>Results</Tab>
               </TabList>
               <TabPanels>
@@ -398,18 +400,17 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                 <TabPanel>
                   <Card variant='outline'>
                     <CardBody>
-                      <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
-                      <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
-                      <Heading size='md'>How to use this editor:</Heading>
-                      <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
-                      <Text>We welcome your submissions to OpenEvals! Once you contribute, your evaluation <i>results</i> are public for anyone to search, while <i>task instances</i> remain private and owned by you.</Text>
+                      <Heading size='md'>Welcome to OpenEvals, a practical evals database that anyone can contribute to. 💛</Heading>
+                      <Text my={4}>An <b>eval</b> is a task that grades an AI system's output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system." textDecoration="underline">[1]</Link></Text>
+                      <Text my={4}>This is an editor to contribute evals.</Text>
                       <Heading size='md' my={4}>Tips for submission:</Heading>
-                      <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
-                      <Text my={4}>2. Compare results for at least 3 models.</Text>
+                      <Text>1. Choose an eval topic that you know well, e.g. something you would be comfortable teaching.</Text>
+                      <Text my={4}>2. Compare results for at least 3 AI <b>models</b>.</Text>
                       {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
-                      <Text my={4}>3. Add at least {MIN_INSTANCES} task instances. Mark at least 1 as a public example.</Text>
-                      <Text>4. Double check ideal outputs for task instances.</Text>
-                      <Text my={4}>Have fun!</Text>
+                      <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
+                      <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
+                      <Text>5. Double check ideal outputs for task instances.</Text>
+                      <Text my={4}>That's all! Have fun~</Text>
                     </CardBody>
                   </Card>
                 </TabPanel>
@@ -417,7 +418,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   {step === 3 ? (
                     <EvalRunResults evalName={evalObj.name} evalId={evalObj.id} evalRunIds={evalRunIds} taskInstances={evalObj.taskInstances} />
                   ) : (
-                    <Center>Your run results will appear here 🌱</Center>
+                    <Center>Your evaluation results will appear here 🌱</Center>
                   )}
                   </TabPanel>
               </TabPanels>
