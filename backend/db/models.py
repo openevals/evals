@@ -5,6 +5,7 @@ from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 eval_authors = Table(
     "eval_authors",
@@ -33,12 +34,12 @@ class User(Base):
     github_id = Column(Integer, unique=True, nullable=True)
     github_login = Column(String, nullable=True)
     github_avatar = Column(String, nullable=True)
-
     author = relationship("Author", back_populates="user")
     eval_upvotes = relationship("EvalUpvote", back_populates="user")
     evals = relationship("Eval", back_populates="owner")
     task_instances = relationship("TaskInstance", back_populates="owner")
     eval_runs = relationship("EvalRun", back_populates="owner")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class Author(Base):
@@ -50,10 +51,10 @@ class Author(Base):
     github_login = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="author")
-
     authored_evals = relationship(
         "Eval", secondary=eval_authors, back_populates="authors"
     )
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class Model(Base):
@@ -63,6 +64,7 @@ class Model(Base):
     model_name = Column(String, nullable=False)
     eval_runs = relationship("EvalRun", back_populates="model")
     outputs = relationship("TaskInstanceOutput", back_populates="model")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class Eval(Base):
@@ -82,6 +84,7 @@ class Eval(Base):
     # Ownership information
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     owner = relationship("User", back_populates="evals")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class EvalUpvote(Base):
@@ -91,6 +94,7 @@ class EvalUpvote(Base):
     eval = relationship("Eval", back_populates="user_upvotes")
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="eval_upvotes")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class TaskInstance(Base):
@@ -110,6 +114,7 @@ class TaskInstance(Base):
     # Ownership information
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     owner = relationship("User", back_populates="task_instances")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class EvalRunStatus(Enum):
@@ -133,6 +138,7 @@ class TaskInstanceOutput(Base):
     num_tokens = Column(Integer, nullable=False)
     eval_run_id = Column(Integer, ForeignKey("eval_runs.id"), nullable=False)
     eval_run = relationship("EvalRun", back_populates="task_instance_outputs")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class EvalRun(Base):
@@ -154,6 +160,7 @@ class EvalRun(Base):
     # Ownership information
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     owner = relationship("User", back_populates="eval_runs")
+    created_at = Column(DateTime, server_default=func.now())
 
 
 class OAuth2Sates(Base):
