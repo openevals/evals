@@ -158,7 +158,15 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   return (
     <>
       <PanelGroup direction="horizontal">
-        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref} onExpand={() => { setPanel1Collapsed(false); }} onCollapse={() => { setPanel1Collapsed(true); }}>
+        <Panel
+          collapsible={true}
+          collapsedSize={2}
+          defaultSize={64}
+          minSize={24}
+          ref={panel1Ref as React.RefObject<ImperativePanelHandle>}
+          onExpand={() => setPanel1Collapsed(false)}
+          onCollapse={() => setPanel1Collapsed(true)}
+        >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             borderLeftRadius='md'

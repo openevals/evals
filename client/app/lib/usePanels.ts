@@ -17,6 +17,22 @@ export default function usePanels(step: number) {
   }, [step]);
 
 
-  return [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed];
+  return [
+    panel1Ref,
+    panel2Ref,
+    panel3Ref,
+    panel1Collapsed,
+    setPanel1Collapsed,
+    panel2Collapsed,
+    setPanel2Collapsed
+  ] as [
+    React.RefObject<ImperativePanelHandle>,
+    React.RefObject<ImperativePanelHandle>,
+    React.RefObject<ImperativePanelHandle>,
+    boolean,
+    React.Dispatch<React.SetStateAction<boolean>>,
+    boolean,
+    React.Dispatch<React.SetStateAction<boolean>>
+  ];
 
 }

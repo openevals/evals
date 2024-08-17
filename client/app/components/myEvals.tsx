@@ -36,6 +36,7 @@ export default function MyEvals() {
           id, name, description, validatorType, upvotes, upvoted
         }) => (
           <ResultItem
+            id={id}
             key={name}
             name={name}
             description={description ?? ''}
@@ -52,13 +53,14 @@ export default function MyEvals() {
           id, name, description, validatorType, upvotes, upvoted
         }) => (
           <ResultItem
+            id={id}
             key={name}
             name={name}
             description={description ?? ''}
             validatorType={validatorType}
             upvotes={upvotes}
             upvoted={upvoted}
-            onUpvote={() => callUpvoteEval(id)}
+            onUpvote={() => {}} 
           />
         ))}
       </>          
