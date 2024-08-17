@@ -45,12 +45,12 @@ def get_or_create_author(db, user):
             github_login=user.github_login,
             user_id=user.id,
         )
+        db.add(author)
     else:
         author.username = user.username
         author.email = user.email
         author.avatar = user.github_avatar
         author.github_login = user.github_login
-        db.add(author)
     db.commit()
     return author
 
