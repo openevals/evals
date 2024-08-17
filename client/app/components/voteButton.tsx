@@ -8,11 +8,18 @@ import { IRootState } from "@/app/lib/store";
 function VoteButton({ votes, upvoted, onUpvote }: { votes: number, upvoted: boolean, onUpvote: () => void }) {
   const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
 
+
+  const cbVote = (ev: any) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    if (isAuthenticated) onUpvote();
+  };
+
   return (
     <Button
       variant='outline'
       p={0}
-      onClick={isAuthenticated ? () => onUpvote() : () => { }}
+      onClick={cbVote}
       backgroundColor={upvoted ? 'var(--chakra-colors-gray-200)' : ''}
     >
       <Box as="span" ml={2}>

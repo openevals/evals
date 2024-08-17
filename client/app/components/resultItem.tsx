@@ -1,7 +1,8 @@
-import { Card, Stack, CardBody, Heading, Text, Button, CardFooter, Tag, HStack, VStack, Avatar } from '@chakra-ui/react';
+import { Card, Stack, CardBody, Heading, Text, Button, CardFooter, Tag, HStack, VStack, Avatar, useToast } from '@chakra-ui/react';
 import VoteButton from './voteButton';
 import { useRouter } from 'next/navigation';
 import { IAuthorResponse } from '../lib/types';
+import { MouseEventHandler } from 'react';
 
 export default function ResultItem({
   id,
@@ -23,9 +24,41 @@ export default function ResultItem({
   mainAuthor?: IAuthorResponse;
 }) {
   const router = useRouter();
+  const toast = useToast();
 
   const viewDetails = () => {
     router.push(`/evals/${id}`);
+  };
+
+  const copyTextToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        description: "Link copied to clipboard.",
+        status: 'success',
+        duration: 9000,
+        isClosable: true
+      });
+    } catch {
+      toast({
+        description: "Error copying link to clipboard.",
+        status: 'error',
+        duration: 9000,
+        isClosable: true
+      });
+    }
+  };
+
+  const cbShare = (ev: any) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    const link = `${process.env.NEXT_PUBLIC_WEB_URL}/evals/${id}`;
+    copyTextToClipboard(link);
+  };
+
+  const cbTry = (ev: any) => {
+    ev.stopPropagation();
+    ev.preventDefault();
   };
 
   return (
@@ -52,8 +85,8 @@ export default function ResultItem({
         </HStack>
         <HStack>
           <VoteButton votes={upvotes} upvoted={upvoted} onUpvote={() => onUpvote()} />
-          <Button variant='outline'>Share</Button>
-          <Button variant="outline">Try</Button>
+          <Button onClick={cbShare} variant='outline'>Share</Button>
+          <Button onClick={cbTry} variant="outline">Try</Button>
         </HStack>
       </Stack>
     </>
