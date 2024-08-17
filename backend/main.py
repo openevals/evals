@@ -1,8 +1,11 @@
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.account import account_router
 from routers.evals import evals_router
+
+load_dotenv()
 
 # Include service routes
 from routers.health import health_router
