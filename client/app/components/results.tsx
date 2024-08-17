@@ -44,7 +44,7 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
       ) : (
         <Box w="50%">
           {evals.map(({
-            id, name, description, validatorType, upvotes, upvoted
+            id, name, description, validatorType, upvotes, upvoted, authors
           }) => (
             <Box key={`eval-${id}`} onClick={() => { openEvalView(id); }}>
               <ResultItem
@@ -55,6 +55,7 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
                 upvotes={upvotes}
                 upvoted={upvoted}
                 onUpvote={() => callUpvoteEval(id)}
+                mainAuthor={authors[0]}
               />
               <Divider />
             </Box>
