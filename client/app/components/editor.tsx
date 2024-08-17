@@ -144,9 +144,9 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       setOutputText('');
 
     } else {
-      console.error('Input text and output text must not be empty')
+      console.error('Input text and output text must not be empty');
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -158,7 +158,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   return (
     <>
       <PanelGroup direction="horizontal">
-        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref} onExpand={() => { setPanel1Collapsed(false) }} onCollapse={() => { setPanel1Collapsed(true) }}>
+        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref} onExpand={() => { setPanel1Collapsed(false); }} onCollapse={() => { setPanel1Collapsed(true); }}>
           <Box w='100%' border='1px'
             borderColor='lightgray'
             borderLeftRadius='md'
@@ -174,7 +174,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   <Spacer />
                   <Spinner id='loadingSpinner' hidden />
                   {step === 1 && (
-                    <Button float='right' onClick={() => { if (step === 1) setStep(2) }}>
+                    <Button float='right' onClick={() => { if (step === 1) setStep(2); }}>
                       <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                       <Text ml={2}>Next</Text>
                     </Button>
@@ -296,7 +296,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false) }} onCollapse={() => { setPanel2Collapsed(true) }} >
+        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false); }} onCollapse={() => { setPanel2Collapsed(true); }} >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             gap={4}

@@ -11,7 +11,7 @@ export default function Trending() {
     const getTrending = async () => {
       const evals = await getTopEvals(); 
       setEvals(evals);
-    }
+    };
     getTrending();
   }, []);
 

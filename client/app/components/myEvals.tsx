@@ -25,7 +25,7 @@ export default function MyEvals() {
       };
       getUserEvalInfo();
     }
-  }, []);
+  });
 
   return (
     <>
@@ -42,7 +42,7 @@ export default function MyEvals() {
             validatorType={validatorType}
             upvotes={upvotes}
             upvoted={upvoted}
-            onUpvote={() => { console.log('TODO') }}
+            onUpvote={() => { console.log('TODO'); }}
           />
         ))}
       </>
@@ -63,5 +63,5 @@ export default function MyEvals() {
         ))}
       </>          
     </>
-  )
+  );
 }
