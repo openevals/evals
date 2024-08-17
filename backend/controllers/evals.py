@@ -26,6 +26,7 @@ def run_eval_task(eval_id):
                     model_query = ModelQueryInput(
                         model_provider=model_provider,
                         model_name=eval_run.model.model_name,
+                        system_message="",
                         input_message="",
                         temperature=0,
                         max_tokens=4096,
@@ -44,6 +45,7 @@ def run_eval_task(eval_id):
                     for task_instance in eval.task_instances:
                         try:
                             # Call the model for the task instance
+                            model_query.system_message = task_instance.system_prompt
                             model_query.input_message = task_instance.input
                             [input_data, output_data] = query(model_query)
 

@@ -115,6 +115,11 @@ def get_eval_run_details(
     eval_run = (
         db.query(EvalRun)
         .filter(EvalRun.id == eval_run_id, EvalRun.eval_id == eval_id)
+        .options(
+            joinedload(EvalRun.task_instance_outputs).joinedload(
+                TaskInstanceOutput.task_instance
+            )
+        )
         .first()
     )
     if eval_run:

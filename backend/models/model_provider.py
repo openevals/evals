@@ -10,6 +10,11 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("myapp")
 
 
 @dataclass
@@ -28,6 +33,7 @@ class ModelResponse:
 class ModelQueryInput:
     model_provider: "ModelProviderType"
     model_name: str
+    system_message: str
     input_message: str
     temperature: float
     max_tokens: int
@@ -64,6 +70,7 @@ class ModelProvider(ABC):
     def query_model_provider(
         cls,
         model_name: str,
+        system_message: str,
         input_message: str,
         temperature: float,
         max_tokens: int,
@@ -87,6 +94,7 @@ class ModelProvider(ABC):
             input.api_key = cls._api_key(input.model_provider)
         response = cls.query_model_provider(
             model_name=input.model_name,
+            system_message=input.system_message,
             input_message=input.input_message,
             temperature=input.temperature,
             max_tokens=input.max_tokens,
@@ -109,6 +117,7 @@ class OpenAIModels(ModelProvider):
     def query_model_provider(
         cls,
         model_name: str,
+        system_message: str,
         input_message: str,
         temperature: float,
         max_tokens: int,
@@ -118,7 +127,10 @@ class OpenAIModels(ModelProvider):
         client = cls.create_client(api_key)
         return client.chat.completions.create(
             model=model_name,
-            messages=[{"role": "user", "content": input_message}],
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": input_message},
+            ],
             temperature=temperature,
             max_tokens=max_tokens,
             stop=stop_sequences,
@@ -149,6 +161,7 @@ class AnthropicModels(ModelProvider):
     def query_model_provider(
         cls,
         model_name: str,
+        system_message: str,
         input_message: str,
         temperature: float,
         max_tokens: int,
@@ -156,10 +169,14 @@ class AnthropicModels(ModelProvider):
         api_key: str,
     ):
         client = cls.create_client(api_key)
+        logger.debug(
+            f"Requesting Anthtopic: SYS={system_message}, INPUT={input_message}"
+        )
         return client.messages.create(
             model=model_name,
             max_tokens=max_tokens,
             temperature=temperature,
+            system=system_message,
             messages=[{"role": "user", "content": input_message}],
             stop_sequences=stop_sequences,
         )
@@ -172,6 +189,7 @@ class AnthropicModels(ModelProvider):
         model_input = ModelInput(
             value=input_message, num_tokens=response.usage.input_tokens
         )
+        print(f"RESULT {model_response}")
         model_response = ModelResponse(
             value=model_response,
             num_tokens=response.usage.output_tokens,
@@ -183,14 +201,17 @@ class GoogleModels(ModelProvider):
     model_name: str
 
     @classmethod
-    def create_client(cls, model_name: str, api_key: str) -> gemini.GenerativeModel:
+    def create_client(
+        cls, model_name: str, api_key: str, system_message: str
+    ) -> gemini.GenerativeModel:
         gemini.configure(api_key=api_key)
-        return gemini.GenerativeModel(model_name)
+        return gemini.GenerativeModel(model_name, system_instruction=system_message)
 
     @classmethod
     def query(cls, input: ModelQueryInput) -> tuple[ModelInput, ModelResponse]:
         response = cls.query_model_provider(
             model_name=input.model_name,
+            system_message=input.system_message,
             input_message=input.input_message,
             temperature=input.temperature,
             max_tokens=input.max_tokens,
@@ -206,13 +227,16 @@ class GoogleModels(ModelProvider):
     def query_model_provider(
         cls,
         model_name: str,
+        system_message: str,
         input_message: str,
         temperature: float,
         max_tokens: int,
         stop_sequences: List[str],
         api_key: str,
     ) -> gemini.types.GenerateContentResponse:
-        model = cls.create_client(model_name=model_name, api_key=api_key)
+        model = cls.create_client(
+            model_name=model_name, api_key=api_key, system_message=system_message
+        )
         return model.generate_content(
             contents=input_message,
             generation_config=gemini.types.GenerationConfig(
@@ -240,7 +264,7 @@ class GoogleModels(ModelProvider):
 
     @classmethod
     def count_tokens(cls, input: ModelQueryInput) -> int:
-        model = cls.create_client(input.model_name, input.api_key)
+        model = cls.create_client(input.model_name, input.api_key, input.system_message)
         return model.count_tokens(input.input_message).total_tokens
 
 
