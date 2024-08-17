@@ -10,11 +10,6 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
-import logging
-
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("myapp")
 
 
 @dataclass
@@ -169,9 +164,6 @@ class AnthropicModels(ModelProvider):
         api_key: str,
     ):
         client = cls.create_client(api_key)
-        logger.debug(
-            f"Requesting Anthtopic: SYS={system_message}, INPUT={input_message}"
-        )
         return client.messages.create(
             model=model_name,
             max_tokens=max_tokens,
@@ -189,7 +181,6 @@ class AnthropicModels(ModelProvider):
         model_input = ModelInput(
             value=input_message, num_tokens=response.usage.input_tokens
         )
-        print(f"RESULT {model_response}")
         model_response = ModelResponse(
             value=model_response,
             num_tokens=response.usage.output_tokens,
