@@ -20,6 +20,7 @@ import { getSupportedModels } from '@/app/utils/getEvalRun';
 import { setEvals, setModels, setSearchTerm } from '@/app/lib/store/dataSlice';
 import { getEvals } from '@/app/utils/getEvals';
 import { useRouter, usePathname } from 'next/navigation';
+import NavButtons from '@/app/components/layout/navButtons';
 
 export default function HeaderComponent() {
   const dispatch = useDispatch();
@@ -126,7 +127,7 @@ export default function HeaderComponent() {
   };
 
   return (
-    <HStack my={4} mx={8}>
+    <HStack my={8} mx={8}>
       <Heading size='md' cursor='pointer' onClick={gotoHome}>OpenEvals</Heading>
       <Popover isOpen={isOpen && suggestions.length > 0} onClose={() => setIsOpen(false)} initialFocusRef={inputRef} placement="bottom-start">
         <PopoverTrigger>
@@ -165,7 +166,8 @@ export default function HeaderComponent() {
       </Popover>
       <Button px={8} onClick={() => doSearch()}>Search</Button>
       <Spacer />
-      <Button ml={16} mr={2} variant="link">About</Button>
+      <NavButtons />
+      <Button ml={8} mr={2} variant="link">About</Button>
       {isAuthenticated && profile ? (
         <Menu>
           <MenuButton as={Avatar} name={profile.username} src={profile.githubAvatar} h="32px" w="32px" cursor="pointer" />

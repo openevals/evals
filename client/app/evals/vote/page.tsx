@@ -3,7 +3,7 @@ import React from "react";
 import UpvoteEvalsComponent from "../../components/upvoteEvals";
 
 export const metadata: Metadata = {
-  title: "OpenEvals - Vote on important evals",
+  title: "OpenEvals - Browse evals",
   description: "Evals for the public",
 };
 

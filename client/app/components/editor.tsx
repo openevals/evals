@@ -31,6 +31,10 @@ import {
   Select,
   Spinner,
   Container,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
   Tabs,
   TabList,
   Tab,
@@ -112,15 +116,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       return;
     }
     toggleSpinner();
-    const checkedModels = models.filter((model) => model.checked);
-    const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
-      modelId: model.id,
-      systemPrompt: systemPrompt,
-    }));
-    // TODO: error handling
-    if (validator === '') {
-      return;
-    }
 
     console.log('name:', name);
     console.log('validator:', validator);
@@ -129,6 +124,53 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     console.log('inputText:', inputText);
     console.log('outputText:', outputText);
     console.log('instances:', instances);
+    // Error checking
+    const errors: string[] = [];
+    if (!name.trim()) {
+      errors.push("Name is required");
+    }
+    if (!description.trim()) {
+      errors.push("Description is required");
+    }
+    if (!validator) {
+      errors.push("Evaluation method is required");
+    }
+    if (!models.some(model => model.checked)) {
+      errors.push("At least one model must be selected");
+    }
+    if (instances.length < 2) {
+      errors.push(`At least ${MIN_INSTANCES} task instances are required`);
+    }
+    if (!instances.some(instance => instance.isPublic)) {
+      errors.push("At least one task instance must be marked as public");
+    }
+
+    if (errors.length > 0) {
+      toast({
+        title: "Oops! Please check that you've entered everything correctly:",
+        description: errors.join(", "),
+        status: "error",
+        isClosable: true,
+        duration: 9000,
+      });
+      toggleSpinner();
+      return;
+    }
+
+    const checkedModels = models.filter((model) => model.checked);
+    const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
+      modelId: model.id,
+      systemPrompt: systemPrompt,
+    }));
+
+    console.log('name:', name);
+    console.log('validator:', validator);
+    console.log('models:', models);
+    console.log('systemPrompt:', systemPrompt);
+    console.log('inputText:', inputText);
+    console.log('outputText:', outputText);
+    console.log('instances:', instances);
+
     const newEval = await postNewEval(accessToken, {
       name,
       description,
@@ -187,111 +229,92 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             borderLeftRadius='md'
             gap={4}
             p={4}
-            h='calc(100vh - 12rem)'
+            h='calc(100vh - 8rem)'
             overflowY='auto'
             onKeyDown={handleKeyDown}
           >
             {!panel1Collapsed && (
               <>
-                <HStack mx={2} top={0}>
-                  <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
-                  <Spacer />
-                  {step === 1 && panel2Collapsed && (
-                    <Button float='right' onClick={() => { if (step === 1) setStep(2) }} minW='180px'>
-                      <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                      <Text ml={2}>
-                        Next
-                      </Text>
-                    </Button>
-                  )}
-                </HStack>
-                <Accordion pt={2} allowMultiple defaultIndex={[0, 1, 2]}>
-                  <AccordionItem py={2} border='none'>
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Description</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <HStack w='100%'>
-                        <Textarea
-                          placeholder='Linear algebra equations in Latex. Output is the answer only in Latex.'
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                        />
-                      </HStack>
+                <VStack spacing={6} align="stretch" px={2}>
+                  <FormControl>
+                    <HStack top={0}>
+                      <FormLabel htmlFor="evalName" srOnly>Evaluation Name</FormLabel>
+                      <Input
+                        id="evalName"
+                        size='lg'
+                        variant='flushed'
+                        placeholder={`Eval name, e.g. "Linear algebra problems"`}
+                        maxW='384px'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                      <Spacer />
+                      {step === 1 && panel2Collapsed && (
+                        <Button float='right' onClick={() => { if (step === 1) setStep(2) }} minW='180px'>
+                          <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                          <Text ml={2}>
+                            Next
+                          </Text>
+                        </Button>
+                      )}
+                    </HStack>
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>Description</Heading>
+                    </FormLabel>
+                    <Textarea
+                      placeholder='Linear algebra equations in Latex. Output is the answer only in Latex.'
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </FormControl>
 
-                    </AccordionPanel>
-                  </AccordionItem>
-                  <AccordionItem py={2} >
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Method to evaluate</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
-                        {Object.values(ValidatorType).map((validatorType) => (
-                          <option key={validatorType} value={validatorType}>
-                            {validatorType}
-                          </option>
-                        ))}
-                      </Select>
-                    </AccordionPanel>
-                  </AccordionItem>
-                  <AccordionItem py={2} >
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Models to test</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <Wrap direction='column'>
-                        {models?.map((model) => (
-                          <WrapItem key={model.modelName}>
-                            <Checkbox
-                              isChecked={model.checked}
-                              onChange={(e) => {
-                                model.checked = !model.checked;
-                                setModels([...models]);
-                              }}
-                            >
-                              {model.modelName}
-                            </Checkbox>
-                          </WrapItem>
-                        ))}
-                      </Wrap>
-                    </AccordionPanel>
-                  </AccordionItem>
-                  <AccordionItem py={2} borderBottom='none' >
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>System Prompt (Recommended)</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <Stack w='100%'>
-                        <Textarea
-                          placeholder='You are a mathematics professor at MIT.'
-                          value={systemPrompt}
-                          onChange={(e) => setSystemPrompt(e.target.value)}
-                        />
-                      </Stack>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>Method to evaluate</Heading>
+                    </FormLabel>
+                    <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
+                      {Object.values(ValidatorType).map((validatorType) => (
+                        <option key={validatorType} value={validatorType}>
+                          {validatorType}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>Models to test</Heading>
+                    </FormLabel>
+                    <Wrap direction='column'>
+                      {models?.map((model) => (
+                        <WrapItem key={model.modelName}>
+                          <Checkbox
+                            isChecked={model.checked}
+                            onChange={(e) => {
+                              model.checked = !model.checked;
+                              setModels([...models]);
+                            }}
+                          >
+                            {model.modelName}
+                          </Checkbox>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>System Prompt (Recommended)</Heading>
+                    </FormLabel>
+                    <Textarea
+                      placeholder='You are a mathematics professor at MIT.'
+                      value={systemPrompt}
+                      onChange={(e) => setSystemPrompt(e.target.value)}
+                    />
+                  </FormControl>
+                </VStack>
               </>
             )}
           </Box>
@@ -313,7 +336,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             borderColor='lightgray'
             gap={4}
             p={4}
-            h='calc(100vh - 12rem)'
+            h='calc(100vh - 8rem)'
             overflowY='auto'
           >
             {!panel2Collapsed && (
@@ -372,11 +395,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           <Box w='100%' border='1px'
             borderColor='lightgray'
             borderRightRadius='md'
-            h='calc(100vh - 12rem)'
+            h='calc(100vh - 8rem)'
             overflowY='auto'
             gap={4}
             p={4}>
-            <Tabs defaultIndex={1}>
+            <Tabs defaultIndex={1} variant='enclosed'>
               <TabList>
                 <Tab>Try an eval</Tab>
                 <Tab>How to use</Tab>

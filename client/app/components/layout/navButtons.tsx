@@ -11,7 +11,7 @@ import { IEvalListItemResponse } from '../../lib/types';
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-export default function NavButtonsComponent() {
+export default function NavButtons() {
   const router = useRouter();
   const pathname = usePathname();
   const [tabIndex, setTabIndex] = useState(0);
@@ -70,12 +70,11 @@ export default function NavButtonsComponent() {
   };
 
   return (
-    <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange} mb={4}>
+    <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange}>
       <TabList>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
         <Tab>Create your own eval (5 min) ⚒️</Tab>
-        <Tab>Contribute to an existing eval! 💛</Tab>
-        <Tab onClick={() => gotoPage('/evals/vote')}>Vote on important evals 😌</Tab>
+        <Tab onClick={() => gotoPage('/evals/vote')}>Browse evals 😌</Tab>
       </TabList>
     </Tabs>
   );
