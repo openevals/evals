@@ -158,7 +158,9 @@ def get_user_evals(
     """
     Get evals that a user has created
     """
-    return auth["user"].authored_evals
+    evals = auth["user"].authored_evals
+    return get_evals_upvoted(evals, auth)
+
 
 
 @evals_router.get(
@@ -172,7 +174,19 @@ def get_user_evals(
     """
     Get evals that a user has upvoted
     """
-    return auth["user"].eval_upvotes
+    evals = auth["user"].eval_upvotes
+    upvoted_evals = [
+        {
+            "id": eval.eval.id,
+            "name": eval.eval.name,
+            "description": eval.eval.description,
+            "validator_type": eval.eval.validator_type,
+            "upvotes": eval.eval.upvotes,
+            "upvoted": True
+        }
+        for eval in evals
+    ]
+    return upvoted_evals
 
 
 @evals_router.get(
