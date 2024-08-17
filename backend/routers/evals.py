@@ -13,7 +13,7 @@ from db.models import (
     TaskInstanceOutput,
     eval_authors,
     EvalUpvote,
-    User,
+    Author,
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -32,6 +32,29 @@ from validation_schemas.evals import (
 evals_router = APIRouter()
 
 
+def get_or_create_author(db, user):
+    """Get or create new author entry"""
+    author = db.query(Author).filter(Author.user_id == user.id).first()
+    if not author:
+        author = db.query(Author).filter(Author.email == user.email).first()
+    if not author:
+        author = Author(
+            username=user.username,
+            email=user.email,
+            avatar=user.github_avatar,
+            github_login=user.github_login,
+            user_id=user.id,
+        )
+    else:
+        author.username = user.username
+        author.email = user.email
+        author.avatar = user.github_avatar
+        author.github_login = user.github_login
+        db.add(author)
+    db.commit()
+    return author
+
+
 @evals_router.post("/create", response_model=EvalResponseSchema, status_code=200)
 def create_eval(
     background_tasks: BackgroundTasks,
@@ -43,7 +66,10 @@ def create_eval(
     Create new evaluation
     """
     new_eval = Eval(
-        name=eval.name, description=eval.description, validator_type=eval.validator_type
+        name=eval.name,
+        description=eval.description,
+        validator_type=eval.validator_type,
+        owner_id=auth["user"].id,
     )
     db.add(new_eval)
 
@@ -57,6 +83,7 @@ def create_eval(
                 system_prompt=eval.model_systems[0].system_prompt,
                 user_prompt=eval.model_systems[0].user_prompt,
                 eval=new_eval,
+                owner_id=auth["user"].id,
             )
             db.add(new_task_instance)
 
@@ -69,13 +96,15 @@ def create_eval(
                 status=EvalRunStatus.Queued,
                 model_id=model.model_id,
                 eval=new_eval,
+                owner_id=auth["user"].id,
             )
             db.add(new_eval_run)
         db.commit()
 
-        # Add user/eval relationship
+        # Add author/eval relationship
+        author = get_or_create_author(db, auth["user"])
         new_author_eval = eval_authors.insert().values(
-            user_id=auth["user"].id, eval_id=new_eval.id
+            author_id=author.id, eval_id=new_eval.id
         )
         db.execute(new_author_eval)
         db.commit()
@@ -141,6 +170,7 @@ def get_evals_upvoted(evals, auth):
             "validator_type": eval.validator_type,
             "upvotes": eval.upvotes,
             "upvoted": eval.id in user_upvotes,
+            "authors": eval.authors,
         }
         for eval in evals
     ]
@@ -158,7 +188,8 @@ def get_user_evals(
     """
     Get evals that a user has created
     """
-    return auth["user"].authored_evals
+    author = get_or_create_author(db, auth["user"])
+    return author.authored_evals
 
 
 @evals_router.get(
@@ -184,7 +215,7 @@ def get_evals(
     """
     Get all evals
     """
-    evals = db.query(Eval).all()
+    evals = db.query(Eval).options(joinedload(Eval.authors)).all()
     if evals:
         return get_evals_upvoted(evals, auth)
 
@@ -204,7 +235,10 @@ def search_evals(
     """
     name_matched_evals = db.query(Eval).filter(Eval.name.ilike(f"%{query}%")).all()
     description_matched_evals = (
-        db.query(Eval).filter(Eval.description.ilike(f"%{query}%")).all()
+        db.query(Eval)
+        .filter(Eval.description.ilike(f"%{query}%"))
+        .options(joinedload(Eval.authors))
+        .all()
     )
     # dedup the evals while preserving the order
     evals = list(
@@ -267,7 +301,13 @@ def get_trending_evals(
     """
     Get top 20 trending evals with the most votes
     """
-    evals = db.query(Eval).order_by(Eval.upvotes.desc()).limit(limit).all()
+    evals = (
+        db.query(Eval)
+        .order_by(Eval.upvotes.desc())
+        .limit(limit)
+        .options(joinedload(Eval.authors))
+        .all()
+    )
     if evals:
         return get_evals_upvoted(evals, auth)
     raise HTTPException(status_code=404, detail={"error": "evals-not-found"})
