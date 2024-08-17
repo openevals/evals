@@ -200,7 +200,7 @@ class OpenAIIntegration:
             openai_author = integration.get_or_create_author(
                 db,
                 name="openai/evals",
-                email="data@open.ai",
+                email="evals@openai.com",
                 avatar="https://www.svgrepo.com/show/306500/openai.svg",
                 github_login="openai",
             )
