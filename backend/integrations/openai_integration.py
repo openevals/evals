@@ -9,7 +9,7 @@ from typing import Generator, List
 
 import yaml
 from db.db import SessionLocal
-from db.models import Eval, TaskInstance, User, ValidatorType
+from db.models import Eval, TaskInstance, Author, ValidatorType, eval_authors
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="../.env")
@@ -175,30 +175,37 @@ class OpenAIIntegration:
         except subprocess.CalledProcessError:
             return "Unknown", ""
 
-    def get_or_create_user(self, db: SessionLocal, name: str, email: str) -> User:
-        if email.endswith("@users.noreply.github.com"):
-            # For GitHub private emails, use the name as username
-            user = db.query(User).filter(User.username == name).first()
-            if not user:
-                user = User(username=name, email=email)
-                db.add(user)
-                db.flush()
-        else:
-            user = db.query(User).filter(User.email == email).first()
-            if not user:
-                user = User(username=name, email=email)
-                db.add(user)
-                db.flush()
-        return user
+    def get_or_create_author(
+        self,
+        db: SessionLocal,
+        name: str,
+        email: str,
+        avatar: str = None,
+        github_login: str = None,
+    ) -> Author:
+        author = db.query(Author).filter(Author.email == email).first()
+        if not author:
+            author = Author(
+                username=name, email=email, avatar=avatar, github_login=github_login
+            )
+            db.add(author)
+        return author
 
     @staticmethod
     def main(dry_run: bool = True):
         logging.basicConfig(level=logging.INFO)
         integration = OpenAIIntegration()
         with SessionLocal() as db:
+            # Create an author for OpenAI
+            openai_author = integration.get_or_create_author(
+                db,
+                name="openai/evals",
+                email="data@open.ai",
+                avatar="https://www.svgrepo.com/show/306500/openai.svg",
+                github_login="openai",
+            )
             for yaml_file, jsonl_file in integration.get_openai_evals():
                 logger.info(f"Processing: {yaml_file.name}")
-
                 try:
                     metadata = integration.parse_metadata(yaml_file)
                     primary_author, author_email = integration.get_primary_author(
@@ -206,15 +213,9 @@ class OpenAIIntegration:
                     )
 
                     eval_obj = integration.create_eval(metadata)
-
-                    if author_email:
-                        user = integration.get_or_create_user(
-                            db, primary_author, author_email
-                        )
-                        eval_obj.user_id = user.id
-                        eval_obj.primary_author = user.username or user.email
-                    else:
-                        eval_obj.primary_author = primary_author
+                    author = integration.get_or_create_author(
+                        db, primary_author, author_email
+                    )
 
                     logger.info(
                         f"Eval: {eval_obj.name} (Type: {eval_obj.validator_type})"
@@ -247,6 +248,18 @@ class OpenAIIntegration:
                             db.add_all(task_instances)
                         try:
                             db.commit()
+
+                            # Register authors
+                            openai_author_eval = eval_authors.insert().values(
+                                author_id=openai_author.id, eval_id=eval_obj.id
+                            )
+                            db.execute(openai_author_eval)
+                            author_eval = eval_authors.insert().values(
+                                author_id=author.id, eval_id=eval_obj.id
+                            )
+                            db.execute(author_eval)
+                            db.commit()
+
                             logger.info(
                                 f"Successfully added {yaml_file.name} to the database."
                             )
