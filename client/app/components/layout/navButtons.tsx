@@ -24,8 +24,8 @@ export default function NavButtons() {
       setTabIndex(0);
     } else if (pathname == '/') {
       setTabIndex(1);
-    } else if (pathname == '/evals/vote') {
-      setTabIndex(3);
+    } else if (pathname == '/evals') {
+      setTabIndex(2);
     } else {
       setTabIndex(-1);
     }
@@ -58,11 +58,7 @@ export default function NavButtons() {
         gotoPage('/');
         break;
       case 2:
-        gotoPage('/');
-        setTabIndex(1);
-        return;
-      case 3:
-        gotoPage('/evals/vote');
+        gotoPage('/evals');
         break;
     }
     setTabIndex(index);
@@ -73,7 +69,7 @@ export default function NavButtons() {
       <TabList>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
         <Tab>Create your own eval (5 min) ⚒️</Tab>
-        <Tab onClick={() => gotoPage('/evals/vote')}>Browse evals 😌</Tab>
+        <Tab onClick={() => gotoPage('/evals')}>Browse evals 😌</Tab>
       </TabList>
     </Tabs>
   );
