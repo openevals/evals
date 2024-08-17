@@ -63,10 +63,10 @@ export interface IModelSystemResponse {
 }
 
 export interface IAuthorResponse {
+  id: number;
   username: string;
-  githubId: number;
   githubLogin: string;
-  githubAvatar: string;
+  avatar: string;
 }
 
 export interface IEvalResponse {
@@ -110,4 +110,5 @@ export interface IEvalListItemResponse {
   validatorType: string;
   upvotes: number;
   upvoted: boolean;
+  authors: IAuthorResponse[];
 }
