@@ -27,7 +27,7 @@ class ValidatorType(Enum):
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True, nullable=False)
+    username = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     affiliation = Column(String, nullable=True)
     github_access_token = Column(String, nullable=True)
