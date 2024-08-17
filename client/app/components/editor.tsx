@@ -39,23 +39,17 @@ import {
   CardBody,
   useToast
 } from '@chakra-ui/react';
-import Results from './results';
-
-import { getSupportedModels, postNewEval } from '@/app/utils/getEvalRun';
-
-import dummyData from '@/app/utils/dummyData.json';
-
-import { MIN_EXAMPLES, MIN_INSTANCES } from '@/app/lib/constants';
+import { postNewEval } from '@/app/utils/getEvalRun';
+import { defaultEvalItem, MIN_INSTANCES } from '@/app/lib/constants';
 import { ModelSystem, ValidatorType, TaskInstance, IModelResponse, IEvalResponse } from '@/app/lib/types';
 import usePanels from "../lib/usePanels";
-
-import useEvalResults from "../lib/hooks/useEvalResults";
 import EvalRunResults from "./evalRunResults";
 import { IRootState } from "../lib/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import InstancesTable from "./instancesTable";
 
 import Trending from "./trending";
+import { addNewEval } from "../lib/store/dataSlice";
 
 export default function Editor({ initialEval }: { initialEval?: IEvalResponse }) {
   // step 1 = enter meta info
@@ -72,26 +66,21 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [instances, setInstances] = useState<TaskInstance[]>([]);
-  const [evalName, setEvalName] = useState<string>('');
-  const [evalId, setEvalId] = useState<number>(0);
+  const [evalObj, setEvalObj] = useState<IEvalResponse>(initialEval ?? defaultEvalItem);
   const [evalRunIds, setEvalRunIds] = useState<number[]>([]);
   const toast = useToast();
   const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
-
-
+  const allModels = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const getModels = async () => {
-      const models = await getSupportedModels();
-      models.forEach((model: Omit<IModelResponse, 'checked'>) => {
-        (model as IModelResponse).checked = false;
-      });
-      setModels(models);
-    };
-    getModels();
-  }, []);
+    const newModels = allModels.map((model: IModelResponse) => {
+      return { ...model, checked: model.checked ?? false };
+    });
+    setModels(newModels);
+  }, [allModels]);
 
   const toggleSpinner = () => {
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -123,15 +112,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       return;
     }
 
-
-    console.log('name:', name);
-    console.log('validator:', validator);
-    console.log('models:', models);
-    console.log('systemPrompt:', systemPrompt);
-    console.log('userPrompt:', userPrompt);
-    console.log('inputText:', inputText);
-    console.log('outputText:', outputText);
-    console.log('instances:', instances);
     const newEval = await postNewEval(accessToken, {
       name,
       description: `Input: ${inputDescription}\nOutput: ${outputDescription}`,
@@ -139,15 +119,18 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       modelSystems,
       taskInstances: instances,
     });
+    setEvalObj(newEval);
+    dispatch(addNewEval({
+      id: newEval.id,
+      name: newEval.name,
+      description: newEval.description,
+      validatorType: newEval.validatorType,
+    }));
 
     /* Show results and keep polling until eval run is finished */
-    setEvalName(newEval.name)
-    setEvalId(newEval.id)
-    console.log(newEval)
-    console.log(newEval.modelSystems.map((value: any) => value.id));
-    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id))
+    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
     setStep(3);
-  }
+  };
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
@@ -415,7 +398,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   </TabPanel>
                   {step === 3 && (
                     <TabPanel>
-                      <EvalRunResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
+                      <EvalRunResults evalName={evalObj.name} evalId={evalObj.id} evalRunIds={evalRunIds} taskInstances={evalObj.taskInstances} />
                     </TabPanel>
                   )}
                 </TabPanels>
