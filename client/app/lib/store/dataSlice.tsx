@@ -21,6 +21,16 @@ const dataSlice = createSlice({
     setEvals(state, action) {
       state.evals = action.payload;
     },
+    addNewEval(state, action) {
+      state.evals = [...state.evals, {
+        id: action.payload.id,
+        name: action.payload.name,
+        description: action.payload.description,
+        validatorType: action.payload.validatorType,
+        upvotes: 0,
+        upvoted: false
+      }];
+    },
     setUpvotedEval(state, action) {
       state.evals = state.evals.map((value: any) => {
         if (value.id !== action.payload.id) return value;
@@ -39,6 +49,6 @@ const dataSlice = createSlice({
 });
 
 export const {
-  setModels, setEvals, setUpvotedEval, setSearchTerm, clearSearchTerm
+  setModels, setEvals, addNewEval, setUpvotedEval, setSearchTerm, clearSearchTerm
 } = dataSlice.actions;
 export default dataSlice.reducer;

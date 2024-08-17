@@ -32,26 +32,9 @@ export default function HeaderComponent() {
   const [suggestions, setSuggestions] = useState<IEvalListItemResponse[]>([]);
   const inputRef = useRef<any>(null);
   const popoverRef = useRef<any>(null);
-  const [inputWidth, setInputWidth] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-
-  // Update the input width to sync with the suggestions width
-  const updateWidth = () => {
-    if (inputRef.current) {
-      setInputWidth(inputRef.current.offsetWidth);
-    }
-  };
-
-  // Listen for screen resize to sync width
-  useEffect(() => {
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => {
-      window.removeEventListener('resize', updateWidth);
-    };
-  }, []);
 
   // Load all the models at the beginning
   useEffect(() => {
@@ -111,6 +94,8 @@ export default function HeaderComponent() {
   const doSearch = () => {
     if (inputValue.length == 0) return;
     dispatch(setSearchTerm(inputValue));
+    setSuggestions([]);
+    setIsOpen(false);
     if (pathname !== '/evals/search') {
       router.push('/evals/search');
     }
@@ -140,7 +125,7 @@ export default function HeaderComponent() {
             autoComplete='off'
           />
         </PopoverTrigger>
-        <PopoverContent width={inputWidth + "px"} ref={popoverRef}>
+        <PopoverContent width={inputRef?.current?.offsetWidth + "px"} ref={popoverRef} maxH='60vh' overflowY='auto'>
           <PopoverBody p={0}>
             {suggestions.map((suggestion, index) => (
               <Box

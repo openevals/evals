@@ -18,10 +18,11 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   const updateObjState = (obj: any) => {
     if (!evalRunsRef.current) return;
     /* Update object state */
-    const newObjs: any[] = evalRunsRef.current!.map((value) => {
-      return (value.id === obj.id) ? obj : value;
+    setEvalRuns(prevData => {
+      return prevData.map((value) => {
+        return (value.id === obj.id) ? obj : value;
+      });
     });
-    setEvalRuns([...newObjs]);
   };
 
 
@@ -39,7 +40,6 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
         lastStatus = obj.status;
         itr += 1;
         updateObjState(obj);
-
       }
     };
 

@@ -20,7 +20,6 @@ export default function NavButtons() {
 
 
   useEffect(() => {
-    console.log(pathname);
     if (pathname == `/evals/${lastEvalId}`) {
       setTabIndex(0);
     } else if (pathname == '/') {

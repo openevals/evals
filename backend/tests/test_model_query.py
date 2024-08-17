@@ -16,6 +16,7 @@ def test_openai_request_live() -> None:
     model_query = ModelQueryInput(
         model_provider=ModelProviderType.OPENAI,
         model_name="gpt-4o",
+        system_message="",
         input_message="The quick brown fox jumps over the lazy dog",
         temperature=0.0,
         max_tokens=10,
@@ -54,6 +55,7 @@ def test_multiple_models(model_provider: ModelProviderType, model_name: str) -> 
     model_query = ModelQueryInput(
         model_provider=model_provider,
         model_name=model_name,
+        system_message="",
         input_message="The quick brown fox jumps over the lazy dog",
         temperature=0.0,
         max_tokens=10,

@@ -17,33 +17,25 @@ import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
 import { IEvalResponse, IModelResponse, ValidatorType } from '../lib/types';
 import EvalRunResults from './evalRunResults';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { IRootState } from '../lib/store';
+import { defaultEvalItem } from '../lib/constants';
 
-const defaultEvalItem = {
-  id: 0,
-  name: '',
-  description: '',
-  validatorType: ValidatorType.ExactMatch,
-  taskInstances: [],
-  modelSystems: [],
-  authors: []
-};
-
-
-export default function ItemDetails() {
+export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
   const models = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
   const [modelMap, setModelMap] = useState<Record<number, string>>({});
   const [runIds, setRunIds] = useState<number[]>([]);
   const params: { id: string } = useParams();
+  const router = useRouter();
 
   useEffect(() => {
     /* Get the id parameter */
-    const id = parseInt(params.id, 10);
+    const id = evalId ?? parseInt(params.id, 10);
     if (!Number.isInteger(id)) {
+      router.push('/');
       return;
     }
 
@@ -136,6 +128,7 @@ export default function ItemDetails() {
               evalId={evalItem.id}
               evalName={evalItem.name}
               evalRunIds={runIds}
+              taskInstances={evalItem.taskInstances}
             />
           ) : (
             <Center>
