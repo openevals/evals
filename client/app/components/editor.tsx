@@ -42,7 +42,8 @@ import {
   TabPanel,
   Card,
   CardBody,
-  useToast
+  useToast,
+  Center
 } from '@chakra-ui/react';
 import Results from './results';
 
@@ -403,9 +404,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
               <TabList>
                 <Tab>Try an eval</Tab>
                 <Tab>How to use</Tab>
-                {step === 3 && (
-                  <Tab>Results</Tab>
-                )}
+                <Tab>Results</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel textAlign='left'>
@@ -430,11 +429,13 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                     </CardBody>
                   </Card>
                 </TabPanel>
-                {step === 3 && (
-                  <TabPanel>
+                <TabPanel>
+                  {step === 3 ? (
                     <EvalRunResults evalName={evalName} evalId={evalId} evalRunIds={evalRunIds} />
+                  ) : (
+                    <Center>Your run results will appear here 🌱</Center>
+                  )}
                   </TabPanel>
-                )}
               </TabPanels>
             </Tabs>
           </Box>

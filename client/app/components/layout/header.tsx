@@ -167,14 +167,16 @@ export default function HeaderComponent() {
       <Button px={8} onClick={() => doSearch()}>Search</Button>
       <Spacer />
       <NavButtons />
-      <Button ml={8} mr={2} variant="link">About</Button>
+      <Button ml={8} mr={2} variant="link" onClick={() => router.push('/about')}>About</Button>
       {isAuthenticated && profile ? (
         <Menu>
           <MenuButton as={Avatar} name={profile.username} src={profile.githubAvatar} h="32px" w="32px" cursor="pointer" />
           <MenuList zIndex={999}>
             <MenuItem>{profile.username}<br />{profile.email}</MenuItem>
+            <MenuDivider />
+            <MenuItem onClick={() => router.push('/my-evals')}>My Evals</MenuItem>
+            <MenuDivider />
             <MenuItem as={Box} onClick={() => window.open(`https://www.github.com/${profile.githubLogin}`, "_blank")} cursor="pointer">Github profile</MenuItem>
-            <MenuItem>User profile</MenuItem>
             <MenuDivider />
             <MenuItem as={Box} onClick={() => dispatch(logoutUser())} cursor="pointer">Logout</MenuItem>
           </MenuList>

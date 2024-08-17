@@ -71,7 +71,7 @@ export default function ItemDetails() {
         <Box p={4} w='400px'>
           <HStack>
             <Heading size='lg'>{evalItem.name}</Heading>
-            <Button ml={2}>Try Eval</Button>
+            <Button ml={2} minW='100px'>Try Eval</Button>
           </HStack>
           <Stack divider={<StackDivider />} spacing='4' py={8}>
             <Box>
@@ -141,7 +141,7 @@ export default function ItemDetails() {
             <Center>
               <VStack>
                 <Text>No model systems have been tested on this eval yet. Would you like to be the first?</Text>
-                <Button ml={2}>Try Eval</Button>
+                <Button ml={2}  minW='100px'>Try Eval</Button>
               </VStack>
             </Center>
           )}
