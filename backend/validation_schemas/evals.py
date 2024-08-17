@@ -41,10 +41,10 @@ class TaskInstanceResponseSchema(BaseModel):
 
 
 class EvalAuthorResponse(BaseModel):
+    id: int
     username: str
-    github_id: int = Field(..., serialization_alias="githubId")
-    github_login: str = Field(..., serialization_alias="githubLogin")
-    github_avatar: str = Field(..., serialization_alias="githubAvatar")
+    github_login: Optional[str] = Field(..., serialization_alias="githubLogin")
+    avatar: Optional[str]
 
 
 class EvalUpdateSchema(BaseModel):
@@ -75,6 +75,7 @@ class EvalListItemResponseSchema(BaseModel):
     validator_type: ValidatorType = Field(..., serialization_alias="validatorType")
     upvotes: int
     upvoted: bool
+    authors: List[EvalAuthorResponse]
 
 
 class TaskInstanceOutputResponseSchema(BaseModel):

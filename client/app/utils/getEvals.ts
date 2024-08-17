@@ -15,7 +15,12 @@ export async function getEvals(accessToken?: string): Promise<IEvalListItemRespo
       method: 'get',
       headers
     });
-    return await res.json() as IEvalListItemResponse[];
+    let response = await res.json() as IEvalListItemResponse[];
+    response = response.map((value)=>{
+      value.authors = value.authors.sort((a, b) => a.id - b.id);
+      return value;
+    });
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
@@ -31,7 +36,12 @@ export async function getUserEvals(accessToken: string): Promise<IEvalListItemRe
         'Authorization': `Bearer ${accessToken}`
       },
     });
-    return await res.json() as IEvalListItemResponse[];
+    let response = await res.json() as IEvalListItemResponse[];
+    response = response.map((value)=>{
+      value.authors = value.authors.sort((a, b) => a.id - b.id);
+      return value;
+    });
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
@@ -47,7 +57,12 @@ export async function getUserUpvotedEvals(accessToken: string): Promise<IEvalLis
         'Authorization': `Bearer ${accessToken}`
       },
     });
-    return await res.json() as IEvalListItemResponse[];
+    let response = await res.json() as IEvalListItemResponse[];
+    response = response.map((value)=>{
+      value.authors = value.authors.sort((a, b) => a.id - b.id);
+      return value;
+    });
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
@@ -68,7 +83,12 @@ export async function getTopEvals(accessToken?: string): Promise<IEvalListItemRe
       method: 'get',
       headers
     });
-    return await res.json() as IEvalListItemResponse[];
+    let response = await res.json() as IEvalListItemResponse[];
+    response = response.map((value)=>{
+      value.authors = value.authors.sort((a, b) => a.id - b.id);
+      return value;
+    });
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
@@ -88,7 +108,12 @@ export async function searchEvals(accessToken?: string, searchText?: string): Pr
       method: 'post',
       headers,
     });
-    return await res.json() as IEvalListItemResponse[];
+    let response = await res.json() as IEvalListItemResponse[];
+    response = response.map((value)=>{
+      value.authors = value.authors.sort((a, b) => a.id - b.id);
+      return value;
+    });
+    return response;
   } catch (e) {
     console.error(e);
     throw e;

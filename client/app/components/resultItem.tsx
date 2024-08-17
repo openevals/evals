@@ -1,6 +1,7 @@
 import { Card, Stack, CardBody, Heading, Text, Button, CardFooter, Tag, HStack, VStack, Avatar } from '@chakra-ui/react';
 import VoteButton from './voteButton';
 import { useRouter } from 'next/navigation';
+import { IAuthorResponse } from '../lib/types';
 
 export default function ResultItem({
   id,
@@ -10,6 +11,7 @@ export default function ResultItem({
   upvotes,
   upvoted,
   onUpvote,
+  mainAuthor,
 }: {
   id: number;
   name: string;
@@ -18,6 +20,7 @@ export default function ResultItem({
   upvotes: number;
   upvoted: boolean;
   onUpvote: () => void;
+  mainAuthor?: IAuthorResponse;
 }) {
   const router = useRouter();
 
@@ -34,10 +37,10 @@ export default function ResultItem({
         _hover={{ backgroundColor: 'gray.100', cursor: 'pointer' }}
       >
         <HStack>
-          <Avatar size='xs' name='openai/evals' src="https://www.svgrepo.com/show/306500/openai.svg" />
+          <Avatar size='xs' name={mainAuthor?.username ?? 'Unknown'} src={mainAuthor?.avatar ?? 'https://www.svgrepo.com/show/448095/person-circle.svg'} />
           <Stack spacing={0}>
-            <Text fontSize='sm'>openai/evals</Text>
-            <Text fontSize='xs'>@justinlinw</Text>
+            <Text fontSize='sm'>{mainAuthor?.username ?? 'Unknown'}</Text>
+            <Text fontSize='xs'>@{mainAuthor?.githubLogin ?? ''}</Text>
           </Stack>
         </HStack>
         <Heading size='md'>{name}</Heading>
