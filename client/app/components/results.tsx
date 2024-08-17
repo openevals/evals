@@ -1,10 +1,9 @@
 import ResultItem from "./resultItem";
-import { getEvals } from "../utils/getEvals";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
 import { upvoteEval } from "../utils/upvote";
-import { Box, Divider, useToast, Flex, CardBody, Card, Spacer } from "@chakra-ui/react";
+import { Box, Divider, useToast, Text, Flex, CardBody, Card, Spacer } from "@chakra-ui/react";
 import { IEvalListItemResponse } from "../lib/types";
 import ItemDetails from "./itemDetails";
 import { setUpvotedEval } from "../lib/store/dataSlice";
@@ -36,7 +35,7 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
 
   const openEvalView = (id: number) => {
     setEvalId(id);
-  }
+  };
 
   return (
     <Flex>
@@ -47,7 +46,7 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
           {evals.map(({
             id, name, description, validatorType, upvotes, upvoted
           }) => (
-            <Box key={`eval-${id}`} onClick={() => { openEvalView(id) }}>
+            <Box key={`eval-${id}`} onClick={() => { openEvalView(id); }}>
               <ResultItem
                 id={id}
                 name={name}

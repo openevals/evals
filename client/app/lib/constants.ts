@@ -1,3 +1,5 @@
+import { ValidatorType } from "./types";
+
 export const MIN_EXAMPLES = 10;
 export const MIN_INSTANCES = 5;
 
@@ -9,3 +11,13 @@ export const GITHUB_SCOPES = [
     "read:user",
     "user:email"
 ];
+
+export const defaultEvalItem = {
+    id: 0,
+    name: '',
+    description: '',
+    validatorType: ValidatorType.ExactMatch,
+    taskInstances: [],
+    modelSystems: [],
+    authors: []
+};

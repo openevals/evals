@@ -17,7 +17,10 @@ export async function postNewEval(accessToken: string, body: {
       },
       body: JSON.stringify(body)
     });
-    return await res.json() as IEvalResponse;
+    const response = await res.json() as IEvalResponse;
+    response.modelSystems = response.modelSystems.sort((a, b) => a.modelId - b.modelId);
+    response.taskInstances = response.taskInstances.sort((a, b) => a.id - b.id);
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
@@ -38,13 +41,15 @@ export function waitMS(timeout: number): Promise<void> {
 export async function getEvalRun(evalId: number, evalRunId: number, latency = 1000): Promise<IEvalRunResponse> {
   try {
     await waitMS(latency);
-    const res = await fetch(`${API_URL}/evals/${evalId}/run/${evalRunId}/get`, { 
+    const res = await fetch(`${API_URL}/evals/${evalId}/run/${evalRunId}/get`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
       },
     });
-    return await res.json() as IEvalRunResponse;
+    const response = await res.json() as IEvalRunResponse;
+    response.taskInstanceOutputs = response.taskInstanceOutputs.sort((a, b) => a.taskInstanceId - b.taskInstanceId);
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
@@ -54,7 +59,9 @@ export async function getEvalRun(evalId: number, evalRunId: number, latency = 10
 export async function getSupportedModels(): Promise<IModelResponse[]> {
   try {
     const res = await fetch(`${API_URL}/models/all`);
-    return await res.json() as IModelResponse[];
+    let response = await res.json() as IModelResponse[];
+    response = response.sort((a, b) => a.id - b.id);
+    return response;
   } catch (e) {
     console.error(e);
     throw e;
