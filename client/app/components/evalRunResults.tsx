@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   Thead,
@@ -16,10 +16,20 @@ import {
 } from '@chakra-ui/react';
 
 import useEvalResults from "../lib/hooks/useEvalResults";
+import { ITaskInstanceResponse } from '../lib/types';
 
 
-export default function EvalRunResults({ evalId, evalRunIds, evalName }: { evalId: number, evalRunIds: number[], evalName: string }) {
+export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInstances }: { evalId: number, evalRunIds: number[], evalName: string, taskInstances: ITaskInstanceResponse[] }) {
   const { evalRuns } = useEvalResults(evalId, evalRunIds);
+  const [taskMap, setTaskMap] = useState<Record<number, ITaskInstanceResponse>>({});
+
+  useEffect(() => {
+    const map: Record<number, ITaskInstanceResponse> = {};
+    taskInstances.forEach((value) => {
+      map[value.id] = value;
+    });
+    setTaskMap(map);
+  }, [taskInstances]);
 
   return (
     <>
@@ -65,7 +75,7 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName }: { evalI
               <Tr>
                 <Td>Ideal Output</Td>
                 {evalRuns[0]?.taskInstanceOutputs.map((output, index) => (
-                  <Td key={`ideal-${index}`}>{output.idealOutput}</Td>
+                  <Td key={`ideal-${index}`}>{taskMap[output.taskInstanceId]?.ideal}</Td>
                 ))}
                 <Td>N/A</Td>
               </Tr>
@@ -75,7 +85,7 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName }: { evalI
                   {run.taskInstanceOutputs.map((output, index) => (
                     <Td key={`output-${run.id}-${index}`}>{output.output}</Td>
                   ))}
-                  <Td>{run.taskInstanceOutputs.filter(output => output.output === output.idealOutput).length}</Td>
+                  <Td>{run.taskInstanceOutputs.filter(output => output.output === taskMap[output.taskInstanceId]?.ideal).length}</Td>
                 </Tr>
               ))}
             </Tbody>
