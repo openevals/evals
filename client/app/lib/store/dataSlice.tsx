@@ -28,7 +28,8 @@ const dataSlice = createSlice({
         description: action.payload.description,
         validatorType: action.payload.validatorType,
         upvotes: 0,
-        upvoted: false
+        upvoted: false,
+        authors: action.payload.authors 
       }];
     },
     setUpvotedEval(state, action) {
