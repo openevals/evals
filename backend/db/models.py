@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 eval_authors = Table(
     "eval_authors",
     Base.metadata,
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("author_id", Integer, ForeignKey("authors.id"), primary_key=True),
     Column("eval_id", Integer, ForeignKey("evals.id"), primary_key=True),
 )
 
@@ -34,10 +34,26 @@ class User(Base):
     github_login = Column(String, nullable=True)
     github_avatar = Column(String, nullable=True)
 
+    author = relationship("Author", back_populates="user")
+    eval_upvotes = relationship("EvalUpvote", back_populates="user")
+    evals = relationship("Eval", back_populates="owner")
+    task_instances = relationship("TaskInstance", back_populates="owner")
+    eval_runs = relationship("EvalRun", back_populates="owner")
+
+
+class Author(Base):
+    __tablename__ = "authors"
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=True)
+    avatar = Column(String, nullable=True)
+    github_login = Column(String, nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="author")
+
     authored_evals = relationship(
         "Eval", secondary=eval_authors, back_populates="authors"
     )
-    eval_upvotes = relationship("EvalUpvote", back_populates="user")
 
 
 class Model(Base):
@@ -58,11 +74,14 @@ class Eval(Base):
     upvotes = Column(Integer, nullable=False, default=0)
     primary_author = Column(String, nullable=True)
     authors = relationship(
-        "User", secondary=eval_authors, back_populates="authored_evals"
+        "Author", secondary=eval_authors, back_populates="authored_evals"
     )
     task_instances = relationship("TaskInstance", back_populates="eval")
     eval_runs = relationship("EvalRun", back_populates="eval")
     user_upvotes = relationship("EvalUpvote", back_populates="eval")
+    # Ownership information
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    owner = relationship("User", back_populates="evals")
 
 
 class EvalUpvote(Base):
@@ -88,6 +107,9 @@ class TaskInstance(Base):
     eval_id = Column(Integer, ForeignKey("evals.id"), nullable=False)
     eval = relationship("Eval", back_populates="task_instances")
     outputs = relationship("TaskInstanceOutput", back_populates="task_instance")
+    # Ownership information
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    owner = relationship("User", back_populates="task_instances")
 
 
 class EvalRunStatus(Enum):
@@ -129,6 +151,9 @@ class EvalRun(Base):
     task_instance_outputs = relationship(
         "TaskInstanceOutput", back_populates="eval_run"
     )
+    # Ownership information
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    owner = relationship("User", back_populates="eval_runs")
 
 
 class OAuth2Sates(Base):
