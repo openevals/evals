@@ -91,7 +91,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const allModels = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
   
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
-  const [tabIndex, setTabIndex] = useState(1);
+  const [tabIndex, setTabIndex] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure(); // modal
 
   const dispatch = useDispatch();
@@ -183,7 +183,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
 
     /* Show results and keep polling until eval run is finished */
     setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
-    setTabIndex(2);
+    setTabIndex(isMobile ? 3 : 2);
     setStep(3);
   };
 
@@ -591,14 +591,11 @@ function DesktopEditor({
         p={4}>
         <Tabs index={tabIndex} onChange={handleTabsChange} variant='enclosed'>
           <TabList>
-            <Tab>Try out an eval</Tab>
             <Tab>Contribute</Tab>
+            <Tab>Try out an eval</Tab>
             <Tab>Results</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel textAlign='left'>
-              <Trending />
-            </TabPanel>
             <TabPanel>
               <Card variant='outline'>
                 <CardBody>
@@ -615,6 +612,9 @@ function DesktopEditor({
                   <Text my={4}>{`That's all! Have fun~`}</Text>
                 </CardBody>
               </Card>
+            </TabPanel>
+            <TabPanel textAlign='left'>
+              <Trending />
             </TabPanel>
             <TabPanel>
               {step === 3 ? (
