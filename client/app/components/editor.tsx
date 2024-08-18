@@ -131,13 +131,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       return;
     }
 
-    console.log('name:', name);
-    console.log('validator:', validator);
-    console.log('models:', models);
-    console.log('systemPrompt:', systemPrompt);
-    console.log('inputText:', inputText);
-    console.log('outputText:', outputText);
-    console.log('instances:', instances);
     // Error checking
     const errors: string[] = [];
     if (!name.trim()) {
