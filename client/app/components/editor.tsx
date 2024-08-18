@@ -14,6 +14,16 @@ import {
   Stack,
   Kbd,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  UnorderedList,
+  ListItem,
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -81,6 +91,8 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
   const [tabIndex, setTabIndex] = useState(1);
+  const { isOpen, onOpen, onClose } = useDisclosure(); // modal
+
 
   const dispatch = useDispatch();
 
@@ -93,7 +105,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
 
 
 
-  const handleSubmit = async () => {
+  const clickSubmitButton = async () => {
     if (!isAuthenticated) {
       toast({
         title: "Not authorized",
@@ -144,6 +156,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       return;
     }
 
+    onOpen();
+
+  };
+
+  const confirmSubmit = async () => {
     const checkedModels = models.filter((model) => model.checked);
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
       modelId: model.id,
@@ -169,7 +186,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
     setTabIndex(2);
     setStep(3);
-  };
+  }
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
@@ -345,7 +362,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                     <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                     <Text ml={2}>Add task instance</Text>
                   </Button>
-                  <Button ml='auto' onClick={handleSubmit} minW='150px'>
+                  <Button ml='auto' onClick={clickSubmitButton} minW='150px'>
                     <Text>Submit</Text>
                   </Button>
                 </HStack>
@@ -433,6 +450,36 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           </Box>
         </Panel>
       </PanelGroup>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Please confirm the following:</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <UnorderedList spacing={2}>
+              <ListItem>
+                <Text>My eval solves a useful task in a format that is easy for humans to understand.</Text>
+              </ListItem>
+              <ListItem>
+                <Text>{`I've`} double checked that my task instances are correct.</Text>
+              </ListItem>
+              <ListItem>
+                <Text>To the best of my knowledge, my task instances are not easily available online in their task format.</Text>
+              </ListItem>
+              <ListItem>
+                <Text>To the best of my knowledge, I {`won't`} share private task instance data publicly. If I do, I will delete my eval from the OpenEvals platform.</Text>
+              </ListItem>
+            </UnorderedList>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>
+              Back
+            </Button>
+            <Button onClick={confirmSubmit}>I confirm, submit</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }
