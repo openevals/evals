@@ -68,8 +68,8 @@ export default function NavButtons() {
     <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange}>
       <TabList>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
-        <Tab>Create your own eval (5 min) ⚒️</Tab>
-        <Tab onClick={() => gotoPage('/evals')}>Browse evals 😌</Tab>
+        <Tab>Contribute an eval (5 min) ⚒️</Tab>
+        <Tab onClick={() => gotoPage('/evals')}>Browse evals 🌎</Tab>
       </TabList>
     </Tabs>
   );

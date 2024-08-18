@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Table,
   Thead,
@@ -12,6 +12,7 @@ import {
   TableCaption,
   TabPanel,
   Heading,
+  Spinner,
   Box
 } from '@chakra-ui/react';
 
@@ -20,8 +21,15 @@ import { ITaskInstanceResponse } from '../lib/types';
 
 
 export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInstances }: { evalId: number, evalRunIds: number[], evalName: string, taskInstances: ITaskInstanceResponse[] }) {
-  const { evalRuns } = useEvalResults(evalId, evalRunIds);
+  const { evalRuns, allRunsCompleted } = useEvalResults(evalId, evalRunIds);
   const [taskMap, setTaskMap] = useState<Record<number, ITaskInstanceResponse>>({});
+  const spinnerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (spinnerRef.current) {
+      spinnerRef.current.hidden = allRunsCompleted;
+    }
+  }, [allRunsCompleted])
 
   useEffect(() => {
     const map: Record<number, ITaskInstanceResponse> = {};
@@ -34,6 +42,7 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInsta
   return (
     <>
       <Box>
+        <Spinner ref={spinnerRef} id='loadingSpinner' hidden size='md' />
         <Heading size='md'>Aggregate Results</Heading>
         <TableContainer>
           <Table variant='simple'>

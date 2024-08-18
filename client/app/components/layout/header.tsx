@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverBody,
   useOutsideClick,
+  Text,
 } from '@chakra-ui/react';
 import GithubLoginButton from '@/app/components/auth/github';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +22,9 @@ import { setEvals, setModels, setSearchTerm } from '@/app/lib/store/dataSlice';
 import { getEvals } from '@/app/utils/getEvals';
 import { useRouter, usePathname } from 'next/navigation';
 import NavButtons from '@/app/components/layout/navButtons';
+import { Roboto_Mono } from 'next/font/google';
+
+const robotoMono = Roboto_Mono({ subsets: ['latin'] });
 
 export default function HeaderComponent() {
   const dispatch = useDispatch();
@@ -112,8 +116,8 @@ export default function HeaderComponent() {
   };
 
   return (
-    <HStack my={8} mx={8}>
-      <Heading size='md' cursor='pointer' onClick={gotoHome}>OpenEvals</Heading>
+    <HStack my={8} mx={8} className={robotoMono.className}>
+      <Text as='b' fontSize='xl' cursor='pointer' onClick={gotoHome} mr={2}>OpenEvals</Text>
       <Popover isOpen={isOpen && suggestions.length > 0} onClose={() => setIsOpen(false)} initialFocusRef={inputRef} placement="bottom-start">
         <PopoverTrigger>
           <Input
@@ -123,6 +127,7 @@ export default function HeaderComponent() {
             onKeyDown={handleKeyDown}
             ref={inputRef}
             autoComplete='off'
+            maxW='30%'
           />
         </PopoverTrigger>
         <PopoverContent width={inputRef?.current?.offsetWidth + "px"} ref={popoverRef} maxH='60vh' overflowY='auto'>
@@ -152,7 +157,7 @@ export default function HeaderComponent() {
       <Button px={8} onClick={() => doSearch()}>Search</Button>
       <Spacer />
       <NavButtons />
-      <Button ml={8} mr={2} variant="link" onClick={() => router.push('/about')}>About</Button>
+      <Button ml={4} mr={2} variant="link" onClick={() => router.push('/about')}>About</Button>
       {isAuthenticated && profile ? (
         <Menu>
           <MenuButton as={Avatar} name={profile.username} src={profile.githubAvatar} h="32px" w="32px" cursor="pointer" />

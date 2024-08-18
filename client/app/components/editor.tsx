@@ -31,7 +31,6 @@ import {
   Wrap,
   WrapItem,
   Select,
-  Spinner,
   Container,
   FormControl,
   FormLabel,
@@ -79,7 +78,10 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
   const instanceInputRef = useRef<HTMLTextAreaElement>(null);
   const allModels = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
+  
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
+  const [tabIndex, setTabIndex] = useState(1)
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -89,12 +91,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     setModels(newModels);
   }, [allModels]);
 
-  const toggleSpinner = () => {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    if (loadingSpinner) {
-      loadingSpinner.hidden = !loadingSpinner.hidden;
-    }
-  };
+
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
@@ -107,7 +104,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       });
       return;
     }
-    toggleSpinner();
 
     console.log('name:', name);
     console.log('validator:', validator);
@@ -145,7 +141,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
         isClosable: true,
         duration: 9000,
       });
-      toggleSpinner();
       return;
     }
 
@@ -172,6 +167,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
 
     /* Show results and keep polling until eval run is finished */
     setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
+    setTabIndex(2);
     setStep(3);
   };
 
@@ -205,7 +201,12 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
         addInstance();
       }
     }
+  }; 
+
+  const handleTabsChange = (index: number) => {
+    setTabIndex(index);
   };
+
 
   return (
     <>
@@ -336,7 +337,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                     <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                     <Text ml={2}>Add task instance</Text>
                   </Button>
-                  <Spinner id='loadingSpinner' hidden />
                   <Button ml='auto' onClick={handleSubmit} minW='150px'>
                     <Text>Submit</Text>
                   </Button>
@@ -386,15 +386,14 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             overflowY='auto'
             gap={4}
             p={4}>
-            <Tabs defaultIndex={1} variant='enclosed'>
+            <Tabs index={tabIndex} onChange={handleTabsChange} variant='enclosed'>
               <TabList>
-                <Tab>Try an eval</Tab>
-                <Tab>How to contribute</Tab>
+                <Tab>Try out an eval</Tab>
+                <Tab>Contribute</Tab>
                 <Tab>Results</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel textAlign='left'>
-                  <Heading size="md" pt={4}>Try out an eval</Heading>
                   <Trending />
                 </TabPanel>
                 <TabPanel>
@@ -404,8 +403,8 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                       <Text my={4}>An <b>eval</b> is a task that grades an AI system's output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system." textDecoration="underline">[1]</Link></Text>
                       <Text my={4}>This is an editor to contribute evals.</Text>
                       <Heading size='md' my={4}>Tips for submission:</Heading>
-                      <Text>1. Choose an eval topic that you know well, e.g. something you would be comfortable teaching.</Text>
-                      <Text my={4}>2. Compare results for at least 3 AI <b>models</b>.</Text>
+                      <Text>1. Choose an eval topic that you know well, e.g. a topic you would be comfortable teaching.</Text>
+                      <Text my={4}>2. Compare results between at least 3 AI <b>models</b>.</Text>
                       {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
                       <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
                       <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
@@ -418,7 +417,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   {step === 3 ? (
                     <EvalRunResults evalName={evalObj.name} evalId={evalObj.id} evalRunIds={evalRunIds} taskInstances={evalObj.taskInstances} />
                   ) : (
-                    <Center>Your evaluation results will appear here 🌱</Center>
+                    <Center py={4}>Your evaluation results will appear here 🌱</Center>
                   )}
                   </TabPanel>
               </TabPanels>

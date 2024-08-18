@@ -1,14 +1,17 @@
 import { Center, Text, Heading, UnorderedList, ListItem, Link, VStack } from "@chakra-ui/react"
+import { Roboto_Mono } from 'next/font/google';
+
+const robotoMono = Roboto_Mono({ subsets: ['latin'] });
 
 export default function About() {
   return (
     <Center>
       <VStack maxW='600px' textAlign='center'>
-        <Heading size='md' p={2}>About OpenEvals</Heading>
+        <Text fontSize='xl' as='b' className={robotoMono.className} p={2}>About OpenEvals</Text>
         <Text>Hi there! OpenEvals is a project to help make evals more reliable and less data-contaminated.</Text>
         <Text><b>Evals</b>, or evaluations, are like school grades but for AI systems. We'd like anyone to easily access these test results, and contribute if they'd like.</Text>
         <Text>To grade someone or something well, it seems important that they can't cheat by peeking at the answers. To prevent AI systems from "cheating", OpenEval evals include a mix of public and private <b>task instances</b>.</Text>
-        <Heading size='md' py={2}>People building this project</Heading>
+        <Text fontSize='xl' as='b' className={robotoMono.className} py={2}>People building this project</Text>
         <Center>
           <UnorderedList textAlign='left' display="inline-block">
             <ListItem>Belinda Mo, <Link href="https://x.com/belindmo" isExternal textDecoration="underline">@belindmo</Link></ListItem>
@@ -17,8 +20,8 @@ export default function About() {
             <ListItem>Reinier Millo-Sanchez, <Link href="https://x.com/reiniermillo" isExternal textDecoration="underline">@reiniermillo</Link></ListItem>
           </UnorderedList>
         </Center>
-        <Text>For now, message us at <Link href="https://x.com/belindmo" isExternal>@belindmo</Link> on Twitter</Text>
-        <Text>Made in San Francisco, CA ^^</Text>
+        <Text>If you'd like to contribute, message <Link href="https://x.com/belindmo" isExternal textDecoration="underline">@belindmo</Link> on Twitter.</Text>
+        <Text>Made in San Francisco, CA 💛</Text>
       </VStack>
     </Center>
   )
