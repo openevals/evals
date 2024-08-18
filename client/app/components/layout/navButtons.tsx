@@ -10,14 +10,18 @@ import { IRootState } from '../../lib/store';
 import { IEvalListItemResponse } from '../../lib/types';
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Flex } from '@chakra-ui/react';
 
-export default function NavButtons() {
+interface NavButtonsProps {
+  direction?: 'row' | 'column';
+}
+
+export default function NavButtons({ direction = 'row' }: NavButtonsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [tabIndex, setTabIndex] = useState(0);
   const [lastEvalId, setLastEvalId] = useState(0);
   const evals = useSelector<IRootState, IEvalListItemResponse[]>((state: IRootState) => state.data.evals);
-
 
   useEffect(() => {
     if (pathname == `/evals/${lastEvalId}`) {
@@ -66,7 +70,7 @@ export default function NavButtons() {
 
   return (
     <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange}>
-      <TabList>
+      <TabList as={Flex} flexDirection={direction}>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
         <Tab>Contribute an eval (5 min) ⚒️</Tab>
         <Tab onClick={() => gotoPage('/evals')}>Browse evals 🌎</Tab>

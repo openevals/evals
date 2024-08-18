@@ -185,7 +185,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
     setTabIndex(2);
     setStep(3);
-  }
+  };
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
