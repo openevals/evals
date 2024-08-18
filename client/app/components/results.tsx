@@ -1,37 +1,11 @@
 import ResultItem from "./resultItem";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "@/app/lib/store";
-import { upvoteEval } from "../utils/upvote";
-import { Box, Divider, useToast, Text, Flex, CardBody, Card, Spacer } from "@chakra-ui/react";
-import { IEvalListItemResponse } from "../lib/types";
+import { Box, Divider, Text, Flex, CardBody, Card, Spacer } from "@chakra-ui/react";
+import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 import ItemDetails from "./itemDetails";
-import { setUpvotedEval } from "../lib/store/dataSlice";
 
-
-export default function Results({ evals, onUpvote }: { evals: IEvalListItemResponse[], onUpvote?: (payload: any) => void }) {
+export default function Results({ evals, onVote }: { evals: IEvalListItemResponse[], onVote?: (payload: IVoteResult) => void }) {
   const [evalId, setEvalId] = useState<number | null>(null);
-  const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
-  const toast = useToast();
-  const dispatch = useDispatch();
-
-
-  const callUpvoteEval = async (evalId: number) => {
-    try {
-      const response = await upvoteEval(accessToken, evalId);
-      const payload = { id: evalId, upvotes: response.upvotes, upvoted: response.upvoted };
-      dispatch(setUpvotedEval(payload));
-      if (onUpvote) onUpvote(payload);
-    } catch {
-      toast({
-        title: "Vote failed",
-        description: "There is an error saving your vote. Please, try it again.",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-    }
-  };
 
   const openEvalView = (id: number) => {
     setEvalId(id);
@@ -54,7 +28,7 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
                 validatorType={validatorType}
                 upvotes={upvotes}
                 upvoted={upvoted}
-                onUpvote={() => callUpvoteEval(id)}
+                onVote={onVote}
                 mainAuthor={authors[0]}
               />
               <Divider />
@@ -72,7 +46,6 @@ export default function Results({ evals, onUpvote }: { evals: IEvalListItemRespo
           </Card>
         </Box>
       )}
-
     </Flex>
   );
 }
