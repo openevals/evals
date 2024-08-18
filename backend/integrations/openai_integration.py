@@ -68,7 +68,7 @@ class OpenAIIntegration:
 
         return Eval(
             name=name_prettifier(eval_key),
-            description=eval_data.get("description", ""),
+            description=eval_data.get("description", name_prettifier(eval_key)),
             validator_type=validator_type,
         )
 
