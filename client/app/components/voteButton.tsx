@@ -2,24 +2,23 @@
 
 import { Button, Box, Center } from "@chakra-ui/react";
 import { TriangleUpIcon } from "@chakra-ui/icons";
-import { useSelector } from "react-redux";
-import { IRootState } from "@/app/lib/store";
+import { IVoteResult } from "../lib/types";
+import useEvalVote from "../lib/hooks/useEvalVote";
 
-function VoteButton({ votes, upvoted, onUpvote }: { votes: number, upvoted: boolean, onUpvote: () => void }) {
-  const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
+function VoteButton({ evalId, votes, upvoted, onVote }: { evalId: number, votes: number, upvoted: boolean, onVote?: (payload: IVoteResult) => void }) {
+  const vote = useEvalVote(evalId, onVote);
 
-
-  const cbVote = (ev: any) => {
+  const callVote = (ev: React.MouseEvent<HTMLButtonElement>) => {
     ev.stopPropagation();
     ev.preventDefault();
-    if (isAuthenticated) onUpvote();
+    vote();
   };
 
   return (
     <Button
       variant='outline'
       p={0}
-      onClick={cbVote}
+      onClick={callVote}
       backgroundColor={upvoted ? 'var(--chakra-colors-gray-200)' : ''}
     >
       <Box as="span" ml={2}>

@@ -111,3 +111,9 @@ export interface IEvalListItemResponse {
   upvoted: boolean;
   authors: IAuthorResponse[];
 }
+
+export interface IVoteResult {
+  id: number;
+  upvotes: number;
+  upvoted: boolean;
+}

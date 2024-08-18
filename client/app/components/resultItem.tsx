@@ -1,8 +1,7 @@
-import { Card, Stack, CardBody, Heading, Text, Button, CardFooter, Tag, HStack, VStack, Avatar, useToast } from '@chakra-ui/react';
+import { Stack, Heading, Text, Button, Tag, HStack, Avatar, useToast } from '@chakra-ui/react';
 import VoteButton from './voteButton';
 import { useRouter } from 'next/navigation';
-import { IAuthorResponse } from '../lib/types';
-import { MouseEventHandler } from 'react';
+import { IAuthorResponse, IVoteResult } from '../lib/types';
 
 export default function ResultItem({
   id,
@@ -11,7 +10,7 @@ export default function ResultItem({
   validatorType,
   upvotes,
   upvoted,
-  onUpvote,
+  onVote,
   mainAuthor,
 }: {
   id: number;
@@ -20,15 +19,11 @@ export default function ResultItem({
   validatorType: string;
   upvotes: number;
   upvoted: boolean;
-  onUpvote: () => void;
+  onVote?: (payload: IVoteResult) => void;
   mainAuthor?: IAuthorResponse;
 }) {
   const router = useRouter();
   const toast = useToast();
-
-  const viewDetails = () => {
-    router.push(`/evals/${id}`);
-  };
 
   const copyTextToClipboard = async (text: string) => {
     try {
@@ -36,27 +31,25 @@ export default function ResultItem({
       toast({
         description: "Link copied to clipboard.",
         status: 'success',
-        duration: 9000,
-        isClosable: true
+        duration: 5000,
       });
     } catch {
       toast({
         description: "Error copying link to clipboard.",
         status: 'error',
-        duration: 9000,
-        isClosable: true
+        duration: 5000,
       });
     }
   };
 
-  const cbShare = (ev: any) => {
+  const shareEval = (ev: React.MouseEvent<HTMLButtonElement>) => {
     ev.stopPropagation();
     ev.preventDefault();
     const link = `${process.env.NEXT_PUBLIC_WEB_URL}/evals/${id}`;
     copyTextToClipboard(link);
   };
 
-  const cbTry = (ev: any) => {
+  const tryEval = (ev: React.MouseEvent<HTMLButtonElement>) => {
     ev.stopPropagation();
     ev.preventDefault();
   };
@@ -84,9 +77,9 @@ export default function ResultItem({
           <Tag size='md'>{validatorType}</Tag>
         </HStack>
         <HStack>
-          <VoteButton votes={upvotes} upvoted={upvoted} onUpvote={() => onUpvote()} />
-          <Button onClick={cbShare} variant='outline'>Share</Button>
-          <Button onClick={cbTry} variant="outline">Try</Button>
+          <VoteButton evalId={id} votes={upvotes} upvoted={upvoted} onVote={onVote} />
+          <Button onClick={shareEval} variant='outline'>Share</Button>
+          <Button onClick={tryEval} variant="outline">Try</Button>
         </HStack>
       </Stack>
     </>
