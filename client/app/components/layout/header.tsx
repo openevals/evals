@@ -9,6 +9,7 @@ import {
   PopoverBody,
   useOutsideClick,
   Text,
+  Center,
   useBreakpointValue,
   VStack,
   IconButton,
@@ -282,6 +283,7 @@ const MobileHeader = ({
           />
         )}
       </HStack>
+      <Text textAlign='center'>OpenEvals: the evals database that anyone can contribute to.</Text>
       {isSearchOpen && (
         <Box position="fixed" top={4} left={0} right={0} bg="white" p={4} zIndex={1000}>
           <Flex alignItems="center">
