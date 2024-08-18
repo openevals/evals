@@ -80,7 +80,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const allModels = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
   
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
-  const [tabIndex, setTabIndex] = useState(1)
+  const [tabIndex, setTabIndex] = useState(1);
 
   const dispatch = useDispatch();
 
@@ -120,7 +120,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     if (!description.trim()) {
       errors.push("Description is required");
     }
-    if (!validator) {
+    if (!Object.values(ValidatorType).includes(validator as ValidatorType)) {
       errors.push("Evaluation method is required");
     }
     if (!models.some(model => model.checked)) {
@@ -153,7 +153,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     const newEval = await postNewEval(accessToken, {
       name,
       description,
-      validatorType: validator,
+      validatorType: validator as ValidatorType,
       modelSystems,
       taskInstances: instances,
     });
@@ -188,11 +188,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       }
 
     } else {
-      console.error('Input text and output text must not be empty')
+      console.error('Input text and output text must not be empty');
     }
-  }
+  };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
       if (step === 1) {
@@ -211,7 +211,15 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   return (
     <>
       <PanelGroup direction="horizontal">
-        <Panel collapsible={true} collapsedSize={2} defaultSize={64} minSize={24} ref={panel1Ref} onExpand={() => { setPanel1Collapsed(false) }} onCollapse={() => { setPanel1Collapsed(true) }}>
+        <Panel
+          collapsible={true}
+          collapsedSize={2}
+          defaultSize={64}
+          minSize={24}
+          ref={panel1Ref as React.RefObject<ImperativePanelHandle>}
+          onExpand={() => setPanel1Collapsed(false)}
+          onCollapse={() => setPanel1Collapsed(true)}
+        >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             borderLeftRadius='md'
@@ -238,7 +246,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                       />
                       <Spacer />
                       {step === 1 && panel2Collapsed && (
-                        <Button float='right' onClick={() => { if (step === 1) setStep(2) }} minW='180px'>
+                        <Button float='right' onClick={() => { if (step === 1) setStep(2); }} minW='180px'>
                           <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                           <Text ml={2}>
                             Next
@@ -318,7 +326,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             setPanel2Collapsed(false);
             if (step == 1) setStep(2);
           }} 
-          onCollapse={() => { setPanel2Collapsed(true) }} 
+          onCollapse={() => { setPanel2Collapsed(true); }} 
         >
           <Box w='100%' border='1px'
             borderColor='lightgray'
@@ -400,7 +408,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   <Card variant='outline'>
                     <CardBody>
                       <Heading size='md'>Welcome to OpenEvals, a practical evals database that anyone can contribute to. 💛</Heading>
-                      <Text my={4}>An <b>eval</b> is a task that grades an AI system's output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system." textDecoration="underline">[1]</Link></Text>
+                      <Text my={4}>An <b>eval</b> is a task that grades an AI {`system's`} output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system." textDecoration="underline">[1]</Link></Text>
                       <Text my={4}>This is an editor to contribute evals.</Text>
                       <Heading size='md' my={4}>Tips for submission:</Heading>
                       <Text>1. Choose an eval topic that you know well, e.g. a topic you would be comfortable teaching.</Text>
@@ -409,7 +417,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                       <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
                       <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
                       <Text>5. Double check ideal outputs for task instances.</Text>
-                      <Text my={4}>That's all! Have fun~</Text>
+                      <Text my={4}>{`That's all! Have fun~`}</Text>
                     </CardBody>
                   </Card>
                 </TabPanel>

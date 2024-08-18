@@ -11,7 +11,7 @@ export default function Trending() {
     const getTrending = async () => {
       const evals = await getTopEvals(); 
       setEvals(evals);
-    }
+    };
     getTrending();
   }, []);
 
@@ -22,13 +22,14 @@ export default function Trending() {
       }) => (
         <>
           <ResultItem
+            id={id}
             key={name}
             name={name}
             description={description ?? ''}
             validatorType={validatorType}
             upvotes={upvotes}
             upvoted={upvoted}
-            onUpvote={() => callUpVoteEval(id)}
+            onUpvote={() => {}}
           />
           <Divider />
         </>

@@ -3,7 +3,7 @@ services:
     container_name: openevals_db
     image: postgres:15
     env_file:
-      - backend/.env
+      - ../.env
     environment:
       POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
       POSTGRES_DB: ${POSTGRESQL_DATABASE}

@@ -1,4 +1,4 @@
-'use client' 
+'use client'; 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
@@ -26,7 +26,7 @@ export default function MyEvals() {
       };
       getUserEvalInfo();
     }
-  }, []);
+  });
 
   return (
     <Box w='100%' p={4}>
@@ -42,7 +42,7 @@ export default function MyEvals() {
           validatorType={validatorType}
           upvotes={upvotes}
           upvoted={upvoted}
-          onUpvote={() => { console.log('TODO') }}
+          onUpvote={() => { console.log('TODO'); }}
         />
       ))}
       <Heading ml={4} size='lg'>My Upvotes</Heading>
@@ -57,9 +57,9 @@ export default function MyEvals() {
           validatorType={validatorType}
           upvotes={upvotes}
           upvoted={upvoted}
-          onUpvote={() => { console.log('TODO')}}
+          onUpvote={() => { console.log('TODO');}}
         />
       ))}
     </Box>
-  )
+  );
 }

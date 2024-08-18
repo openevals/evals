@@ -29,7 +29,7 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInsta
     if (spinnerRef.current) {
       spinnerRef.current.hidden = allRunsCompleted;
     }
-  }, [allRunsCompleted])
+  }, [allRunsCompleted]);
 
   useEffect(() => {
     const map: Record<number, ITaskInstanceResponse> = {};
