@@ -26,7 +26,8 @@ export default function MyEvals() {
       };
       getUserEvalInfo();
     }
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
 
   return (
     <Box w='100%' p={4}>
