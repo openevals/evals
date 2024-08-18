@@ -68,3 +68,23 @@ export async function getSupportedModels(): Promise<IModelResponse[]> {
   }
 }
 
+
+export async function addNewEvalRuns(accessToken: string, evalId: number, modelSystems: ModelSystem[]): Promise<IEvalResponse> {
+  try {
+    const res = await fetch(`${API_URL}/evals/${evalId}/run`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(modelSystems)
+    });
+    const response = await res.json() as IEvalResponse;
+    response.modelSystems = response.modelSystems.sort((a, b) => a.modelId - b.modelId);
+    response.taskInstances = response.taskInstances.sort((a, b) => a.id - b.id);
+    return response;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};

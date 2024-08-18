@@ -13,13 +13,16 @@ import {
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { TaskInstance } from '../lib/types';
+import { Dispatch, SetStateAction } from 'react';
 
 export default function InstancesTable({
   instances,
   setInstances,
+  onChange,
 }: {
   instances: TaskInstance[];
-  setInstances: (instances: TaskInstance[]) => void;
+  setInstances: Dispatch<SetStateAction<TaskInstance[]>>;
+  onChange?: () => void;
 }): JSX.Element {
   return (
     <TableContainer
@@ -43,9 +46,14 @@ export default function InstancesTable({
                   <Checkbox
                     isChecked={instance.isPublic}
                     onChange={(e) => {
-                      const updatedInstances = [...instances];
-                      updatedInstances[index].isPublic = e.target.checked;
-                      setInstances(updatedInstances);
+                      setInstances(prevInstances => {
+                        return prevInstances.map((value, idx) => {
+                          const obj = {...value};
+                          if (idx === index) obj.isPublic = e.target.checked;
+                          return obj;
+                        });
+                      });
+                      if (onChange) onChange();
                     }}
                   />
                 </Td>)
@@ -54,9 +62,14 @@ export default function InstancesTable({
                 <Input
                   value={instance.input}
                   onChange={(e) => {
-                    const updatedInstances = [...instances];
-                    updatedInstances[index].input = e.target.value;
-                    setInstances(updatedInstances);
+                    setInstances(prevInstances => {
+                      return prevInstances.map((value, idx) => {
+                        const obj = {...value};
+                        if (idx === index) obj.input = e.target.value;
+                        return obj;
+                      });
+                    });
+                    if (onChange) onChange();
                   }}
                   variant='unstyled'
                 />
@@ -65,9 +78,14 @@ export default function InstancesTable({
                 <Input
                   value={instance.ideal}
                   onChange={(e) => {
-                    const updatedInstances = [...instances];
-                    updatedInstances[index].ideal = e.target.value;
-                    setInstances(updatedInstances);
+                    setInstances(prevInstances => {
+                      return prevInstances.map((value, idx) => {
+                        const obj = {...value};
+                        if (idx === index) obj.ideal = e.target.value;
+                        return obj;
+                      });
+                    });
+                    if (onChange) onChange();
                   }}
                   variant='unstyled'
                 />
@@ -84,6 +102,7 @@ export default function InstancesTable({
                       if (setInstances) {
                         const updatedInstances = instances.filter((_, i) => i !== index);
                         setInstances(updatedInstances);
+                        if (onChange) onChange();
                       }
                     }}
                   />

@@ -15,13 +15,14 @@ import {
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
-import { IEvalResponse, IModelResponse, ValidatorType } from '../lib/types';
+import { IEvalResponse, IModelResponse } from '../lib/types';
 import EvalRunResults from './evalRunResults';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../lib/store';
 import { defaultEvalItem } from '../lib/constants';
+import { setEvalToTry } from '../lib/store/dataSlice';
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
@@ -30,6 +31,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [runIds, setRunIds] = useState<number[]>([]);
   const params: { id: string } = useParams();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     /* Get the id parameter */
@@ -57,13 +59,18 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     setModelMap(map);
   }, [models]);
 
+  const tryEval = () => {
+    dispatch(setEvalToTry(evalItem));
+    router.push('/');
+  };
+
   return (
     <>
       <Wrap>
         <Box p={4} w='400px'>
           <HStack>
             <Heading size='lg'>{evalItem.name}</Heading>
-            <Button ml={2} minW='100px'>Try Eval</Button>
+            <Button ml={2} minW='100px' onClick={tryEval}>Try Eval</Button>
           </HStack>
           <Stack divider={<StackDivider />} spacing='4' py={8}>
             <Box>
@@ -92,7 +99,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 )) : (
                   <Text>None</Text>
                 )
-              }
+                }
               </Text>
             </Box>
             <Box>
@@ -134,7 +141,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             <Center>
               <VStack>
                 <Text>No model systems have been tested on this eval yet. Would you like to be the first?</Text>
-                <Button ml={2}  minW='100px'>Try Eval</Button>
+                <Button ml={2} minW='100px' onClick={tryEval}>Try Eval</Button>
               </VStack>
             </Center>
           )}

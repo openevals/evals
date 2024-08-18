@@ -1,14 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { IModelResponse, IEvalListItemResponse } from '../types';
+import { IModelResponse, IEvalListItemResponse, IEvalResponse } from '../types';
 
 const initialState: {
   models: IModelResponse[];
   evals: IEvalListItemResponse[];
   search: string;
+  evalToTry?: IEvalResponse;
 } = {
   models: [],
   evals: [],
   search: '',
+  evalToTry: undefined
 };
 
 const dataSlice = createSlice({
@@ -29,7 +31,7 @@ const dataSlice = createSlice({
         validatorType: action.payload.validatorType,
         upvotes: 0,
         upvoted: false,
-        authors: action.payload.authors 
+        authors: action.payload.authors
       }];
     },
     setUpvotedEval(state, action) {
@@ -46,10 +48,16 @@ const dataSlice = createSlice({
     clearSearchTerm(state, action) {
       state.search = '';
     },
+    setEvalToTry(state, action) {
+      state.evalToTry = action.payload;
+    },
+    clearEvalToTry(state, action) {
+      state.evalToTry = undefined;
+    }
   },
 });
 
 export const {
-  setModels, setEvals, addNewEval, setUpvotedEval, setSearchTerm, clearSearchTerm
+  setModels, setEvals, addNewEval, setUpvotedEval, setSearchTerm, clearSearchTerm, setEvalToTry, clearEvalToTry
 } = dataSlice.actions;
 export default dataSlice.reducer;
