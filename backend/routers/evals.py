@@ -81,7 +81,6 @@ def create_eval(
                 input=task.input,
                 ideal=task.ideal,
                 system_prompt=eval.model_systems[0].system_prompt,
-                user_prompt=eval.model_systems[0].user_prompt,
                 eval=new_eval,
                 owner_id=auth["user"].id,
             )
@@ -189,7 +188,8 @@ def get_user_evals(
     Get evals that a user has created
     """
     author = get_or_create_author(db, auth["user"])
-    return author.authored_evals
+    evals = author.authored_evals
+    return get_evals_upvoted(evals, auth)
 
 
 @evals_router.get(
@@ -203,7 +203,20 @@ def get_user_evals(
     """
     Get evals that a user has upvoted
     """
-    return auth["user"].eval_upvotes
+    evals = auth["user"].eval_upvotes
+    upvoted_evals = [
+        {
+            "id": eval.eval.id,
+            "name": eval.eval.name,
+            "description": eval.eval.description,
+            "validator_type": eval.eval.validator_type,
+            "upvotes": eval.eval.upvotes,
+            "upvoted": True,
+            "authors": eval.eval.authors,
+        }
+        for eval in evals
+    ]
+    return upvoted_evals
 
 
 @evals_router.get(

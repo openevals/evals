@@ -11,13 +11,26 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Button,
   HStack,
+  Stack,
   Kbd,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  UnorderedList,
+  ListItem,
   Accordion,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Divider,
+  Link,
   Box,
   Textarea,
   VStack,
@@ -28,8 +41,11 @@ import {
   Wrap,
   WrapItem,
   Select,
-  Spinner,
   Container,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
   Tabs,
   TabList,
   Tab,
@@ -37,7 +53,8 @@ import {
   TabPanel,
   Card,
   CardBody,
-  useToast
+  useToast,
+  Center
 } from '@chakra-ui/react';
 import { postNewEval } from '@/app/utils/getEvalRun';
 import { defaultEvalItem, MIN_INSTANCES } from '@/app/lib/constants';
@@ -57,12 +74,10 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   // step 3 = run results
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [name, setName] = useState('');
-  const [inputDescription, setInputDescription] = useState('');
-  const [outputDescription, setOutputDescription] = useState('');
+  const [description, setDescription] = useState('');
   const [validator, setValidator] = useState<ValidatorType | ''>('');
   const [models, setModels] = useState<IModelResponse[]>([]);
   const [systemPrompt, setSystemPrompt] = useState('');
-  const [userPrompt, setUserPrompt] = useState('');
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [instances, setInstances] = useState<TaskInstance[]>([]);
@@ -71,8 +86,14 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const toast = useToast();
   const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
   const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
+  const instanceInputRef = useRef<HTMLTextAreaElement>(null);
   const allModels = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
+  
   const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
+  const [tabIndex, setTabIndex] = useState(1);
+  const { isOpen, onOpen, onClose } = useDisclosure(); // modal
+
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -82,14 +103,9 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     setModels(newModels);
   }, [allModels]);
 
-  const toggleSpinner = () => {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    if (loadingSpinner) {
-      loadingSpinner.hidden = !loadingSpinner.hidden;
-    }
-  };
 
-  const handleSubmit = async () => {
+
+  const clickSubmitButton = async () => {
     if (!isAuthenticated) {
       toast({
         title: "Not authorized",
@@ -100,22 +116,61 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       });
       return;
     }
-    toggleSpinner();
+
+    console.log('name:', name);
+    console.log('validator:', validator);
+    console.log('models:', models);
+    console.log('systemPrompt:', systemPrompt);
+    console.log('inputText:', inputText);
+    console.log('outputText:', outputText);
+    console.log('instances:', instances);
+    // Error checking
+    const errors: string[] = [];
+    if (!name.trim()) {
+      errors.push("Name is required");
+    }
+    if (!description.trim()) {
+      errors.push("Description is required");
+    }
+    if (!Object.values(ValidatorType).includes(validator as ValidatorType)) {
+      errors.push("Evaluation method is required");
+    }
+    if (!models.some(model => model.checked)) {
+      errors.push("At least one model must be selected");
+    }
+    if (instances.length < 2) {
+      errors.push(`At least ${MIN_INSTANCES} task instances are required`);
+    }
+    if (!instances.some(instance => instance.isPublic)) {
+      errors.push("At least one task instance must be marked as public");
+    }
+
+    if (errors.length > 0) {
+      toast({
+        title: "Oops! Please check that you've entered everything correctly:",
+        description: errors.join(", "),
+        status: "error",
+        isClosable: true,
+        duration: 9000,
+      });
+      return;
+    }
+
+    onOpen();
+
+  };
+
+  const confirmSubmit = async () => {
     const checkedModels = models.filter((model) => model.checked);
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
       modelId: model.id,
       systemPrompt: systemPrompt,
-      userPrompt: userPrompt,
     }));
-    // TODO: error handling
-    if (validator === '') {
-      return;
-    }
 
     const newEval = await postNewEval(accessToken, {
       name,
-      description: `Input: ${inputDescription}\nOutput: ${outputDescription}`,
-      validatorType: validator,
+      description,
+      validatorType: validator as ValidatorType,
       modelSystems,
       taskInstances: instances,
     });
@@ -129,8 +184,9 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
 
     /* Show results and keep polling until eval run is finished */
     setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
+    setTabIndex(2);
     setStep(3);
-  };
+  }
 
   const addInstance = () => {
     if (inputText !== '' && outputText !== '') {
@@ -143,17 +199,31 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       setInputText('');
       setOutputText('');
 
+      // Set focus to the inputText field after adding an instance
+      if (instanceInputRef.current) {
+        instanceInputRef.current.focus();
+      }
+
     } else {
       console.error('Input text and output text must not be empty');
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
-      addInstance();
+      if (step === 1) {
+        setStep(2);
+      } else {
+        addInstance();
+      }
     }
+  }; 
+
+  const handleTabsChange = (index: number) => {
+    setTabIndex(index);
   };
+
 
   return (
     <>
@@ -172,144 +242,114 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
             borderLeftRadius='md'
             gap={4}
             p={4}
-            h='calc(100vh - 12rem)'
+            h='calc(100vh - 8rem)'
             overflowY='auto'
+            onKeyDown={handleKeyDown}
           >
             {!panel1Collapsed && (
               <>
-                <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
-                  <Input variant='flushed' placeholder={`Your eval name, e.g. "Linear algebra problems"`} maxW='384px' value={name} onChange={(e) => setName(e.target.value)} />
-                  <Spacer />
-                  <Spinner id='loadingSpinner' hidden />
-                  {step === 1 && (
-                    <Button float='right' onClick={() => { if (step === 1) setStep(2); }}>
-                      <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                      <Text ml={2}>Next</Text>
-                    </Button>
-                  )}
-                </HStack>
-                <Accordion pt={2} allowMultiple defaultIndex={[0, 1, 2]}>
-                  <AccordionItem py={2} border='none'>
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Description</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <HStack w='100%'>
-                        <VStack w='50%'>
-                          <Text>Input</Text>
-                          <Textarea
-                            placeholder='Linear algebra equation in Latex'
-                            value={inputDescription}
-                            onChange={(e) => setInputDescription(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                          />
-                        </VStack>
-                        <VStack w='50%'>
-                          <Text>Ideal Output</Text>
-                          <Textarea
-                            placeholder='Answer only in Latex'
-                            value={outputDescription}
-                            onChange={(e) => setOutputDescription(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                          />
-                        </VStack>
-                      </HStack>
+                <VStack spacing={6} align="stretch" px={2}>
+                  <FormControl>
+                    <HStack top={0}>
+                      <FormLabel htmlFor="evalName" srOnly>Evaluation Name</FormLabel>
+                      <Input
+                        id="evalName"
+                        size='lg'
+                        variant='flushed'
+                        placeholder={`Eval name, e.g. "Linear algebra problems"`}
+                        maxW='384px'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                      <Spacer />
+                      {step === 1 && panel2Collapsed && (
+                        <Button float='right' onClick={() => { if (step === 1) setStep(2); }} minW='180px'>
+                          <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                          <Text ml={2}>
+                            Next
+                          </Text>
+                        </Button>
+                      )}
+                    </HStack>
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>Description</Heading>
+                    </FormLabel>
+                    <Textarea
+                      placeholder='Linear algebra equations in Latex. Output is the answer only in Latex.'
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </FormControl>
 
-                    </AccordionPanel>
-                  </AccordionItem>
-                  <AccordionItem py={2} >
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Method to evaluate</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
-                        {Object.values(ValidatorType).map((validatorType) => (
-                          <option key={validatorType} value={validatorType}>
-                            {validatorType}
-                          </option>
-                        ))}
-                      </Select>
-                    </AccordionPanel>
-                  </AccordionItem>
-                  <AccordionItem py={2} >
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Models to test</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <Wrap direction='column'>
-                        {models?.map((model) => (
-                          <WrapItem key={model.modelName}>
-                            <Checkbox
-                              isChecked={model.checked}
-                              onChange={(e) => {
-                                model.checked = !model.checked;
-                                setModels([...models]);
-                              }}
-                            >
-                              {model.modelName}
-                            </Checkbox>
-                          </WrapItem>
-                        ))}
-                      </Wrap>
-                    </AccordionPanel>
-                  </AccordionItem>
-                  <AccordionItem py={2} borderBottom='none' >
-                    <h2>
-                      <AccordionButton>
-                        <Box as='span' flex='1' textAlign='left'>
-                          <Heading size='sm'>Prompts</Heading>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <HStack>
-                        <VStack w='100%'>
-                          <Text>System Prompt (Recommended)</Text>
-                          <Textarea
-                            placeholder='You are a mathematics professor at MIT.'
-                            value={systemPrompt}
-                            onChange={(e) => setSystemPrompt(e.target.value)}
-                          />
-                        </VStack>
-                        <VStack w='100%'>
-                          <Text>User Prompt (Optional)</Text>
-                          <Textarea
-                            placeholder='Solve linear algebra problems by responding with the numeric answer only.'
-                            value={userPrompt}
-                            onChange={(e) => setUserPrompt(e.target.value)}
-                          />
-                        </VStack>
-                      </HStack>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>Method to evaluate</Heading>
+                    </FormLabel>
+                    <Select placeholder='Select validator type' value={validator} onChange={(e) => setValidator(e.target.value as ValidatorType)}>
+                      {Object.values(ValidatorType).map((validatorType) => (
+                        <option key={validatorType} value={validatorType}>
+                          {validatorType}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>Models to test</Heading>
+                    </FormLabel>
+                    <Wrap direction='column'>
+                      {models?.map((model) => (
+                        <WrapItem key={model.modelName}>
+                          <Checkbox
+                            isChecked={model.checked}
+                            onChange={(e) => {
+                              model.checked = !model.checked;
+                              setModels([...models]);
+                            }}
+                          >
+                            {model.modelName}
+                          </Checkbox>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>
+                      <Heading size='sm'>System Prompt (Recommended)</Heading>
+                    </FormLabel>
+                    <Textarea
+                      placeholder='You are a mathematics professor at MIT.'
+                      value={systemPrompt}
+                      onChange={(e) => setSystemPrompt(e.target.value)}
+                    />
+                  </FormControl>
+                </VStack>
               </>
             )}
           </Box>
         </Panel>
         <PanelResizeHandle />
-        <Panel collapsible={true} collapsedSize={2} defaultSize={2} minSize={24} ref={panel2Ref} onExpand={() => { setPanel2Collapsed(false); }} onCollapse={() => { setPanel2Collapsed(true); }} >
+        <Panel 
+          collapsible={true} 
+          collapsedSize={2} 
+          defaultSize={2} 
+          minSize={24} 
+          ref={panel2Ref} 
+          onExpand={() => { 
+            setPanel2Collapsed(false);
+            if (step == 1) setStep(2);
+          }} 
+          onCollapse={() => { setPanel2Collapsed(true); }} 
+        >
           <Box w='100%' border='1px'
             borderColor='lightgray'
             gap={4}
             p={4}
-            h='calc(100vh - 12rem)'
+            h='calc(100vh - 8rem)'
             overflowY='auto'
           >
             {!panel2Collapsed && (
@@ -318,11 +358,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                   <Box as='span' flex='1' textAlign='left'>
                     <Heading size='sm'>Task instances</Heading>
                   </Box>
-                  <Button variant='outline' ml='auto' onClick={addInstance}>
+                  <Button variant='outline' ml='auto' onClick={addInstance}  minW='300px'>
                     <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                     <Text ml={2}>Add task instance</Text>
                   </Button>
-                  <Button ml='auto' onClick={handleSubmit}>
+                  <Button ml='auto' onClick={clickSubmitButton} minW='150px'>
                     <Text>Submit</Text>
                   </Button>
                 </HStack>
@@ -334,6 +374,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={handleKeyDown}
+                      ref={instanceInputRef}
                     />
                   </VStack>
                   <VStack w='50%'>
@@ -366,55 +407,79 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           <Box w='100%' border='1px'
             borderColor='lightgray'
             borderRightRadius='md'
-            h='calc(100vh - 12rem)'
+            h='calc(100vh - 8rem)'
+            overflowY='auto'
             gap={4}
             p={4}>
-            <Container
-              w='100%'
-              overflowY='auto'
-            >
-              <Tabs defaultIndex={1}>
-                <TabList position="sticky" top={0} zIndex={1} bg="white">
-                  <Tab>Try an eval</Tab>
-                  <Tab>How to use</Tab>
-                  {step === 3 && (
-                    <Tab>Results</Tab>
+            <Tabs index={tabIndex} onChange={handleTabsChange} variant='enclosed'>
+              <TabList>
+                <Tab>Try out an eval</Tab>
+                <Tab>Contribute</Tab>
+                <Tab>Results</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel textAlign='left'>
+                  <Trending />
+                </TabPanel>
+                <TabPanel>
+                  <Card variant='outline'>
+                    <CardBody>
+                      <Heading size='md'>Welcome to OpenEvals, a practical evals database that anyone can contribute to. 💛</Heading>
+                      <Text my={4}>An <b>eval</b> is a task that grades an AI {`system's`} output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system." textDecoration="underline">[1]</Link></Text>
+                      <Text my={4}>This is an editor to contribute evals.</Text>
+                      <Heading size='md' my={4}>Tips for submission:</Heading>
+                      <Text>1. Choose an eval topic that you know well, e.g. a topic you would be comfortable teaching.</Text>
+                      <Text my={4}>2. Compare results between at least 3 AI <b>models</b>.</Text>
+                      {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
+                      <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
+                      <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
+                      <Text>5. Double check ideal outputs for task instances.</Text>
+                      <Text my={4}>{`That's all! Have fun~`}</Text>
+                    </CardBody>
+                  </Card>
+                </TabPanel>
+                <TabPanel>
+                  {step === 3 ? (
+                    <EvalRunResults evalName={evalObj.name} evalId={evalObj.id} evalRunIds={evalRunIds} taskInstances={evalObj.taskInstances} />
+                  ) : (
+                    <Center py={4}>Your evaluation results will appear here 🌱</Center>
                   )}
-                </TabList>
-                <TabPanels>
-                  <TabPanel textAlign='left'>
-                    <Heading size="md" pt={4}>Try out an eval</Heading>
-                    <Trending />
                   </TabPanel>
-                  <TabPanel>
-                    <Card variant='outline'>
-                      <CardBody>
-                        <Heading size='md'>OpenEvals: Community-made AI model evaluations!</Heading>
-                        <Text my={4}>OpenEvals provides an aggregated set of real-world, practical, and uncontaminated evals. 💛</Text>
-                        <Heading size='md'>How to use this editor:</Heading>
-                        <Text my={4}>This is an editor to create, edit, and save evals to learn how a specific AI model performs for your needs.</Text>
-                        <Text>We welcome your submissions to OpenEvals! Once you contribute, your evaluation <i>results</i> are public for anyone to search, while <i>task instances</i> remain private and owned by you.</Text>
-                        <Heading size='md' my={4}>Tips for submission:</Heading>
-                        <Text>1. Choose an eval topic that you know well, e.g. you would be comfortable teaching.</Text>
-                        <Text my={4}>2. Compare results for at least 3 models.</Text>
-                        <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text>
-                        <Text my={4}>4. Add at least {MIN_INSTANCES} task instances.</Text>
-                        <Text>5. Double check ideal outputs for task instances.</Text>
-                        <Text my={4}>Have fun!</Text>
-                      </CardBody>
-                    </Card>
-                  </TabPanel>
-                  {step === 3 && (
-                    <TabPanel>
-                      <EvalRunResults evalName={evalObj.name} evalId={evalObj.id} evalRunIds={evalRunIds} taskInstances={evalObj.taskInstances} />
-                    </TabPanel>
-                  )}
-                </TabPanels>
-              </Tabs>
-            </Container>
+              </TabPanels>
+            </Tabs>
           </Box>
         </Panel>
       </PanelGroup>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Please confirm the following:</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <UnorderedList spacing={2}>
+              <ListItem>
+                <Text>My eval solves a useful task in a format that is easy for humans to understand.</Text>
+              </ListItem>
+              <ListItem>
+                <Text>{`I've`} double checked that my task instances are correct.</Text>
+              </ListItem>
+              <ListItem>
+                <Text>To the best of my knowledge, my task instances are not easily available online in their task format.</Text>
+              </ListItem>
+              <ListItem>
+                <Text>To the best of my knowledge, I {`won't`} share private task instance data publicly. If I do, I will delete my eval from the OpenEvals platform.</Text>
+              </ListItem>
+            </UnorderedList>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>
+              Back
+            </Button>
+            <Button onClick={confirmSubmit}>I confirm, submit</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

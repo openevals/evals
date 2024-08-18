@@ -13,7 +13,6 @@ export interface TaskInstance {
 
 export interface ModelSystem {
   modelId: number;
-  userPrompt: string;
   systemPrompt: string;
 };
 

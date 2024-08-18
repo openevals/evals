@@ -9,6 +9,9 @@ import {
   Box,
   Tag,
   Wrap,
+  HStack,
+  VStack,
+  Center,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
@@ -58,8 +61,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     <>
       <Wrap>
         <Box p={4} w='400px'>
-          <Heading size='lg'>{evalItem.name}</Heading>
-          <Stack divider={<StackDivider />} spacing='4'>
+          <HStack>
+            <Heading size='lg'>{evalItem.name}</Heading>
+            <Button ml={2} minW='100px'>Try Eval</Button>
+          </HStack>
+          <Stack divider={<StackDivider />} spacing='4' py={8}>
             <Box>
               <Heading size='xs'>
                 <Stack direction={['row']}>
@@ -81,9 +87,12 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 Models tested:
               </Heading>
               <Text pt='2' fontSize='sm'>
-                {evalItem.modelSystems.map((ms: any) => (
+                {evalItem.modelSystems.length > 0 ? evalItem.modelSystems.map((ms: any) => (
                   <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>{modelMap[ms.modelId]}</Tag>
-                ))}
+                )) : (
+                  <Text>None</Text>
+                )
+              }
               </Text>
             </Box>
             <Box>
@@ -93,14 +102,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Text pt='2' fontSize='sm'>
                 {/* TODO: Right now this only queries the first */}
                 {evalItem.modelSystems.length > 0 && (
-                  <>
-                    {evalItem.taskInstances[0].systemPrompt && (
-                      <Text>System prompt: {evalItem.taskInstances[0].systemPrompt}</Text>
-                    )}
-                    {evalItem.taskInstances[0].userPrompt && (
-                      <Text>User prompt: {evalItem.taskInstances[0].userPrompt}</Text>
-                    )}
-                  </>
+                  evalItem.taskInstances[0]?.systemPrompt ? (
+                    <Text>System prompt: {evalItem.taskInstances[0].systemPrompt}</Text>
+                  ) : (
+                    <Text>None</Text>
+                  )
                 )}
               </Text>
             </Box>
@@ -117,14 +123,21 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
           </Stack>
         </Box>
         <Box p={4} minW='70%'>
-          <EvalRunResults
-            evalId={evalItem.id}
-            evalName={evalItem.name}
-            evalRunIds={runIds}
-            taskInstances={evalItem.taskInstances}
-          />
-          <Button mr={4}>Details</Button>
-          <Button>Try Eval</Button>
+          {runIds.length > 0 ? (
+            <EvalRunResults
+              evalId={evalItem.id}
+              evalName={evalItem.name}
+              evalRunIds={runIds}
+              taskInstances={evalItem.taskInstances}
+            />
+          ) : (
+            <Center>
+              <VStack>
+                <Text>No model systems have been tested on this eval yet. Would you like to be the first?</Text>
+                <Button ml={2}  minW='100px'>Try Eval</Button>
+              </VStack>
+            </Center>
+          )}
         </Box>
       </Wrap>
     </>

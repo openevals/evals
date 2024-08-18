@@ -7,6 +7,7 @@ const FINISHED_STATUS = ['Failed', 'Finished'];
 
 const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   const [evalRuns, setEvalRuns] = useState<IEvalRunResponse[]>([]);
+  const [allRunsCompleted, setAllRunsCompleted] = useState(false);
   const evalRunsRef = useRef<any[]>();
 
   /* Keeps reference updated */
@@ -29,6 +30,8 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   useEffect(() => {
     if (evalRunIds.length === 0) return;
 
+    let completedRuns = 0;
+
     /* Poll the response of the eval run until the object get a finisehd status */
     const loadUntilFinished = async (evalRunId: number, latency: number) => {
       let itr = 0;
@@ -40,6 +43,10 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
         lastStatus = obj.status;
         itr += 1;
         updateObjState(obj);
+      }
+      completedRuns++;
+      if (completedRuns === evalRunIds.length) {
+        setAllRunsCompleted(true);
       }
     };
 
@@ -71,7 +78,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   }, [evalId, evalRunIds]);
 
 
-  return { evalRuns };
+  return { evalRuns, allRunsCompleted };
 };
 
 export default useEvalResults;

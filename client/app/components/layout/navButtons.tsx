@@ -11,7 +11,7 @@ import { IEvalListItemResponse } from '../../lib/types';
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-export default function NavButtonsComponent() {
+export default function NavButtons() {
   const router = useRouter();
   const pathname = usePathname();
   const [tabIndex, setTabIndex] = useState(0);
@@ -24,8 +24,8 @@ export default function NavButtonsComponent() {
       setTabIndex(0);
     } else if (pathname == '/') {
       setTabIndex(1);
-    } else if (pathname == '/evals/vote') {
-      setTabIndex(3);
+    } else if (pathname == '/evals') {
+      setTabIndex(2);
     } else {
       setTabIndex(-1);
     }
@@ -58,23 +58,18 @@ export default function NavButtonsComponent() {
         gotoPage('/');
         break;
       case 2:
-        gotoPage('/');
-        setTabIndex(1);
-        return;
-      case 3:
-        gotoPage('/evals/vote');
+        gotoPage('/evals');
         break;
     }
     setTabIndex(index);
   };
 
   return (
-    <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange} mb={4}>
+    <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange}>
       <TabList>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
-        <Tab>Create your own eval (5 min) ⚒️</Tab>
-        <Tab>Contribute to an existing eval! 💛</Tab>
-        <Tab onClick={() => gotoPage('/evals/vote')}>Vote on important evals 😌</Tab>
+        <Tab>Contribute an eval (5 min) ⚒️</Tab>
+        <Tab onClick={() => gotoPage('/evals')}>Browse evals 🌎</Tab>
       </TabList>
     </Tabs>
   );
