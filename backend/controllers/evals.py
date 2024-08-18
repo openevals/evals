@@ -10,7 +10,7 @@ from models.model_provider import (
 from controllers.validation import validate_response
 
 
-def run_eval_task(eval_id):
+def run_eval_task(eval_id, eval_run_ids=None):
     """Run the eval as background task"""
     db = SessionLocal()
     try:
@@ -19,6 +19,8 @@ def run_eval_task(eval_id):
         if eval:
             # Iterate over all eval runs
             for eval_run in eval.eval_runs:
+                if eval_run_ids is not None and eval_run.id not in eval_run_ids:
+                    continue
                 try:
                     model_provider = ModelProviderType[
                         eval_run.model.model_developer.upper()
