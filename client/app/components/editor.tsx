@@ -166,6 +166,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   };
 
   const confirmSubmit = async () => {
+    onClose();
     const checkedModels = models.filter((model) => model.checked);
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
       modelId: model.id,
