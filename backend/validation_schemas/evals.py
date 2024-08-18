@@ -9,7 +9,6 @@ from validation_schemas.models import ModelSchema
 class ModelSystemSchema(BaseModel):
     model_id: int = Field(..., alias="modelId")
     system_prompt: Optional[str] = Field(..., alias="systemPrompt")
-    user_prompt: Optional[str] = Field(..., alias="userPrompt")
 
 
 class TaskInstanceSchema(BaseModel):
@@ -37,7 +36,6 @@ class TaskInstanceResponseSchema(BaseModel):
     input: str
     ideal: str
     system_prompt: Optional[str] = Field(..., serialization_alias="systemPrompt")
-    user_prompt: Optional[str] = Field(..., serialization_alias="userPrompt")
 
 
 class EvalAuthorResponse(BaseModel):

@@ -81,7 +81,6 @@ def create_eval(
                 input=task.input,
                 ideal=task.ideal,
                 system_prompt=eval.model_systems[0].system_prompt,
-                user_prompt=eval.model_systems[0].user_prompt,
                 eval=new_eval,
                 owner_id=auth["user"].id,
             )
@@ -212,7 +211,8 @@ def get_user_evals(
             "description": eval.eval.description,
             "validator_type": eval.eval.validator_type,
             "upvotes": eval.eval.upvotes,
-            "upvoted": True
+            "upvoted": True,
+            "authors": eval.eval.authors,
         }
         for eval in evals
     ]
