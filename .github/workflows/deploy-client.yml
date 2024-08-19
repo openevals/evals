@@ -1,0 +1,83 @@
+name: Deploy web page client
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'client/**'
+      - '.eks_deploy/client.yml'
+      - '.github/workflows/deploy-client.yml'
+
+env:
+  ECR_REPO_NAME: 'openevals-client'
+  AWS_REGION_NAME: 'us-west-1'
+  CLUSTER_NAME: 'openevals-prod'
+  ENVIRONMENT: 'prod'
+  DESIRED_REPLICAS: 4
+  MIN_REPLICAS: 4
+  MAX_REPLICAS: 15
+  SSL_ARN: ${{ secrets.CLIENT_SSL_ARN }}
+  AWS_GROUP_TYPE: 'general-processing'
+
+jobs:
+  server-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Generate env file
+        run: |
+          REST_OF_ENV=$(cat << EOF
+          NEXT_PUBLIC_WEB_URL=https://www.openevals.org
+          NEXT_PUBLIC_API_URL=https://api.openevals.org
+          NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+          EOF
+          )
+          echo "$REST_OF_ENV" >> ./client/.env
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION_NAME }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push the image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
+          IMAGE_TAG: openevals-client-${{ env.ENVIRONMENT }}-latest
+        run: |
+          # Build a docker container and push it to ECR
+          cd client
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          echo "Pushing image to ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Install and configure kubectl
+        run: |
+          VERSION=$(curl --silent https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+          curl https://storage.googleapis.com/kubernetes-release/release/$VERSION/bin/linux/amd64/kubectl \
+              --progress-bar \
+              --location \
+              --remote-name
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION_NAME }}
+    
+      - name: Deploy
+        run: |
+          cat .eks_deploy/client.yml | envsubst > .eks_deploy/client-updated.yml
+          kubectl apply -f .eks_deploy/client-updated.yml --force --grace-period=5
+          kubectl -n openevals-client rollout restart deploy
+          kubectl -n openevals-client rollout status deploy
+
+      - name: Print nice message on completion of CI Pipeline
+        run: echo "CI Pipeline part finished successfully"
