@@ -16,11 +16,15 @@ export async function getEvals(accessToken?: string): Promise<IEvalListItemRespo
       headers
     });
     let response = await res.json() as IEvalListItemResponse[];
-    response = response.map((value)=>{
-      value.authors = value.authors.sort((a, b) => a.id - b.id);
-      return value;
-    });
-    return response;
+    if (Array.isArray(response)) {
+      response = response.map((value)=>{
+        value.authors = value.authors.sort((a, b) => a.id - b.id);
+        return value;
+      });
+      return response;
+    } else {
+      return [];
+    }
   } catch (e) {
     console.error(e);
     throw e;
@@ -84,11 +88,15 @@ export async function getTopEvals(accessToken?: string): Promise<IEvalListItemRe
       headers
     });
     let response = await res.json() as IEvalListItemResponse[];
-    response = response.map((value)=>{
-      value.authors = value.authors.sort((a, b) => a.id - b.id);
-      return value;
-    });
-    return response;
+    if (Array.isArray(response)) {
+      response = response.map((value)=>{
+        value.authors = value.authors.sort((a, b) => a.id - b.id);
+        return value;
+      });
+      return response;
+    } else {
+      return [];
+    }
   } catch (e) {
     console.error(e);
     throw e;
