@@ -13,12 +13,10 @@ env:
   AWS_REGION_NAME: 'us-west-1'
   CLUSTER_NAME: 'openevals-prod'
   ENVIRONMENT: 'prod'
-  DOMAIN: 'api.openevals.org'
   DESIRED_REPLICAS: 6
   MIN_REPLICAS: 6
   MAX_REPLICAS: 15
   SSL_ARN: ${{ secrets.BACKEND_SSL_ARN }}
-  SUFFIX: ''
   AWS_GROUP_TYPE: 'general-processing'
 
 jobs:
