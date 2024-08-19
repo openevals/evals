@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { upvoteEval } from '@/app/utils/upvote';
+import { upvoteEval } from '../../utils/upvoteEval';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../store';
 import { setUpvotedEval } from '../store/dataSlice';
