@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
+
 // This matches ValidatorType in the backend
 export enum ValidatorType {
   Includes = "Includes",
@@ -117,3 +120,43 @@ export interface IVoteResult {
   upvotes: number;
   upvoted: boolean;
 }
+
+export interface DesktopEditorProps {
+  isTryingEval: boolean,
+  name: string;
+  setName: (name: string) => void;
+  step: number;
+  setStep: (step: 1 | 2 | 3) => void;
+  panel1Collapsed: boolean;
+  setPanel1Collapsed: (collapsed: boolean) => void;
+  panel2Collapsed: boolean;
+  setPanel2Collapsed: (collapsed: boolean) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => void;
+  panel1Ref: React.RefObject<ImperativePanelHandle>;
+  panel2Ref: React.RefObject<ImperativePanelHandle>;
+  panel3Ref: React.RefObject<ImperativePanelHandle>;
+  addInstance: () => void;
+  onInstancesChange: () => void;
+  clickSubmitButton: () => void;
+  inputText: string;
+  setInputText: (text: string) => void;
+  outputText: string;
+  setOutputText: (text: string) => void;
+  instances: TaskInstance[];
+  setInstances: Dispatch<SetStateAction<TaskInstance[]>>;
+  instanceInputRef: React.RefObject<HTMLTextAreaElement>;
+  tabIndex: number;
+  handleTabsChange: (index: number) => void;
+  evalObj: IEvalResponse;
+  evalRunIds: number[];
+  description: string;
+  setDescription: (description: string) => void;
+  validator: ValidatorType | '';
+  setValidator: (validator: ValidatorType | '') => void;
+  models: IModelResponse[];
+  setModels: (models: IModelResponse[]) => void;
+  systemPrompt: string;
+  setSystemPrompt: (prompt: string) => void;
+}
+
+export interface MobileEditorProps extends DesktopEditorProps { }

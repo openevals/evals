@@ -2,6 +2,9 @@ import { Stack, Heading, Text, Button, Tag, HStack, Avatar, useToast } from '@ch
 import VoteButton from './voteButton';
 import { useRouter } from 'next/navigation';
 import { IAuthorResponse, IVoteResult } from '../lib/types';
+import { getEvalItem } from '../utils/getEvalItem';
+import { useDispatch } from 'react-redux';
+import { setEvalToTry } from '../lib/store/dataSlice';
 
 export default function ResultItem({
   id,
@@ -24,6 +27,7 @@ export default function ResultItem({
 }) {
   const router = useRouter();
   const toast = useToast();
+  const dispatch = useDispatch();
 
   const copyTextToClipboard = async (text: string) => {
     try {
@@ -49,9 +53,13 @@ export default function ResultItem({
     copyTextToClipboard(link);
   };
 
-  const tryEval = (ev: React.MouseEvent<HTMLButtonElement>) => {
+  const tryEval = async (ev: React.MouseEvent<HTMLButtonElement>) => {
     ev.stopPropagation();
     ev.preventDefault();
+
+    const evalDetails = await getEvalItem(id);
+    dispatch(setEvalToTry(evalDetails));
+    router.push('/');
   };
 
   return (

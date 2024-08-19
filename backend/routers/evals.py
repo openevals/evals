@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-
+from sqlalchemy import select
 from controllers.evals import run_eval_task
 from controllers.jwt import validate_optional_token, validate_token
 from db.db import get_db
@@ -27,6 +27,7 @@ from validation_schemas.evals import (
     EvalSchema,
     EvalUpdateSchema,
     EvalUpvotesResponseSchema,
+    ModelSystemSchema,
 )
 
 evals_router = APIRouter()
@@ -424,4 +425,63 @@ def update_eval(
             status_code=400, detail={"error": "eval-update-failed"}
         ) from error
 
+    return eval
+
+
+@evals_router.post(
+    "/{eval_id}/run",
+    response_model=EvalResponseSchema,
+    status_code=200,
+)
+def create_eval_run(
+    eval_id: int,
+    model_systems: List[ModelSystemSchema],
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    auth: dict = Depends(validate_token),
+) -> dict:
+    """
+    Create new eval run for existant eval
+    """
+    # Look for the target eval run
+    eval = db.query(Eval).filter(Eval.id == eval_id).first()
+
+    if not eval:
+        raise HTTPException(status_code=404, detail={"error": "eval-not-found"})
+
+    # Register all associated runs per model
+    eval_runs = []
+    for model in model_systems:
+        new_eval_run = EvalRun(
+            score=0,
+            datetime=datetime.now(),
+            validator_type=eval.validator_type,
+            status=EvalRunStatus.Queued,
+            model_id=model.model_id,
+            eval_id=eval.id,
+            owner_id=auth["user"].id,
+        )
+        eval_runs.append(new_eval_run)
+        db.add(new_eval_run)
+    db.commit()
+
+    # Get the author object
+    author = get_or_create_author(db, auth["user"])
+
+    # Run query to see if the user is an author of the current eval
+    query = select(eval_authors).where(
+        (eval_authors.c.author_id == author.id) & (eval_authors.c.eval_id == eval_id)
+    )
+    result = db.execute(query).first()
+
+    if not result:
+        # Add author/eval relationship
+        new_author_eval = eval_authors.insert().values(
+            author_id=author.id, eval_id=eval.id
+        )
+        db.execute(new_author_eval)
+        db.commit()
+
+    eval_run_ids = [eval_run.id for eval_run in eval_runs]
+    background_tasks.add_task(run_eval_task, eval.id, eval_run_ids)
     return eval
