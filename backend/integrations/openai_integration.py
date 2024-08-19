@@ -1,16 +1,17 @@
 import json
 import logging
 import os
-import subprocess
 import re
+import subprocess
 from collections import defaultdict
 from pathlib import Path
 from typing import Generator, List
 
 import yaml
-from db.db import SessionLocal
-from db.models import Eval, TaskInstance, Author, ValidatorType, eval_authors
 from dotenv import load_dotenv
+
+from backend.db.db import SessionLocal
+from backend.db.models import Author, Eval, TaskInstance, ValidatorType, eval_authors
 
 load_dotenv(dotenv_path="../.env")
 

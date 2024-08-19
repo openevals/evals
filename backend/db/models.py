@@ -1,11 +1,12 @@
 from enum import Enum
 
-from db import Base
 from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
+from backend.db.base import Base
 
 eval_authors = Table(
     "eval_authors",

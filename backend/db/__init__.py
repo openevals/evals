@@ -1,5 +1,5 @@
-from db.base import Base
-from db.models import (
+from backend.db.base import Base
+from backend.db.models import (
     Eval,
     EvalRun,
     Model,
