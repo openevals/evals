@@ -83,8 +83,8 @@ jobs:
     
       - name: Deploy
         run: |
-          cat ../.eks_deploy/backend.yml | envsubst > ./backend-updated.yml
-          kubectl apply -f backend-updated.yml --force --grace-period=5
+          cat .eks_deploy/backend.yml | envsubst > .eks_deploy/backend-updated.yml
+          kubectl apply -f .eks_deploy/backend-updated.yml --force --grace-period=5
           kubectl -n openevals-backend rollout restart deploy
           kubectl -n openevals-backend rollout status deploy
 
