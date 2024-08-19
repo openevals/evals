@@ -10,7 +10,7 @@ import {
   Td,
   TableContainer,
   TableCaption,
-  TabPanel,
+  Center,
   Heading,
   Spinner,
   Box
@@ -42,8 +42,10 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInsta
   return (
     <>
       <Box>
-        <Spinner ref={spinnerRef} id='loadingSpinner' hidden size='md' />
-        <Heading size='md'>Aggregate Results</Heading>
+        <Center my={2}>
+          <Spinner ref={spinnerRef} id='loadingSpinner' hidden size='md' />
+        </Center>
+        <Heading size='md' pb={4}>Aggregate Results</Heading>
         <TableContainer>
           <Table variant='simple'>
             <TableCaption>{'Model results for ' + evalName}</TableCaption>
@@ -67,7 +69,7 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInsta
         </TableContainer>
       </Box>
       <Box py={8}>
-        <Heading size='md'>Model Results</Heading>
+        <Heading size='md' pb={4}>Model Results</Heading>
         <TableContainer>
           <Table variant='simple'>
             <TableCaption>{'Model outputs for ' + evalName}</TableCaption>

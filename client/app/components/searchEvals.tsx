@@ -31,5 +31,5 @@ export default function SearchEvalsComponent() {
     }));
   };
 
-  return (<Results evals={evals} onUpvote={setUpvoted} />);
+  return (<Results evals={evals} onVote={setUpvoted} />);
 }

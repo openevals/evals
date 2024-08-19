@@ -256,6 +256,13 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           evalObj={evalObj}
           evalRunIds={evalRunIds}
           instanceInputRef={instanceInputRef}
+          panel1Collapsed={panel1Collapsed}
+          setPanel1Collapsed={setPanel1Collapsed}
+          panel2Collapsed={panel2Collapsed}
+          setPanel2Collapsed={setPanel2Collapsed}
+          panel1Ref={panel1Ref}
+          panel2Ref={panel2Ref}
+          panel3Ref={panel3Ref}
         />
       ) : (
         <DesktopEditor
@@ -731,7 +738,7 @@ function MobileEditor({
                         setModels(newModels);
                       }}
                     >
-                      {model.name}
+                      {model.modelName}
                     </Checkbox>
                   ))}
                 </VStack>
