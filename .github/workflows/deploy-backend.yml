@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - '.eks_deploy/backend.yml'
+      - '.github/workflows/deploy-backend.yml'
 
 env:
   ECR_REPO_NAME: 'openevals-backend'
