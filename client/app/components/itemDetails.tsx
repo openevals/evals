@@ -67,7 +67,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   return (
     <>
       <Wrap>
-        <Box p={4} w='400px'>
+        <Box p={4} w={{base:"100%", md:"400px"}}>
           <HStack>
             <Heading size='lg'>{evalItem.name}</Heading>
             <Button ml={2} minW='100px' onClick={tryEval}>Try Eval</Button>
