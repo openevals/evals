@@ -1,0 +1,9 @@
+# Terraform dot files
+.terraform
+.terraformrc
+**/.terraform/*
+.terraform.d
+*.tfstate
+*.tfstate.*
+*.plan
+*.tfvars
