@@ -27,7 +27,7 @@ spec:
         group-type: $AWS_GROUP_TYPE
       containers:
         - name: openevals-backend-app
-          image: 160885253688.dkr.ecr.$AWS_REGION_NAME.amazonaws.com/openevals-backend:vi-account-api-$ENVIRONMENT-latest
+          image: 160885253688.dkr.ecr.$AWS_REGION_NAME.amazonaws.com/openevals-backend:openevals-backend-$ENVIRONMENT-latest
           imagePullPolicy: Always
           resources:
             limits:
