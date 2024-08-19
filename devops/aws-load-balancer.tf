@@ -27,8 +27,12 @@ module "openevals_load_balancer_service_account" {
   managed_by             = "Helm"
   helm_release_name      = "aws-load-balancer-controller"
   helm_release_namespace = "kube-system"
+  providers = {
+    aws = aws
+    kubernetes = kubernetes
+  }
   depends_on = [
-    module.eks.cluster_id
+    module.eks.cluster_endpoint
   ]
 }
 

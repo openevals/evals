@@ -63,7 +63,6 @@ resource "aws_iam_role_policy_attachment" "irsa" {
 ###
 resource "kubernetes_manifest" "irsa_service_account" {
   count    = var.create_service_account ? 1 : 0
-  provider = kubernetes
   manifest = {
     "apiVersion" = "v1"
     "kind"       = "ServiceAccount"

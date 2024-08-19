@@ -1,4 +1,4 @@
-resource "aws_db_instance" "mi_postgres_rds" {
+resource "aws_db_instance" "openevals_rds" {
   allocated_storage    = 30
   engine               = "postgres"
   engine_version       = "16.4"
@@ -22,7 +22,7 @@ resource "aws_db_instance" "mi_postgres_rds" {
 
 resource "aws_db_subnet_group" "openevals_subnet_group" {
   name       = "openevals-subnet-group"
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids = module.vpc.public_subnets
   tags = {
     Name = "OpenEvals Subnet Group"
   }
@@ -32,14 +32,6 @@ resource "aws_security_group" "openevals_rds_sg" {
   name        = "openevals-sg"
   description = "OpenEval Security Group"
   vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description = "ingress postgres"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     from_port       = 5432

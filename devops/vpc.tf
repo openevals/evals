@@ -14,6 +14,7 @@ module "vpc" {
   enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
+  enable_dns_support = true
 
   manage_default_network_acl    = true
   default_network_acl_tags      = { Name = "${local.cluster_name}-default" }
