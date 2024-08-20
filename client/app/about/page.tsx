@@ -19,8 +19,7 @@ export default function About() {
           About OpenEvals
         </Text>
         <Text>{`Hi there! OpenEvals is a project to help make evals more legible, reproducible, and less data-contaminated.`}</Text>
-        <Text>{`Evals, or evaluations, are like school grades but for AI systems. We'd like anyone to easily access these test results for use cases they care about and contribute new ones if they'd like!`}</Text>
-        <Text>{`To grade someone or something well, it seems important that they can't cheat by peeking at the answers. To prevent AI systems from "cheating", OpenEval evals include a mix of public and private task instances which are customizable.`}</Text>
+        <Text>{`Shiny new model scores 89 on MMLU? What does that mean for your use case? Find out by contributing evals for your own use cases! Worried about data contamination? OpenEvals is private by default and you can customize eval visibility.`}</Text>
         <Text
           fontSize="xl"
           as="b"
