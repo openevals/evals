@@ -23,13 +23,13 @@ import { ITaskInstanceResponse } from '../lib/types';
 export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInstances }: { evalId: number, evalRunIds: number[], evalName: string, taskInstances: ITaskInstanceResponse[] }) {
   const { evalRuns, allRunsCompleted } = useEvalResults(evalId, evalRunIds);
   const [taskMap, setTaskMap] = useState<Record<number, ITaskInstanceResponse>>({});
-  const spinnerRef = useRef<HTMLDivElement>(null);
+  // const spinnerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (spinnerRef.current) {
-      spinnerRef.current.hidden = allRunsCompleted;
-    }
-  }, [allRunsCompleted]);
+  // useEffect(() => {
+  //   if (spinnerRef.current) {
+  //     spinnerRef.current.hidden = allRunsCompleted;
+  //   }
+  // }, [allRunsCompleted]);
 
   useEffect(() => {
     const map: Record<number, ITaskInstanceResponse> = {};
@@ -42,9 +42,9 @@ export default function EvalRunResults({ evalId, evalRunIds, evalName, taskInsta
   return (
     <>
       <Box>
-        <Center my={2}>
+        {/* <Center my={2}>
           <Spinner ref={spinnerRef} id='loadingSpinner' hidden size='md' />
-        </Center>
+        </Center> */}
         <Heading size='md' pb={4}>Aggregate Results</Heading>
         <TableContainer>
           <Table variant='simple'>

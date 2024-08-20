@@ -99,9 +99,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     if (!name.trim()) {
       errors.push("Name is required");
     }
-    if (!description.trim()) {
-      errors.push("Description is required");
-    }
     if (!Object.values(ValidatorType).includes(validator as ValidatorType)) {
       errors.push("Evaluation method is required");
     }
