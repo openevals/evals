@@ -19,7 +19,7 @@ export default function About() {
           About OpenEvals
         </Text>
         <Text>{`Hi there! OpenEvals is a project to help make evals more legible, reproducible, and less data-contaminated.`}</Text>
-        <Text>{`Shiny new model scores 89 on MMLU? What does that mean for your use case? Find out by contributing evals for your own use cases! Worried about data contamination? OpenEvals is private by default and you can customize eval visibility.`}</Text>
+        <Text>{`Shiny new model scores 89 on MMLU? What does that mean for your use case? Find out by contributing your own evals for tasks you care about. Worried about data contamination? OpenEvals is private by default and you can customize eval visibility.`}</Text>
         <Text
           fontSize="xl"
           as="b"
@@ -43,14 +43,6 @@ export default function About() {
                 isExternal
                 textDecoration="underline"
               >{`@justinlinw`}</Link>
-            </ListItem>
-            <ListItem>
-              {`Amy Deng, `}
-              <Link
-                href="https://x.com/amydeng_"
-                isExternal
-                textDecoration="underline"
-              >{`@amydeng_`}</Link>
             </ListItem>
             <ListItem>
               {`Reinier Millo-Sanchez, `}
