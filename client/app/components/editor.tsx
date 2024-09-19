@@ -87,6 +87,13 @@ export default function Editor({
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (isTryingEval) {
+      setStep(2);
+      setTabIndex(isMobile ? 3 : 2);
+    }
+  }, [isTryingEval]);
+
   /* Load the data from the model to try */
   useEffect(() => {
     if (evalToTryObj) {

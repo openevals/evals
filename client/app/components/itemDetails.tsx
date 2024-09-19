@@ -9,7 +9,8 @@ import {
   Box,
   Tag,
   Wrap,
-  HStack,
+  Flex,
+  Spacer,
   VStack,
   Center,
   TableContainer,
@@ -19,17 +20,20 @@ import {
   Th,
   Tbody,
   Td,
-} from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { getEvalItem } from "../utils/getEvalItem";
-import { IEvalResponse, IModelResponse } from "../lib/types";
-import EvalRunResults from "./evalRunResults";
-import { useParams, useRouter } from "next/navigation";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "../lib/store";
-import { defaultEvalItem } from "../lib/constants";
-import { setEvalToTry } from "../lib/store/dataSlice";
+  useBreakpointValue,
+  useToast,
+} from '@chakra-ui/react';
+import { useState, useEffect } from 'react';
+import { getEvalItem } from '../utils/getEvalItem';
+import { IEvalResponse, IModelResponse } from '../lib/types';
+import EvalRunResults from './evalRunResults';
+import { useParams, useRouter } from 'next/navigation';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../lib/store';
+import { defaultEvalItem } from '../lib/constants';
+import { setEvalToTry } from '../lib/store/dataSlice';
+import { LinkIcon } from '@chakra-ui/icons';
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
@@ -41,6 +45,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   const params: { id: string } = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
+
+  
+  const isMobile = useBreakpointValue({ base: true, sm: true, md: false });
+
 
   useEffect(() => {
     /* Get the id parameter */
@@ -73,20 +82,45 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     router.push("/");
   };
 
+  const copyLink = () => {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      toast({
+        title: "Link copied to clipboard",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }).catch((err) => {
+      console.error('Failed to copy: ', err);
+      toast({
+        title: "Failed to copy link",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    });
+  };
+
   return (
     <>
       <Wrap>
-        <Box p={4} w={{ base: "100%", md: "400px" }}>
-          <HStack>
-            <Heading size="lg">{evalItem.name}</Heading>
-            <Button ml={2} minW="100px" onClick={tryEval}>
-              Try Eval
-            </Button>
-          </HStack>
-          <Stack divider={<StackDivider />} spacing="4" py={8}>
+        <Box p={4} w={{base:"100%", md:"768px"}}>
+          <Flex>
+            <Heading size='lg'>{evalItem.name}</Heading>
+            <Spacer />
+            <div>
+              <Button ml={4} minW='100px' onClick={tryEval}>Contribute Run</Button>
+              <Button ml={2} variant="ghost" onClick={copyLink}>
+                <LinkIcon mr={2} />
+                {!isMobile && 'Share Link'}
+              </Button>
+            </div>
+          </Flex>
+          <Stack divider={<StackDivider />} spacing='4' py={8}>
             <Box>
-              <Heading size="xs">
-                <Stack direction={["row"]}>
+              <Heading size='xs'>
+                <Stack direction={['row']} alignItems="center">
                   <Text>Method to evaluate: </Text>
                   <Tag>{evalItem.validatorType}</Tag>
                 </Stack>
@@ -99,46 +133,46 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               </Text>
             </Box>
             <Box>
-              <Heading size="xs">Models tested:</Heading>
-              <Text pt="2" fontSize="sm">
-                {evalItem.modelSystems.length > 0 ? (
-                  evalItem.modelSystems.map((ms: any) => (
-                    <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>
-                      {modelMap[ms.modelId]}
-                    </Tag>
-                  ))
+              <Heading size='xs'>
+                System Prompt:
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {/* TODO: Right now this only queries the first */}
+                {evalItem.taskInstances[0]?.systemPrompt ? (
+                  <Text>{evalItem.taskInstances[0].systemPrompt}</Text>
                 ) : (
                   <Text>None</Text>
                 )}
               </Text>
             </Box>
             <Box>
-              <Heading size="xs">Prompts used:</Heading>
-              <Text pt="2" fontSize="sm">
-                {/* TODO: Right now this only queries the first */}
-                {evalItem.modelSystems.length > 0 &&
-                  (evalItem.taskInstances[0]?.systemPrompt ? (
-                    <Text>
-                      System prompt: {evalItem.taskInstances[0].systemPrompt}
-                    </Text>
-                  ) : (
-                    <Text>None</Text>
-                  ))}
+              <Heading size='xs'>
+                Models tested:
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {evalItem.modelSystems.length > 0 ? evalItem.modelSystems.map((ms: any) => (
+                  <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>{modelMap[ms.modelId]}</Tag>
+                )) : (
+                  <Text>None</Text>
+                )
+                }
               </Text>
             </Box>
             <Box>
-              <Heading size="xs">Authors:</Heading>
-              <Text pt="2" fontSize="sm">
-                {evalItem.authors.map((a) => (
-                  <Text key={`author-item-${a.id}`}>{a.username}</Text>
+              <Heading size='xs'>
+                Authors:
+              </Heading>
+              <Text pt='2' fontSize='sm'>
+                {evalItem.authors.map((a, idx) => (
+                  <Text key={`author-item-${idx}`}>{a.username}</Text>
                 ))}
-              </Text>
-            </Box>
-            <Box>
-              <Heading size="xs">Contributors:</Heading>
-              <Text pt="2" fontSize="sm">
-                {evalItem.contributors.map((a) => (
-                  <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
+                </Text>
+              </Box>
+              <Box>
+                <Heading size="xs">Contributors:</Heading>
+                <Text pt="2" fontSize="sm">
+                  {evalItem.contributors.map((a) => (
+                    <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
                 ))}
               </Text>
             </Box>
@@ -199,7 +233,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             </TableContainer>
           </Box>
         </Box>
-        <Box p={4} minW="70%">
+        <Box p={8} pb={16} minW='70%'>
           {runIds.length > 0 ? (
             <EvalRunResults
               evalId={evalItem.id}
@@ -210,13 +244,8 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
           ) : (
             <Center>
               <VStack>
-                <Text>
-                  No model systems have been tested on this eval yet. Would you
-                  like to be the first?
-                </Text>
-                <Button ml={2} minW="100px" onClick={tryEval}>
-                  Try Eval
-                </Button>
+                <Text>No models have been tested on this eval yet. Would you like to be the first?</Text>
+                <Button ml={2} minW='100px' onClick={tryEval}>Contribute Run</Button>
               </VStack>
             </Center>
           )}

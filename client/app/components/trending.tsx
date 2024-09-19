@@ -32,20 +32,18 @@ export default function Trending() {
       {evals.map(({
         id, name, description, validatorType, upvotes, upvoted, authors
       }) => (
-        <>
-          <ResultItem
-            key={`trending-eval-${id}`}
-            id={id}
-            name={name}
-            description={description ?? ''}
-            validatorType={validatorType}
-            upvotes={upvotes}
-            upvoted={upvoted}
-            onVote={updateEvals}
-            mainAuthor={authors[0]}
-          />
-          <Divider />
-        </>
+        <ResultItem
+          key={`trending-eval-${id}`}
+          id={id}
+          name={name}
+          description={description ?? ''}
+          validatorType={validatorType}
+          upvotes={upvotes}
+          upvoted={upvoted}
+          onVote={updateEvals}
+          mainAuthor={authors?.[0] ?? null }
+          onClick='Editor'
+        />
       ))}
     </>
   );

@@ -38,6 +38,7 @@ export default function ResultItem({
   mainAuthor,
   canDelete,
   onDelete,
+  onClick,
 }: {
   id: number;
   name: string;
@@ -46,9 +47,10 @@ export default function ResultItem({
   upvotes: number;
   upvoted: boolean;
   onVote?: (payload: IVoteResult) => void;
-  mainAuthor?: IAuthorResponse;
+  mainAuthor?: IAuthorResponse | null;
   canDelete?: boolean;
   onDelete?: (evalId: number) => void;
+  onClick?: 'ItemDetail' | 'Editor'
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -83,9 +85,15 @@ export default function ResultItem({
     copyTextToClipboard(link);
   };
 
-  const tryEval = async (ev: React.MouseEvent<HTMLButtonElement>) => {
-    ev.stopPropagation();
-    ev.preventDefault();
+  const goToItemDetail = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    router.push(`/evals/${id}`);
+  };
+
+  const goToEditor = async (e: React.MouseEvent<HTMLButtonElement|HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
 
     const evalDetails = await getEvalItem(id);
     dispatch(setEvalToTry(evalDetails));
@@ -117,46 +125,42 @@ export default function ResultItem({
       <Stack
         p={4}
         my={4}
-        textAlign="start"
-        _hover={{ backgroundColor: "gray.100", cursor: "pointer" }}
+        textAlign='start'
+        _hover={{ backgroundColor: 'gray.100',  cursor: 'pointer' }}
+        borderWidth="1px"
+        borderRadius="lg"
+        borderColor="lightgray"
+        onClick={(e) => {
+          if (onClick === 'ItemDetail') {
+            goToItemDetail(e);
+          } else {
+            goToEditor(e);
+          }
+        }}
       >
         {mainAuthor && (
-          <HStack>
-            <Avatar
-              size="xs"
-              name={mainAuthor.username ?? "Unknown"}
-              src={
-                mainAuthor.avatar ??
-                "https://www.svgrepo.com/show/448095/person-circle.svg"
-              }
-            />
-            <Stack spacing={0}>
-              <Text fontSize="sm">{mainAuthor.username ?? "Unknown"}</Text>
-              <Text fontSize="xs">@{mainAuthor.githubLogin ?? ""}</Text>
-            </Stack>
-          </HStack>
-        )}
-        <Heading size="md">{name}</Heading>
-        <Text>{description}</Text>
         <HStack>
-          <Tag size="md">{validatorType}</Tag>
+          <Avatar size='xs' name={mainAuthor?.username ?? 'Unknown'} src={mainAuthor?.avatar ?? 'https://www.svgrepo.com/show/448095/person-circle.svg'} />
+          <Stack spacing={0}>
+            <Text fontSize='sm'>{mainAuthor?.username ?? 'Unknown'}</Text>
+            <Text fontSize='xs'>@{mainAuthor?.githubLogin ?? ''}</Text>
+          </Stack>
         </HStack>
+        )}
+        <Heading size='md'>{name}</Heading>
+        <Text>
+          {description}
+        </Text>
         <HStack>
+          <Tag size='md'>{validatorType}</Tag>
+        </HStack>
+        <HStack zIndex={1}>
           <Flex width="100%" justifyContent="space-between" alignItems="center">
             <HStack>
-              <VoteButton
-                evalId={id}
-                votes={upvotes}
-                upvoted={upvoted}
-                onVote={onVote}
-              />
-              <Button onClick={shareEval} variant="outline">
-                Share
-              </Button>
-              <Button onClick={tryEval} variant="outline">
-                Try
-              </Button>
-            </HStack>
+              <VoteButton evalId={id} votes={upvotes} upvoted={upvoted} onVote={onVote} />
+              <Button onClick={shareEval} variant='outline'>Share</Button>
+              <Button onClick={goToEditor} variant="outline">Run Eval</Button>
+              </HStack>
             {canDelete && (
               <Button
                 leftIcon={<DeleteIcon />}

@@ -111,6 +111,7 @@ export default function MyEvals() {
               mainAuthor={authors[0]}
               canDelete={true}
               onDelete={onDeleteEval}
+              onClick='ItemDetail'
             />
           ),
         )
@@ -143,6 +144,7 @@ export default function MyEvals() {
               upvoted={upvoted}
               onVote={updateEvals}
               mainAuthor={authors[0]}
+              onClick='ItemDetail'
             />
           ),
         )

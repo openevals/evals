@@ -37,6 +37,7 @@ import EvalRunResults from "./evalRunResults";
 import InstancesTable from "./instancesTable";
 import Trending from "./trending";
 import EditorModelItem from "./editorModel";
+import { useEffect } from "react";
 
 export default function DesktopEditor({
   isTryingEval,
@@ -75,6 +76,7 @@ export default function DesktopEditor({
   systemPrompt,
   setSystemPrompt,
 }: DesktopEditorProps) {
+
   return (
     <PanelGroup direction="horizontal">
       <Panel
@@ -100,37 +102,32 @@ export default function DesktopEditor({
           {!panel1Collapsed && (
             <>
               <VStack spacing={6} align="stretch" px={2}>
-                <Heading size="md">
-                  {isTryingEval ? "Contributing to eval" : "Create new eval"}
-                </Heading>
+                <Heading size='lg' pt={2}>{isTryingEval ? "Contribute model runs to an existing eval" : "Make a new eval"}</Heading>
+                {isTryingEval && (
+                  <Text>Your setting API keys will be used. Thank you for your contribution 💛</Text>
+                )}
                 <FormControl>
-                  <HStack top={0}>
-                    <FormLabel htmlFor="evalName" srOnly>
-                      Evaluation Name
-                    </FormLabel>
-                    <Input
-                      id="evalName"
-                      size="lg"
-                      variant="flushed"
-                      placeholder={`Eval name, e.g. "Linear algebra problems"`}
-                      maxW="384px"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                    <Spacer />
-                    {step === 1 && panel2Collapsed && (
-                      <Button
-                        float="right"
-                        onClick={() => {
-                          if (step === 1) setStep(2);
-                        }}
-                        minW="180px"
-                      >
-                        <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                        <Text ml={2}>Next</Text>
-                      </Button>
-                    )}
-                  </HStack>
+                  <FormLabel>
+                    <Heading size='sm'>Name</Heading>
+                  </FormLabel>
+                  <Input
+                    id="evalName"
+                    size='lg'
+                    variant='flushed'
+                    placeholder={`Eval name, e.g. "Linear algebra problems"`}
+                    maxW='384px'
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                  <Spacer />
+                  {step === 1 && panel2Collapsed && (
+                    <Button float='right' onClick={() => { if (step === 1) setStep(2); }} minW='180px'>
+                      <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                      <Text ml={2}>
+                        Next
+                      </Text>
+                    </Button>
+                  )}
                 </FormControl>
                 <FormControl>
                   <FormLabel>
@@ -139,7 +136,7 @@ export default function DesktopEditor({
                   <Textarea
                     placeholder="Linear algebra equations in Latex. Output is the answer only in Latex."
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => setDescription(e.target.value) }
                   />
                 </FormControl>
 
@@ -147,14 +144,11 @@ export default function DesktopEditor({
                   <FormLabel>
                     <Heading size="sm">Method to evaluate</Heading>
                   </FormLabel>
-                  <Select
-                    placeholder="Select validator type"
-                    value={validator}
-                    onChange={(e) =>
-                      setValidator(e.target.value as ValidatorType)
-                    }
+                  <Select 
+                    placeholder='Select validator type' value={validator} 
+                    onChange={(e) => setValidator(e.target.value as ValidatorType)} 
                     required
-                  >
+                    >
                     {Object.values(ValidatorType).map((validatorType) => (
                       <option key={validatorType} value={validatorType}>
                         {validatorType}
@@ -165,30 +159,32 @@ export default function DesktopEditor({
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size="sm">Models to test</Heading>
+                    <Heading size='sm'>System Prompt (Recommended)</Heading>
                   </FormLabel>
-                  <Wrap direction="column">
-                    {models?.map((model) => (
-                      <EditorModelItem
-                        key={`model-${model.id}`}
-                        model={model}
-                        modelUpdated={() => {
-                          setModels([...models]);
-                        }}
-                      />
-                    ))}
-                  </Wrap>
+                  <Textarea
+                    placeholder='You are a mathematics professor at MIT.'
+                    value={systemPrompt}
+                    onChange={(e) => setSystemPrompt(e.target.value)}
+                  />
                 </FormControl>
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size="sm">System Prompt (Recommended)</Heading>
+                    <Heading size='sm'>Models</Heading>
                   </FormLabel>
-                  <Textarea
-                    placeholder="You are a mathematics professor at MIT."
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                  />
+                  <Wrap 
+                    direction='column'                     
+                  >
+                    {models?.map((model) => (
+                      <EditorModelItem
+                      key={`model-${model.id}`}
+                      model={model}
+                      modelUpdated={() => {
+                        setModels([...models]);
+                      }}
+                    />
+                    ))}
+                  </Wrap>
                 </FormControl>
               </VStack>
             </>

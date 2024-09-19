@@ -8,11 +8,11 @@ export const metadata: Metadata = {
   description: "Evals for the public",
 };
 
-export default function EvalSearchPage() {
+export default function BrowsePage() {
   return (
     <Box>
       <Heading size='lg' p={4}>Browse evals</Heading>
-      <UpvoteEvalsComponent />
+      <UpvoteEvalsComponent/>
     </Box>
   );
 }
