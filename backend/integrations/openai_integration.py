@@ -96,15 +96,17 @@ class OpenAIIntegration:
     ) -> List[TaskInstance]:
         task_instances = []
         for sample in samples:
-            input_messages = sample.get("input", [])
+            input_messages = sample.get("input", {})
             system_prompt = ""
             user_input = ""
 
             for message in input_messages:
-                if message["role"] == "system":
-                    system_prompt += message["content"] + "\n\n"
-                elif message["role"] == "user":
-                    user_input += message["content"] + "\n\n"
+                if type(message).__name__ != "dict":
+                    continue
+                if message.get("role") == "system":
+                    system_prompt += message.get("content", "") + "\n\n"
+                elif message.get("role") == "user":
+                    user_input += message.get("content", "") + "\n\n"
 
             system_prompt = system_prompt.strip()
             user_input = user_input.strip()
@@ -250,7 +252,6 @@ class OpenAIIntegration:
 
                     if not dry_run:
                         db.add(eval_obj)
-                        db.flush()
                         if jsonl_file:
                             db.add_all(task_instances)
                         try:
