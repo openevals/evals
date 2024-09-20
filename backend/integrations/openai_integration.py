@@ -204,6 +204,8 @@ class OpenAIIntegration:
                 avatar="https://www.svgrepo.com/show/306500/openai.svg",
                 github_login="openai",
             )
+            authors_map = {}
+            registered_authors = []
             for yaml_file, jsonl_file in integration.get_openai_evals():
                 logger.info(f"Processing: {yaml_file.name}")
                 try:
@@ -212,15 +214,20 @@ class OpenAIIntegration:
                         yaml_file
                     )
 
+                    # Check if author was not used before
+                    if primary_author not in authors_map:
+                        authors_map[primary_author] = integration.get_or_create_author(
+                            db, primary_author, author_email
+                        )
+                        registered_authors.append(primary_author)
+
+                    author = authors_map[primary_author]
                     eval_obj = integration.create_eval(metadata)
-                    author = integration.get_or_create_author(
-                        db, primary_author, author_email
-                    )
 
                     logger.info(
                         f"Eval: {eval_obj.name} (Type: {eval_obj.validator_type})"
                     )
-                    logger.info(f"Primary Author: {eval_obj.primary_author}")
+                    logger.info(f"Primary Author: {author.username}")
                     logger.info(f"Description: {eval_obj.description[:100]}...")
 
                     if jsonl_file:
