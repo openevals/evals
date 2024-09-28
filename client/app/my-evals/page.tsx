@@ -6,7 +6,7 @@ import {
   getUserCreatedEvals,
   getUserContributedEvals,
 } from "../utils/getEvals";
-import { Heading, Box, Text } from "@chakra-ui/react";
+import { Heading, Box, Text, Link } from "@chakra-ui/react";
 import ResultItem from "../components/resultItem";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 import { deleteEval } from "../lib/store/dataSlice";
@@ -52,7 +52,7 @@ export default function MyEvals() {
   }, []);
 
   useEffect(() => {
-    setUserVotedEvals(evals.filter((value) => value.upvoted));
+    setUserVotedEvals(evals.filter((value: IEvalListItemResponse) => value.upvoted));
   }, [evals]);
 
   const onDeleteEval = (evalId: number) => {
@@ -84,10 +84,9 @@ export default function MyEvals() {
   };
 
   return (
-    <Box w="100%" p={4}>
-      <Heading ml={4} size="lg">
-        My Created Evals
-      </Heading>
+    <Box w='100%' p={4} mx={{ base: 0, md: 4 }} maxW="1200px" margin="0 auto">
+      <Heading size='lg' >My Created Evals</Heading>
+      <Box my={8}>
       {userCreatedEvals?.length > 0 ? (
         userCreatedEvals.map(
           ({
@@ -116,13 +115,11 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Text ml={4} my={4}>
-          User has not created any evals
-        </Text>
+        <Link href="/" color="gray" fontWeight="bold">Create your first eval!</Link>
       )}
-      <Heading ml={4} size="lg">
-        My Contributed Evals
-      </Heading>
+      </Box>
+      <Heading size="lg">My Contributed Evals</Heading>
+      <Box my={8}>
       {userContributedEvals?.length > 0 ? (
         userContributedEvals.map(
           ({
@@ -153,9 +150,9 @@ export default function MyEvals() {
           User has not contributed to any evals
         </Text>
       )}
-      <Heading ml={4} size="lg">
-        My Upvotes
-      </Heading>
+      </Box>
+      <Heading size="lg">My Upvotes</Heading>
+      <Box my={8}>
       {userVotedEvals?.length > 0 ? (
         userVotedEvals.map(
           ({
@@ -181,10 +178,9 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Text ml={4} my={4}>
-          User has not voted on any evals
-        </Text>
+        <Link href="/evals" color="gray" fontWeight="bold">Browse evals to see what you'd like to upvote.</Link>
       )}
+      </Box>
     </Box>
   );
 }
