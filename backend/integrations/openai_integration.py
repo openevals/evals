@@ -1,15 +1,15 @@
 import json
 import logging
 import os
-import subprocess
 import re
+import subprocess  # nosec B404
 from collections import defaultdict
 from pathlib import Path
 from typing import Generator, List
 
 import yaml
 from db.db import SessionLocal
-from db.models import Eval, TaskInstance, Author, ValidatorType, eval_authors
+from db.models import Author, Eval, TaskInstance, ValidatorType, eval_authors
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="../.env")
@@ -96,15 +96,17 @@ class OpenAIIntegration:
     ) -> List[TaskInstance]:
         task_instances = []
         for sample in samples:
-            input_messages = sample.get("input", [])
+            input_messages = sample.get("input", {})
             system_prompt = ""
             user_input = ""
 
             for message in input_messages:
-                if message["role"] == "system":
-                    system_prompt += message["content"] + "\n\n"
-                elif message["role"] == "user":
-                    user_input += message["content"] + "\n\n"
+                if type(message).__name__ != "dict":
+                    continue
+                if message.get("role") == "system":
+                    system_prompt += message.get("content", "") + "\n\n"
+                elif message.get("role") == "user":
+                    user_input += message.get("content", "") + "\n\n"
 
             system_prompt = system_prompt.strip()
             user_input = user_input.strip()
@@ -204,6 +206,8 @@ class OpenAIIntegration:
                 avatar="https://www.svgrepo.com/show/306500/openai.svg",
                 github_login="openai",
             )
+            authors_map = {}
+            registered_authors = []
             for yaml_file, jsonl_file in integration.get_openai_evals():
                 logger.info(f"Processing: {yaml_file.name}")
                 try:
@@ -212,15 +216,20 @@ class OpenAIIntegration:
                         yaml_file
                     )
 
+                    # Check if author was not used before
+                    if primary_author not in authors_map:
+                        authors_map[primary_author] = integration.get_or_create_author(
+                            db, primary_author, author_email
+                        )
+                        registered_authors.append(primary_author)
+
+                    author = authors_map[primary_author]
                     eval_obj = integration.create_eval(metadata)
-                    author = integration.get_or_create_author(
-                        db, primary_author, author_email
-                    )
 
                     logger.info(
                         f"Eval: {eval_obj.name} (Type: {eval_obj.validator_type})"
                     )
-                    logger.info(f"Primary Author: {eval_obj.primary_author}")
+                    logger.info(f"Primary Author: {author.username}")
                     logger.info(f"Description: {eval_obj.description[:100]}...")
 
                     if jsonl_file:
@@ -243,7 +252,6 @@ class OpenAIIntegration:
 
                     if not dry_run:
                         db.add(eval_obj)
-                        db.flush()
                         if jsonl_file:
                             db.add_all(task_instances)
                         try:
