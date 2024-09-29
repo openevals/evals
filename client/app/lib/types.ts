@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 
+export type AIProvider = 'openai' | 'anthropic' | 'google';
+
 // This matches ValidatorType in the backend
 export enum ValidatorType {
   Includes = "Includes",

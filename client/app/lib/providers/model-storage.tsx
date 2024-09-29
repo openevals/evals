@@ -2,6 +2,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface StateContextType {
+  settingsVisible: boolean;
+  setSettingsVisible: (value: boolean) => void;
   openAIKey: string;
   setOpenAIKey: (value: string) => void;
   geminiKey: string;
@@ -14,6 +16,7 @@ interface StateContextType {
 const StateContext = createContext<StateContextType | undefined>(undefined);
 
 export const ModelStorageProvider = ({ children }: { children: ReactNode }) => {
+  const [settingsVisible, setSettingsVisible] = useState(false);
   const [openAIKey, saveOpenAIKey] = useState("");
   const [geminiKey, saveGeminiKey] = useState("");
   const [anthropicKey, saveAnthropicKey] = useState("");
@@ -61,7 +64,7 @@ export const ModelStorageProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <StateContext.Provider value={{ openAIKey, setOpenAIKey, geminiKey, setGeminiKey, anthropicKey, setAnthropicKey, clearData }}>
+    <StateContext.Provider value={{ openAIKey, setOpenAIKey, geminiKey, setGeminiKey, anthropicKey, setAnthropicKey, clearData, settingsVisible, setSettingsVisible }}>
       {children}
     </StateContext.Provider>
   );
