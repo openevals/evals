@@ -28,6 +28,7 @@ import { getEvals } from '@/app/utils/getEvals';
 import { useRouter, usePathname } from 'next/navigation';
 import NavButtons from '@/app/components/layout/navButtons';
 import { Roboto_Mono } from 'next/font/google';
+import KeysSettings from '../keySettings/modal';
 
 const robotoMono = Roboto_Mono({ subsets: ['latin'] });
 
@@ -204,6 +205,7 @@ export default function HeaderComponent() {
               height={32} 
             />
           )}
+          <KeysSettings />
         </HStack>
       )}
       {isTablet && <NavButtons />}
@@ -225,7 +227,7 @@ interface MobileHeaderProps {
   router: any; // Consider using a more specific type if possible
 }
 import { Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure } from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { HamburgerIcon} from "@chakra-ui/icons";
 
 const MobileHeader = ({
   inputValue,
