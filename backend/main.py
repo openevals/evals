@@ -12,6 +12,7 @@ load_dotenv()
 from routers.health import health_router
 from routers.models import models_router
 from routers.oauth import oauth_router
+from routers.validate_keys import validate_keys_router
 
 docs_url = "/docs" if os.getenv("ENV") != "production" else None
 redoc_url = "/redoc" if os.getenv("ENV") != "production" else None
@@ -32,6 +33,7 @@ app.include_router(models_router, prefix="/models")
 app.include_router(evals_router, prefix="/evals")
 app.include_router(oauth_router, prefix="/oauth")
 app.include_router(account_router, prefix="/account")
+app.include_router(validate_keys_router, prefix="/validate")
 app.include_router(health_router)
 
 # Only for debug purposes
