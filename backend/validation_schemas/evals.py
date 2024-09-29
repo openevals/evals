@@ -6,9 +6,20 @@ from pydantic import BaseModel, Field
 from validation_schemas.models import ModelSchema
 
 
+class ModelKeysSchema(BaseModel):
+    openai: Optional[str]
+    anthropic: Optional[str]
+    google: Optional[str]
+
+
 class ModelSystemSchema(BaseModel):
     model_id: int = Field(..., alias="modelId")
     system_prompt: Optional[str] = Field(..., alias="systemPrompt")
+
+
+class RunEvalSchema(BaseModel):
+    keys: ModelKeysSchema
+    systems: List[ModelSystemSchema]
 
 
 class TaskInstanceSchema(BaseModel):

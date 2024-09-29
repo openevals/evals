@@ -1,16 +1,12 @@
 from datetime import datetime
 from db.db import SessionLocal
 from db.models import Eval, TaskInstanceOutput, EvalRunStatus
-from models.model_provider import (
-    query,
-    ModelQueryInput,
-    ModelProviderType,
-    ModelProvider,
-)
+from models.model_provider import query, ModelQueryInput, ModelProviderType
 from controllers.validation import validate_response
+from validation_schemas.evals import ModelKeysSchema
 
 
-def run_eval_task(eval_id, eval_run_ids=None):
+def run_eval_task(eval_id, keys: ModelKeysSchema, eval_run_ids=None):
     """Run the eval as background task"""
     db = SessionLocal()
     try:
@@ -33,7 +29,7 @@ def run_eval_task(eval_id, eval_run_ids=None):
                         temperature=0,
                         max_tokens=4096,
                         stop_sequences=["<END>"],
-                        api_key=ModelProvider._api_key(model_provider=model_provider),
+                        api_key=keys.model_dump()[model_provider.value.lower()],
                     )
 
                     # Update the eval run status

@@ -27,7 +27,7 @@ from validation_schemas.evals import (
     EvalSchema,
     EvalUpdateSchema,
     EvalUpvotesResponseSchema,
-    ModelSystemSchema,
+    RunEvalSchema,
 )
 
 evals_router = APIRouter()
@@ -435,7 +435,7 @@ def update_eval(
 )
 def create_eval_run(
     eval_id: int,
-    model_systems: List[ModelSystemSchema],
+    run_eval: RunEvalSchema,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     auth: dict = Depends(validate_token),
@@ -451,7 +451,7 @@ def create_eval_run(
 
     # Register all associated runs per model
     eval_runs = []
-    for model in model_systems:
+    for model in run_eval.systems:
         new_eval_run = EvalRun(
             score=0,
             datetime=datetime.now(),
@@ -483,5 +483,5 @@ def create_eval_run(
         db.commit()
 
     eval_run_ids = [eval_run.id for eval_run in eval_runs]
-    background_tasks.add_task(run_eval_task, eval.id, eval_run_ids)
+    background_tasks.add_task(run_eval_task, eval.id, run_eval.keys, eval_run_ids)
     return eval
