@@ -14,6 +14,12 @@ export interface TaskInstance {
   ideal: string;
 }
 
+export interface IModelKeys {
+  openai?: string;
+  anthropic?: string;
+  google?: string;
+};
+
 export interface ModelSystem {
   modelId: number;
   systemPrompt: string;
@@ -160,3 +166,7 @@ export interface DesktopEditorProps {
 }
 
 export interface MobileEditorProps extends DesktopEditorProps { }
+
+export interface IKeyValidationResponse {
+  isValid: boolean;
+}

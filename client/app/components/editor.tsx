@@ -26,8 +26,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { addNewEval, clearEvalToTry } from "../lib/store/dataSlice";
 import MobileEditor from './editorMobile';
 import DesktopEditor from './editorDesktop';
+import { useModelStorageContext } from '../lib/providers/model-storage';
 
 export default function Editor({ initialEval }: { initialEval?: IEvalResponse }) {
+  const { openAIKey, anthropicKey, geminiKey } = useModelStorageContext();
   // step 1 = enter meta info
   // step 2 = add task instances
   // step 3 = run results
@@ -134,7 +136,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     }));
 
 
-    const newEval = isTryingEval ? await addNewEvalRuns(accessToken, evalObj.id, modelSystems) : await postNewEval(accessToken, {
+    const newEval = isTryingEval ? await addNewEvalRuns(accessToken, evalObj.id, {
+      openai: openAIKey,
+      anthropic: anthropicKey,
+      google: geminiKey,
+    }, modelSystems) : await postNewEval(accessToken, {
       name,
       description,
       validatorType: validator as ValidatorType,

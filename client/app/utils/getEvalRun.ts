@@ -1,5 +1,5 @@
 import { API_URL } from "@/app/lib/constants";
-import { ValidatorType, TaskInstance, ModelSystem, IModelResponse, IEvalResponse, IEvalRunResponse } from '@/app/lib/types';
+import { ValidatorType, TaskInstance, ModelSystem, IModelResponse, IEvalResponse, IEvalRunResponse, IModelKeys } from '@/app/lib/types';
 
 export async function postNewEval(accessToken: string, body: {
   name: string;
@@ -69,7 +69,7 @@ export async function getSupportedModels(): Promise<IModelResponse[]> {
 }
 
 
-export async function addNewEvalRuns(accessToken: string, evalId: number, modelSystems: ModelSystem[]): Promise<IEvalResponse> {
+export async function addNewEvalRuns(accessToken: string, evalId: number, modelKeys: IModelKeys, modelSystems: ModelSystem[]): Promise<IEvalResponse> {
   try {
     const res = await fetch(`${API_URL}/evals/${evalId}/run`, {
       method: 'POST',
@@ -77,7 +77,7 @@ export async function addNewEvalRuns(accessToken: string, evalId: number, modelS
         'Authorization': `Bearer ${accessToken}`,
         'Content-type': 'application/json',
       },
-      body: JSON.stringify(modelSystems)
+      body: JSON.stringify({ keys: modelKeys, systems: modelSystems })
     });
     const response = await res.json() as IEvalResponse;
     response.modelSystems = response.modelSystems.sort((a, b) => a.modelId - b.modelId);
