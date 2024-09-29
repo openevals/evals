@@ -17,10 +17,8 @@ import {
   VStack,
   Spacer,
   Input,
-  Checkbox,
   Text,
   Wrap,
-  WrapItem,
   Select,
   FormControl,
   FormLabel,
@@ -38,6 +36,7 @@ import { ValidatorType, DesktopEditorProps } from '@/app/lib/types';
 import EvalRunResults from "./evalRunResults";
 import InstancesTable from "./instancesTable";
 import Trending from "./trending";
+import EditorModelItem from "./editorModel";
 
 export default function DesktopEditor({
   isTryingEval,
@@ -152,19 +151,13 @@ export default function DesktopEditor({
                     <Heading size='sm'>Models to test</Heading>
                   </FormLabel>
                   <Wrap direction='column'>
-                    {models?.map((model) => (
-                      <WrapItem key={model.modelName}>
-                        <Checkbox
-                          isChecked={model.checked}
-                          onChange={(e) => {
-                            model.checked = !model.checked;
-                            setModels([...models]);
-                          }}
-                        >
-                          {model.modelName}
-                        </Checkbox>
-                      </WrapItem>
-                    ))}
+                    {models?.map((model) =>
+                      <EditorModelItem
+                        key={`model-${model.id}`}
+                        model={model}
+                        modelUpdated={() => { setModels([...models]); }}
+                      />
+                    )}
                   </Wrap>
                 </FormControl>
 

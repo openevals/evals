@@ -8,7 +8,6 @@ import {
   Textarea,
   VStack,
   Input,
-  Checkbox,
   Text,
   Select,
   FormControl,
@@ -26,6 +25,7 @@ import { MIN_INSTANCES } from '@/app/lib/constants';
 import { ValidatorType, MobileEditorProps } from '@/app/lib/types';
 import EvalRunResults from "./evalRunResults";
 import InstancesTable from "./instancesTable";
+import EditorModelItem from './editorModel';
 
 export default function MobileEditor({
   isTryingEval,
@@ -121,17 +121,11 @@ export default function MobileEditor({
                 <FormLabel>Models</FormLabel>
                 <VStack align="stretch" w="100%">
                   {models.map((model, index) => (
-                    <Checkbox
-                      key={index}
-                      isChecked={model.checked}
-                      onChange={(e) => {
-                        const newModels = [...models];
-                        newModels[index].checked = e.target.checked;
-                        setModels(newModels);
-                      }}
-                    >
-                      {model.modelName}
-                    </Checkbox>
+                    <EditorModelItem
+                      key={`model-${model.id}`}
+                      model={model}
+                      modelUpdated={() => { setModels([...models]); }}
+                    />
                   ))}
                 </VStack>
               </FormControl>
