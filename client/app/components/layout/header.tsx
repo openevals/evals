@@ -1,27 +1,14 @@
 "use client";
 
 import {
-  Input,
-  HStack,
-  Button,
-  Heading,
-  Spacer,
-  Box,
-  Flex,
-  Link,
-  Avatar,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
+  Input, HStack, Button, Spacer, Box, Flex, Avatar,
+  Menu, MenuButton, MenuList, MenuItem, MenuDivider,
   Popover,
   PopoverTrigger,
   PopoverContent,
   PopoverBody,
   useOutsideClick,
   Text,
-  Center,
   useBreakpointValue,
   VStack,
   IconButton,
@@ -99,11 +86,9 @@ export default function HeaderComponent() {
   // Filter the evals by name and description
   const fetchSuggestions = (value: string) => {
     value = value.toLowerCase();
-    if (evals.length > 0) {
-      const filteredSuggestions = evals.filter(
-        (obj: IEvalListItemResponse) =>
-          obj.name.toLowerCase().includes(value) ||
-          obj.description?.toLowerCase().includes(value),
+    if (evals.length > 0 && value.length > 0) {
+      const filteredSuggestions = evals.filter((obj: IEvalListItemResponse) =>
+        obj.name.toLowerCase().includes(value) || obj.description?.toLowerCase().includes(value)
       );
       setSuggestions(filteredSuggestions);
       setIsOpen(true);
@@ -176,6 +161,11 @@ export default function HeaderComponent() {
           profile={profile}
           dispatch={dispatch}
           router={router}
+          suggestions={suggestions}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          setSuggestions={setSuggestions}
+          setInputValue={setInputValue}
         />
       ) : (
         <HStack>
@@ -302,6 +292,11 @@ interface MobileHeaderProps {
   profile: IUserProfileResponse | null;
   dispatch: any; // Consider using a more specific type if possible
   router: any; // Consider using a more specific type if possible
+  suggestions: IEvalListItemResponse[];
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSuggestions: React.Dispatch<React.SetStateAction<IEvalListItemResponse[]>>;
+  setInputValue: React.Dispatch<React.SetStateAction<string>>;
 }
 import {
   Drawer,
@@ -327,8 +322,13 @@ const MobileHeader = ({
   profile,
   dispatch,
   router,
+  suggestions,
+  isOpen,
+  setIsOpen,
+  setSuggestions,
+  setInputValue
 }: MobileHeaderProps) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isDrawerOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
@@ -413,19 +413,54 @@ const MobileHeader = ({
           zIndex={1000}
         >
           <Flex alignItems="center">
-            <Input
-              placeholder="Start typing..."
-              value={inputValue}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              autoComplete="off"
-              flex={1}
-              mr={2}
-              ref={mobileInputRef}
-              onBlur={() => {
-                setTimeout(() => setIsSearchOpen(false), 100);
-              }}
-            />
+            <Popover
+              isOpen={isOpen && suggestions.length > 0 && inputValue.length > 0}
+              onClose={() => setIsOpen(false)}
+              placement="bottom-start"
+              initialFocusRef={mobileInputRef}
+            >
+              <PopoverTrigger>
+                <Input
+                  placeholder="Start typing..."
+                  value={inputValue}
+                  onChange={handleChange}
+                  onKeyDown={handleKeyDown}
+                  autoComplete='off'
+                  flex={1}
+                  mr={2}
+                  ref={mobileInputRef}
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setIsSearchOpen(false);
+                      setIsOpen(false);
+                    }, 100);
+                  }}
+                />
+              </PopoverTrigger>
+              <PopoverContent maxH='60vh' overflowY='auto'>
+                <PopoverBody>
+                  {suggestions.map((suggestion, index) => (
+                    <Box
+                      key={index}
+                      p={2}
+                      _hover={{ bg: 'gray.100' }}
+                      cursor="pointer"
+                      onClick={() => {
+                        router.push(`/evals/${suggestion.id}`);
+                        setIsOpen(false);
+                        setSuggestions([]);
+                        setInputValue('');
+                        setIsSearchOpen(false);
+                      }}
+                    >
+                      {index > 0 && <hr />}
+                      <b>{suggestion.name}</b><br />
+                      {suggestion.description}
+                    </Box>
+                  ))}
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
             <IconButton
               aria-label="Search"
               icon={<SearchIcon />}
@@ -434,7 +469,7 @@ const MobileHeader = ({
           </Flex>
         </Box>
       )}
-      <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+      <Drawer placement="left" onClose={onClose} isOpen={isDrawerOpen}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
