@@ -35,9 +35,6 @@ jobs:
           POSTGRESQL_USERNAME=${{ secrets.POSTGRESQL_USERNAME }}
           POSTGRESQL_PASSWORD=${{ secrets.POSTGRESQL_PASSWORD }}
           POSTGRESQL_DATABASE=openevals
-          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
           GITHUB_CLIENT_ID=${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
           GITHUB_CLIENT_SECRET=${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
           WEB_URL=https://www.openevals.org

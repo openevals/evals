@@ -62,14 +62,6 @@ To set up the database connection for the service, define the following environm
 
 Database configuration is mandatory for the service to run.
 
-#### AI Models integrations
-
-The service currently supports the three major AI models providers. API keys for each provider should be configured as an environment variable:
-
-- `OPENAI_API_KEY`: OpenAI API key for GPT models.
-- `ANTHROPIC_API_KEY`: Anthropic API key for Claude models.
-- `GOOGLE_API_KEY`: Google API key for Genesis models.
-
 #### OAuth configuration
 
 This service utilizes GitHub OAuth for managing user accounts. To set this up, you need to configure the following GitHub client environment variables:
@@ -130,6 +122,14 @@ After running the service, API documentation can be viewed at [OpenEvals Backend
 #### Running the service with Docker
 
 ### Testing
+
+To run the test AI model keys should defined in `.env` file:
+
+- `OPENAI_API_KEY`: OpenAI API key for GPT models.
+- `ANTHROPIC_API_KEY`: Anthropic API key for Claude models.
+- `GOOGLE_API_KEY`: Google API key for Genesis models.
+
+Test can be executed with:
 
 ```bash
 cd backend
