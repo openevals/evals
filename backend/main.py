@@ -1,5 +1,6 @@
-import uvicorn
 import os
+
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +13,7 @@ load_dotenv()
 from routers.health import health_router
 from routers.models import models_router
 from routers.oauth import oauth_router
-from routers.validate_keys import validate_keys_router
+from routers.validate_keys import validate_keys_router  # noqa E402
 
 docs_url = "/docs" if os.getenv("ENV") != "production" else None
 redoc_url = "/redoc" if os.getenv("ENV") != "production" else None

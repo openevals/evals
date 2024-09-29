@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import List, Optional
-from sqlalchemy import select
+
 from controllers.evals import run_eval_task
 from controllers.jwt import validate_optional_token, validate_token
 from db.db import get_db
 from db.models import (
+    Author,
     Eval,
     EvalRun,
     EvalRunStatus,
@@ -12,12 +13,10 @@ from db.models import (
     TaskInstance,
     TaskInstanceOutput,
     eval_authors,
-    EvalUpvote,
-    Author,
 )
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from sqlalchemy import update
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 from validation_schemas.evals import (

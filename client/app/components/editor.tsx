@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import {
   Button,
   Modal,
@@ -16,45 +16,73 @@ import {
   useBreakpointValue,
   Text,
   useToast,
-} from '@chakra-ui/react';
-import { addNewEvalRuns, postNewEval } from '@/app/utils/getEvalRun';
-import { defaultEvalItem, MIN_INSTANCES } from '@/app/lib/constants';
-import { ModelSystem, ValidatorType, TaskInstance, IModelResponse, IEvalResponse } from '@/app/lib/types';
+} from "@chakra-ui/react";
+import { addNewEvalRuns, postNewEval } from "@/app/utils/getEvalRun";
+import { defaultEvalItem, MIN_INSTANCES } from "@/app/lib/constants";
+import {
+  ModelSystem,
+  ValidatorType,
+  TaskInstance,
+  IModelResponse,
+  IEvalResponse,
+} from "@/app/lib/types";
 import usePanels from "../lib/usePanels";
 import { IRootState } from "../lib/store";
 import { useDispatch, useSelector } from "react-redux";
 import { addNewEval, clearEvalToTry } from "../lib/store/dataSlice";
-import MobileEditor from './editorMobile';
-import DesktopEditor from './editorDesktop';
-import { useModelStorageContext } from '../lib/providers/model-storage';
+import MobileEditor from "./editorMobile";
+import DesktopEditor from "./editorDesktop";
+import { useModelStorageContext } from "../lib/providers/model-storage";
 
-export default function Editor({ initialEval }: { initialEval?: IEvalResponse }) {
+export default function Editor({
+  initialEval,
+}: {
+  initialEval?: IEvalResponse;
+}) {
   const { openAIKey, anthropicKey, geminiKey } = useModelStorageContext();
   // step 1 = enter meta info
   // step 2 = add task instances
   // step 3 = run results
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [validator, setValidator] = useState<ValidatorType | ''>('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [validator, setValidator] = useState<ValidatorType | "">("");
   const [models, setModels] = useState<IModelResponse[]>([]);
-  const [systemPrompt, setSystemPrompt] = useState('');
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const [systemPrompt, setSystemPrompt] = useState("");
+  const [inputText, setInputText] = useState("");
+  const [outputText, setOutputText] = useState("");
   const [instances, setInstances] = useState<TaskInstance[]>([]);
-  const [evalObj, setEvalObj] = useState<IEvalResponse>(initialEval ?? defaultEvalItem);
+  const [evalObj, setEvalObj] = useState<IEvalResponse>(
+    initialEval ?? defaultEvalItem,
+  );
   const [evalRunIds, setEvalRunIds] = useState<number[]>([]);
   const toast = useToast();
-  const isAuthenticated = useSelector<IRootState, string>((state: IRootState) => state.auth.isAuthenticated);
-  const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
+  const isAuthenticated = useSelector<IRootState, string>(
+    (state: IRootState) => state.auth.isAuthenticated,
+  );
+  const accessToken = useSelector<IRootState, string>(
+    (state: IRootState) => state.auth.token,
+  );
   const instanceInputRef = useRef<HTMLTextAreaElement>(null);
-  const allModels = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
+  const allModels = useSelector<IRootState, IModelResponse[]>(
+    (state: IRootState) => state.data.models,
+  );
 
-  const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed] = usePanels(step);
+  const [
+    panel1Ref,
+    panel2Ref,
+    panel3Ref,
+    panel1Collapsed,
+    setPanel1Collapsed,
+    panel2Collapsed,
+    setPanel2Collapsed,
+  ] = usePanels(step);
   const [tabIndex, setTabIndex] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure(); // modal
 
-  const evalToTryObj = useSelector<IRootState, IEvalResponse>((state: IRootState) => state.data.evalToTry);
+  const evalToTryObj = useSelector<IRootState, IEvalResponse>(
+    (state: IRootState) => state.data.evalToTry,
+  );
   const [isTryingEval, setIsTryingEval] = useState(false);
 
   const dispatch = useDispatch();
@@ -84,11 +112,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   }, [allModels]);
 
   const clickSubmitButton = async () => {
-
     if (!isAuthenticated) {
       toast({
         title: "Not authorized",
-        description: "You should authenticate with your account first to create new evaluations.",
+        description:
+          "You should authenticate with your account first to create new evaluations.",
         status: "error",
         isClosable: true,
         duration: 9000,
@@ -104,13 +132,13 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     if (!Object.values(ValidatorType).includes(validator as ValidatorType)) {
       errors.push("Evaluation method is required");
     }
-    if (!models.some(model => model.checked)) {
+    if (!models.some((model) => model.checked)) {
       errors.push("At least one model must be selected");
     }
     if (instances.length < 2) {
       errors.push(`At least ${MIN_INSTANCES} task instances are required`);
     }
-    if (!instances.some(instance => instance.isPublic)) {
+    if (!instances.some((instance) => instance.isPublic)) {
       errors.push("At least one task instance must be marked as public");
     }
 
@@ -135,27 +163,35 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       systemPrompt: systemPrompt,
     }));
 
-
-    const newEval = isTryingEval ? await addNewEvalRuns(accessToken, evalObj.id, {
-      openai: openAIKey,
-      anthropic: anthropicKey,
-      google: geminiKey,
-    }, modelSystems) : await postNewEval(accessToken, {
-      name,
-      description,
-      validatorType: validator as ValidatorType,
-      modelSystems,
-      taskInstances: instances,
-    });
+    const newEval = isTryingEval
+      ? await addNewEvalRuns(
+          accessToken,
+          evalObj.id,
+          {
+            openai: openAIKey,
+            anthropic: anthropicKey,
+            google: geminiKey,
+          },
+          modelSystems,
+        )
+      : await postNewEval(accessToken, {
+          name,
+          description,
+          validatorType: validator as ValidatorType,
+          modelSystems,
+          taskInstances: instances,
+        });
     setEvalObj(newEval);
 
     if (!isTryingEval) {
-      dispatch(addNewEval({
-        id: newEval.id,
-        name: newEval.name,
-        description: newEval.description,
-        validatorType: newEval.validatorType,
-      }));
+      dispatch(
+        addNewEval({
+          id: newEval.id,
+          name: newEval.name,
+          description: newEval.description,
+          validatorType: newEval.validatorType,
+        }),
+      );
       setIsTryingEval(true);
     }
 
@@ -166,7 +202,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   };
 
   const addInstance = () => {
-    if (inputText !== '' && outputText !== '') {
+    if (inputText !== "" && outputText !== "") {
       const newInstance: TaskInstance = {
         isPublic: false,
         input: inputText,
@@ -178,21 +214,22 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       } else {
         setInstances([...instances, newInstance]);
       }
-      setInputText('');
-      setOutputText('');
+      setInputText("");
+      setOutputText("");
 
       // Set focus to the inputText field after adding an instance
       if (instanceInputRef.current) {
         instanceInputRef.current.focus();
       }
-
     } else {
-      console.error('Input text and output text must not be empty');
+      console.error("Input text and output text must not be empty");
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>,
+  ) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
       if (step === 1) {
         setStep(2);
@@ -224,7 +261,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     clearEvalToTryData();
   };
 
-  const changeValidator = (value: ValidatorType | '') => {
+  const changeValidator = (value: ValidatorType | "") => {
     setValidator(value);
     clearEvalToTryData();
   };
@@ -235,7 +272,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   };
 
   const isMobile = useBreakpointValue({ base: true, md: false });
-
 
   return (
     <>
@@ -324,16 +360,28 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           <ModalBody>
             <UnorderedList spacing={2}>
               <ListItem>
-                <Text>My eval solves a useful task in a format that is easy for humans to understand.</Text>
+                <Text>
+                  My eval solves a useful task in a format that is easy for
+                  humans to understand.
+                </Text>
               </ListItem>
               <ListItem>
-                <Text>{`I've`} double checked that my task instances are correct.</Text>
+                <Text>
+                  {`I've`} double checked that my task instances are correct.
+                </Text>
               </ListItem>
               <ListItem>
-                <Text>To the best of my knowledge, my task instances are not easily available online in their task format.</Text>
+                <Text>
+                  To the best of my knowledge, my task instances are not easily
+                  available online in their task format.
+                </Text>
               </ListItem>
               <ListItem>
-                <Text>To the best of my knowledge, I {`won't`} share private task instance data publicly. If I do, I will delete my eval from the OpenEvals platform.</Text>
+                <Text>
+                  To the best of my knowledge, I {`won't`} share private task
+                  instance data publicly. If I do, I will delete my eval from
+                  the OpenEvals platform.
+                </Text>
               </ListItem>
             </UnorderedList>
           </ModalBody>

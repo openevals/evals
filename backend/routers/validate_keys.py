@@ -1,14 +1,9 @@
-from fastapi import APIRouter
 from controllers.evals import ModelQueryInput
-from models.model_provider import (
-    query,
-    ModelQueryInput,
-    ModelProviderType,
-    ModelProviderValidationModel,
-)
+from fastapi import APIRouter
+from models.model_provider import ModelProviderType, ModelProviderValidationModel, query
 from validation_schemas.validate_keys import (
-    AIKeyValidationSchema,
     AIKeyValidationResponseSchema,
+    AIKeyValidationSchema,
 )
 
 validate_keys_router = APIRouter()

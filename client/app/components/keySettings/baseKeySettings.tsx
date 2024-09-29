@@ -4,29 +4,29 @@ import {
   Input,
   ModalBody,
   Grid,
-  GridItem
-} from '@chakra-ui/react';
+  GridItem,
+} from "@chakra-ui/react";
 
 import { SmallCloseIcon, ExternalLinkIcon } from "@chakra-ui/icons";
-import { useState } from 'react';
-import { isValidAIModelKey } from '@/app/utils/validateKeys';
-import { AI_PROVIDER_NAME, AI_PROVIDER_URL } from '@/app/lib/constants';
+import { useState } from "react";
+import { isValidAIModelKey } from "@/app/utils/validateKeys";
+import { AI_PROVIDER_NAME, AI_PROVIDER_URL } from "@/app/lib/constants";
 
 export default function BaseKeysSettings({
   provider,
   aiKey,
-  setAiKey
+  setAiKey,
 }: {
-  provider: 'openai' | 'anthropic' | 'google',
-  aiKey: string,
-  setAiKey: (aiKey: string) => void
+  provider: "openai" | "anthropic" | "google";
+  aiKey: string;
+  setAiKey: (aiKey: string) => void;
 }) {
-  const [keyValue, setKeyValue] = useState(aiKey || '');
+  const [keyValue, setKeyValue] = useState(aiKey || "");
   const [keySaved, setKeySaved] = useState(aiKey?.length > 0);
 
   /**
    * Track the changes for the key
-   * @param evt 
+   * @param evt
    */
   const onKeyChange = (evt: any) => {
     setKeyValue(evt.target.value);
@@ -57,17 +57,18 @@ export default function BaseKeysSettings({
    * Clear the key
    */
   const clearKey = () => {
-    setAiKey('');
-    setKeyValue('');
+    setAiKey("");
+    setKeyValue("");
     setKeySaved(false);
   };
 
   return (
     <ModalBody>
       <Heading size="xs">
-        {AI_PROVIDER_NAME[provider]} API key <ExternalLinkIcon cursor="pointer" onClick={goToProvider} />
+        {AI_PROVIDER_NAME[provider]} API key{" "}
+        <ExternalLinkIcon cursor="pointer" onClick={goToProvider} />
       </Heading>
-      <Grid mt={4} templateColumns='repeat(4, 1fr)' columnGap={1}>
+      <Grid mt={4} templateColumns="repeat(4, 1fr)" columnGap={1}>
         <GridItem colSpan={keySaved ? 4 : 3} pos="relative">
           <Input
             id={`${provider}-key`}
@@ -77,12 +78,24 @@ export default function BaseKeysSettings({
             value={keyValue}
             onChange={onKeyChange}
             style={{ paddingRight: 30 }}
-            autoComplete='off'
+            autoComplete="off"
           />
-          {keyValue.length > 0 && <SmallCloseIcon onClick={clearKey} pos="absolute" cursor="pointer" right={2} top={11} color="gray.400" zIndex={10} />}
+          {keyValue.length > 0 && (
+            <SmallCloseIcon
+              onClick={clearKey}
+              pos="absolute"
+              cursor="pointer"
+              right={2}
+              top={11}
+              color="gray.400"
+              zIndex={10}
+            />
+          )}
         </GridItem>
         <GridItem colSpan={1} display={keySaved ? "none" : "block"}>
-          <Button w="100%" onClick={() => validateAndSaveKey()}>{keySaved ? "..." : "Validate"}</Button>
+          <Button w="100%" onClick={() => validateAndSaveKey()}>
+            {keySaved ? "..." : "Validate"}
+          </Button>
         </GridItem>
       </Grid>
     </ModalBody>

@@ -1,13 +1,10 @@
-import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from pathlib import Path
 from typing import List
 
 import google.generativeai as gemini
 from anthropic import Anthropic
-from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 

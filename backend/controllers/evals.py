@@ -1,8 +1,9 @@
 from datetime import datetime
-from db.db import SessionLocal
-from db.models import Eval, TaskInstanceOutput, EvalRunStatus
-from models.model_provider import query, ModelQueryInput, ModelProviderType
+
 from controllers.validation import validate_response
+from db.db import SessionLocal
+from db.models import Eval, EvalRunStatus, TaskInstanceOutput
+from models.model_provider import ModelProviderType, ModelQueryInput, query
 from validation_schemas.evals import ModelKeysSchema
 
 

@@ -4,20 +4,20 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
-      - '.eks_deploy/backend.yml'
-      - '.github/workflows/deploy-backend.yml'
+      - "backend/**"
+      - ".eks_deploy/backend.yml"
+      - ".github/workflows/deploy-backend.yml"
 
 env:
-  ECR_REPO_NAME: 'openevals-backend'
-  AWS_REGION_NAME: 'us-west-1'
-  CLUSTER_NAME: 'openevals-prod'
-  ENVIRONMENT: 'prod'
+  ECR_REPO_NAME: "openevals-backend"
+  AWS_REGION_NAME: "us-west-1"
+  CLUSTER_NAME: "openevals-prod"
+  ENVIRONMENT: "prod"
   DESIRED_REPLICAS: 6
   MIN_REPLICAS: 6
   MAX_REPLICAS: 15
   SSL_ARN: ${{ secrets.BACKEND_SSL_ARN }}
-  AWS_GROUP_TYPE: 'general-processing'
+  AWS_GROUP_TYPE: "general-processing"
 
 jobs:
   server-deploy:
@@ -79,7 +79,7 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION_NAME }}
-    
+
       - name: Deploy
         run: |
           cat .eks_deploy/backend.yml | envsubst > .eks_deploy/backend-updated.yml

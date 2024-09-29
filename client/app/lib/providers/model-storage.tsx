@@ -1,5 +1,11 @@
-'use client';
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+"use client";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 
 interface StateContextType {
   settingsVisible: boolean;
@@ -22,49 +28,61 @@ export const ModelStorageProvider = ({ children }: { children: ReactNode }) => {
   const [anthropicKey, saveAnthropicKey] = useState("");
 
   useEffect(() => {
-    setOpenAIKey(localStorage.getItem('openai-key') ?? '');
-    setGeminiKey(localStorage.getItem('gemini-key') ?? '');
-    setAnthropicKey(localStorage.getItem('anthropic-key') ?? '');
+    setOpenAIKey(localStorage.getItem("openai-key") ?? "");
+    setGeminiKey(localStorage.getItem("gemini-key") ?? "");
+    setAnthropicKey(localStorage.getItem("anthropic-key") ?? "");
   }, []);
 
   /**
    * Set and save the OpenAI key
-   * @param key 
+   * @param key
    */
   const setOpenAIKey = (key: string) => {
     saveOpenAIKey(key);
-    localStorage.setItem('openai-key', key);
+    localStorage.setItem("openai-key", key);
   };
 
   /**
    * Set and save the Gemini key
-   * @param key 
+   * @param key
    */
   const setGeminiKey = (key: string) => {
     saveGeminiKey(key);
-    localStorage.setItem('gemini-key', key);
+    localStorage.setItem("gemini-key", key);
   };
 
   /**
    * Set and save the Anthropic key
-   * @param key 
+   * @param key
    */
   const setAnthropicKey = (key: string) => {
     saveAnthropicKey(key);
-    localStorage.setItem('anthropic-key', key);
+    localStorage.setItem("anthropic-key", key);
   };
 
   /**
    * Clear the OpenAI key and models
    */
   const clearData = () => {
-    setOpenAIKey('');
-    setGeminiKey('');
-    setAnthropicKey('');
+    setOpenAIKey("");
+    setGeminiKey("");
+    setAnthropicKey("");
   };
 
   return (
-    <StateContext.Provider value={{ openAIKey, setOpenAIKey, geminiKey, setGeminiKey, anthropicKey, setAnthropicKey, clearData, settingsVisible, setSettingsVisible }}>
+    <StateContext.Provider
+      value={{
+        openAIKey,
+        setOpenAIKey,
+        geminiKey,
+        setGeminiKey,
+        anthropicKey,
+        setAnthropicKey,
+        clearData,
+        settingsVisible,
+        setSettingsVisible,
+      }}
+    >
       {children}
     </StateContext.Provider>
   );
@@ -73,7 +91,7 @@ export const ModelStorageProvider = ({ children }: { children: ReactNode }) => {
 export const useModelStorageContext = (): StateContextType => {
   const context = useContext(StateContext);
   if (context === undefined) {
-    throw new Error('Context not ready');
+    throw new Error("Context not ready");
   }
   return context;
 };

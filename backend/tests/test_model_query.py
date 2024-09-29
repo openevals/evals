@@ -1,10 +1,9 @@
-import pytest
 import os
-import tiktoken
 
+import pytest
+import tiktoken
 from models.model_provider import (
     ModelInput,
-    ModelProvider,
     ModelProviderType,
     ModelQueryInput,
     ModelResponse,
