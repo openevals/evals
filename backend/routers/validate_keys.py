@@ -1,11 +1,9 @@
 from fastapi import APIRouter
-from version import OPENEVALS_VERSION
 from controllers.evals import ModelQueryInput
 from models.model_provider import (
     query,
     ModelQueryInput,
     ModelProviderType,
-    ModelProvider,
     ModelProviderValidationModel,
 )
 from validation_schemas.validate_keys import (
@@ -35,7 +33,4 @@ def validate_key(provider: str, body: AIKeyValidationSchema) -> dict:
         api_key=body.key,
     )
     model_input, model_response = query(input=model_query)
-    print(model_input)
-    print(model_response)
-
-    return {"is_valid": True}
+    return {"is_valid": model_input.num_tokens > 0 and model_response.num_tokens > 0}
