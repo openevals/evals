@@ -81,6 +81,7 @@ export default function MobileEditor({
                 <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
                 <Text>5. Double check ideal outputs for task instances.</Text>
                 <Text my={4}>{`That's all! Have fun~`}</Text>
+                <Text>{`(Note: this editor is easier to use on desktop)`}</Text>
               </CardBody>
             </Card>
             <Button
