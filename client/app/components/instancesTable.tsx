@@ -9,6 +9,7 @@ import {
   Checkbox,
   Box,
   Input,
+  Textarea,
   Icon,
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
@@ -59,7 +60,7 @@ export default function InstancesTable({
                 </Td>)
               }
               <Td>
-                <Input
+                <Textarea
                   value={instance.input}
                   onChange={(e) => {
                     setInstances(prevInstances => {
@@ -72,10 +73,11 @@ export default function InstancesTable({
                     if (onChange) onChange();
                   }}
                   variant='unstyled'
+                  resize='vertical'
                 />
               </Td>
               <Td>
-                <Input
+                <Textarea
                   value={instance.ideal}
                   onChange={(e) => {
                     setInstances(prevInstances => {
@@ -88,6 +90,7 @@ export default function InstancesTable({
                     if (onChange) onChange();
                   }}
                   variant='unstyled'
+                  resize='vertical'
                 />
               </Td>
               <Td>
