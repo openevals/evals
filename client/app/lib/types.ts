@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 
+export type AIProvider = "openai" | "anthropic" | "google";
+
 // This matches ValidatorType in the backend
 export enum ValidatorType {
   Includes = "Includes",
@@ -14,14 +16,20 @@ export interface TaskInstance {
   ideal: string;
 }
 
+export interface IModelKeys {
+  openai?: string;
+  anthropic?: string;
+  google?: string;
+}
+
 export interface ModelSystem {
   modelId: number;
   systemPrompt: string;
-};
+}
 
 export interface EvalRunOutput {
-  score: number,
-  model: ModelSystem,
+  score: number;
+  model: ModelSystem;
 }
 
 export interface IStateResponse {
@@ -122,7 +130,7 @@ export interface IVoteResult {
 }
 
 export interface DesktopEditorProps {
-  isTryingEval: boolean,
+  isTryingEval: boolean;
   name: string;
   setName: (name: string) => void;
   step: number;
@@ -131,7 +139,9 @@ export interface DesktopEditorProps {
   setPanel1Collapsed: (collapsed: boolean) => void;
   panel2Collapsed: boolean;
   setPanel2Collapsed: (collapsed: boolean) => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => void;
+  handleKeyDown: (
+    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>,
+  ) => void;
   panel1Ref: React.RefObject<ImperativePanelHandle>;
   panel2Ref: React.RefObject<ImperativePanelHandle>;
   panel3Ref: React.RefObject<ImperativePanelHandle>;
@@ -151,12 +161,16 @@ export interface DesktopEditorProps {
   evalRunIds: number[];
   description: string;
   setDescription: (description: string) => void;
-  validator: ValidatorType | '';
-  setValidator: (validator: ValidatorType | '') => void;
+  validator: ValidatorType | "";
+  setValidator: (validator: ValidatorType | "") => void;
   models: IModelResponse[];
   setModels: (models: IModelResponse[]) => void;
   systemPrompt: string;
   setSystemPrompt: (prompt: string) => void;
 }
 
-export interface MobileEditorProps extends DesktopEditorProps { }
+export interface MobileEditorProps extends DesktopEditorProps {}
+
+export interface IKeyValidationResponse {
+  isValid: boolean;
+}

@@ -1,13 +1,10 @@
-import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from pathlib import Path
 from typing import List
 
 import google.generativeai as gemini
 from anthropic import Anthropic
-from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 
@@ -38,25 +35,6 @@ class ModelQueryInput:
 
 class ModelProvider(ABC):
     @classmethod
-    def _api_key(cls, model_provider: "ModelProviderType") -> str:
-        provider_name = model_provider.name
-        env_var = f"{provider_name}_API_KEY"
-        current_dir = Path(__file__).resolve().parent
-        root_dir = current_dir.parent
-        env_path = root_dir / ".env"
-        if env_path.is_file():
-            load_dotenv(dotenv_path=env_path)
-        key = os.getenv(env_var)
-        if not key:
-            if env_path.is_file():
-                raise ValueError(f"{env_var} not set in .env file")
-            else:
-                raise ValueError(
-                    f"{env_var} not set in env vars, .env not found at {env_path}"
-                )
-        return key
-
-    @classmethod
     def create_client(cls):
         return None
 
@@ -85,8 +63,6 @@ class ModelProvider(ABC):
 
     @classmethod
     def query(cls, input: "ModelQueryInput") -> tuple[ModelInput, ModelResponse]:
-        if not input.api_key:
-            input.api_key = cls._api_key(input.model_provider)
         response = cls.query_model_provider(
             model_name=input.model_name,
             system_message=input.system_message,
@@ -265,6 +241,12 @@ class ModelProviderType(Enum):
     GOOGLE = "Google"
 
 
+ModelProviderValidationModel = {
+    ModelProviderType.OPENAI: "gpt-4o",
+    ModelProviderType.ANTHROPIC: "claude-3-5-sonnet-20240620",
+    ModelProviderType.GOOGLE: "gemini-1.5-flash",
+}
+
 MODEL_PROVIDER_MAP = {
     ModelProviderType.OPENAI: OpenAIModels,
     ModelProviderType.ANTHROPIC: AnthropicModels,
@@ -273,7 +255,5 @@ MODEL_PROVIDER_MAP = {
 
 
 def query(input: ModelQueryInput) -> tuple[ModelInput, ModelResponse]:
-    if not input.api_key:
-        input.api_key = ModelProvider._api_key(input.model_provider)
     provider_class = MODEL_PROVIDER_MAP[input.model_provider]
     return provider_class.query(input)
