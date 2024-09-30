@@ -223,9 +223,8 @@ export default function HeaderComponent() {
           </Button>
           <Spacer />
           {isDesktop && <NavButtons />}
-          <Button mx={8} variant="link" onClick={() => router.push("/about")}>
-            About
-          </Button>
+          <Button mx={8} variant="link" onClick={() => router.push('/about')}>About</Button>
+          <Button mr={8} variant="link" onClick={() => router.push('/my-evals')}>My Evals</Button>
           {isAuthenticated && profile ? (
             <Menu>
               <MenuButton
@@ -243,22 +242,7 @@ export default function HeaderComponent() {
                   {profile.email}
                 </MenuItem>
                 <MenuDivider />
-                <MenuItem onClick={() => router.push("/my-evals")}>
-                  My Evals
-                </MenuItem>
-                <MenuDivider />
-                <MenuItem
-                  as={Box}
-                  onClick={() =>
-                    window.open(
-                      `https://www.github.com/${profile.githubLogin}`,
-                      "_blank",
-                    )
-                  }
-                  cursor="pointer"
-                >
-                  Github profile
-                </MenuItem>
+                <MenuItem as={Box} onClick={() => window.open(`https://www.github.com/${profile.githubLogin}`, "_blank")} cursor="pointer">Github profile</MenuItem>
                 <MenuDivider />
                 <MenuItem
                   as={Box}
