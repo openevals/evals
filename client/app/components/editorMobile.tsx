@@ -26,6 +26,7 @@ import { ValidatorType, MobileEditorProps } from "@/app/lib/types";
 import EvalRunResults from "./evalRunResults";
 import InstancesTable from "./instancesTable";
 import EditorModelItem from "./editorModel";
+import RobotoHeader from './robotoHeader';
 
 export default function MobileEditor({
   isTryingEval,
@@ -59,15 +60,10 @@ export default function MobileEditor({
 }: MobileEditorProps) {
   return (
     <VStack spacing={4} align="stretch" w="100%">
-      <Heading size="md">
-        {isTryingEval ? "Contributing to eval" : "Create new eval"}
-      </Heading>
-      <Tabs
-        index={tabIndex}
-        onChange={handleTabsChange}
-        variant="enclosed"
-        isFitted
-      >
+      <Center>
+        <RobotoHeader size='md'>{isTryingEval ? "Contributing to eval" : "Create new eval"}</RobotoHeader>
+      </Center>
+      <Tabs index={tabIndex} onChange={handleTabsChange} variant="enclosed" isFitted>
         <TabList>
           <Tab>🌎</Tab>
           <Tab>Meta</Tab>
@@ -78,31 +74,11 @@ export default function MobileEditor({
           <TabPanel>
             <Card>
               <CardBody>
-                <Text fontWeight="bold" mb={4}>
-                  How to contribute an eval:
-                </Text>
-                <Text my={4}>
-                  1. Give your eval a <b>name</b> and <b>description</b>.
-                </Text>
-                <Text my={4}>
-                  2. Choose an <b>evaluation method</b> and <b>models</b> to
-                  test.
-                </Text>
-                <Text my={4}>
-                  3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task
-                  instance is one input-output pair for an eval.
-                </Text>
-                <Text my={4}>
-                  4. Mark at least 1 task instance as a public example. Task
-                  instances are private by default to avoid{" "}
-                  <b>data contamination</b>.{" "}
-                  <Link
-                    href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations."
-                    textDecoration="underline"
-                  >
-                    [2]
-                  </Link>
-                </Text>
+                <Text fontWeight="bold" mb={4}>Tips to create an eval:</Text>
+                <Text my={4}>1. Give your eval a <b>name</b> and <b>description</b>.</Text>
+                <Text my={4}>2. Choose an <b>evaluation method</b> and <b>models</b> to test.</Text>
+                <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
+                <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
                 <Text>5. Double check ideal outputs for task instances.</Text>
                 <Text my={4}>{`That's all! Have fun~`}</Text>
               </CardBody>
@@ -191,7 +167,7 @@ export default function MobileEditor({
             </VStack>
           </TabPanel>
           <TabPanel>
-            <VStack spacing={4} align="stretch">
+            <VStack spacing={4} py={4} align="stretch">
               <Center>Add at least {MIN_INSTANCES} task instances.</Center>
               <FormControl>
                 <FormLabel>Input</FormLabel>

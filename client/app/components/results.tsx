@@ -6,7 +6,7 @@ import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 
 export default function Results({ evals, onVote }: { evals: IEvalListItemResponse[], onVote?: (payload: IVoteResult) => void }) {
   return (
-    <Flex px={4}>
+    <Flex>
       {evals.length == 0 ? (
         <Box w="100%"><Text size="lg" textAlign="center">No evals found</Text></Box>
       ) : (

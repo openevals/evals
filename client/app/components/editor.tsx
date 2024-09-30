@@ -68,15 +68,7 @@ export default function Editor({
     (state: IRootState) => state.data.models,
   );
 
-  const [
-    panel1Ref,
-    panel2Ref,
-    panel3Ref,
-    panel1Collapsed,
-    setPanel1Collapsed,
-    panel2Collapsed,
-    setPanel2Collapsed,
-  ] = usePanels(step);
+  const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed, panel3Collapsed, setPanel3Collapsed] = usePanels(step);
   const [tabIndex, setTabIndex] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure(); // modal
 
@@ -312,13 +304,6 @@ export default function Editor({
           evalObj={evalObj}
           evalRunIds={evalRunIds}
           instanceInputRef={instanceInputRef}
-          panel1Collapsed={panel1Collapsed}
-          setPanel1Collapsed={setPanel1Collapsed}
-          panel2Collapsed={panel2Collapsed}
-          setPanel2Collapsed={setPanel2Collapsed}
-          panel1Ref={panel1Ref}
-          panel2Ref={panel2Ref}
-          panel3Ref={panel3Ref}
         />
       ) : (
         <DesktopEditor
@@ -345,6 +330,8 @@ export default function Editor({
           setPanel1Collapsed={setPanel1Collapsed}
           panel2Collapsed={panel2Collapsed}
           setPanel2Collapsed={setPanel2Collapsed}
+          panel3Collapsed={panel3Collapsed}
+          setPanel3Collapsed={setPanel3Collapsed}
           handleKeyDown={handleKeyDown}
           panel1Ref={panel1Ref}
           panel2Ref={panel2Ref}

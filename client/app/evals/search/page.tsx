@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function EvalSearchPage() {
   return (
-    <Box>
-      <Heading size='lg' p={4}>Results</Heading>
+    <Box m={8}>
+      <Heading size='lg'>Results</Heading>
       <SearchEvalsComponent />
     </Box>
 );

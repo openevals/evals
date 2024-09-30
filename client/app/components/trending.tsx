@@ -1,7 +1,7 @@
 import { getTopEvals } from "../utils/getEvals";
 import { useEffect, useState } from "react";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
-import { Divider } from "@chakra-ui/react";
+import { Heading } from "@chakra-ui/react";
 import ResultItem from "./resultItem";
 
 export default function Trending() {
@@ -29,6 +29,7 @@ export default function Trending() {
 
   return (
     <>
+      <Heading size='md' textAlign="center" py={4}>Trending evals</Heading>
       {evals.map(({
         id, name, description, validatorType, upvotes, upvoted, authors
       }) => (

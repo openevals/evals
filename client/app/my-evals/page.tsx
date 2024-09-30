@@ -84,9 +84,9 @@ export default function MyEvals() {
   };
 
   return (
-    <Box w='100%' p={4} mx={{ base: 0, md: 4 }} maxW="1200px" margin="0 auto">
-      <Heading size='lg' >My Created Evals</Heading>
-      <Box my={8}>
+    <Box w='100%' p={4} maxW="1200px" margin="0 auto">
+      <Heading size='lg' mb={8} textAlign="center">My Evals</Heading>
+      <Box>
       {userCreatedEvals?.length > 0 ? (
         userCreatedEvals.map(
           ({
@@ -118,8 +118,8 @@ export default function MyEvals() {
         <Link href="/" color="gray" fontWeight="bold">Create your first eval!</Link>
       )}
       </Box>
-      <Heading size="lg">My Contributed Evals</Heading>
-      <Box my={8}>
+      <Heading size="lg" my={8} textAlign="center">Contributed Evals</Heading>
+      <Box>
       {userContributedEvals?.length > 0 ? (
         userContributedEvals.map(
           ({
@@ -151,8 +151,8 @@ export default function MyEvals() {
         </Text>
       )}
       </Box>
-      <Heading size="lg">My Upvotes</Heading>
-      <Box my={8}>
+      <Heading size="lg" my={8} textAlign="center">Liked Evals</Heading>
+      <Box>
       {userVotedEvals?.length > 0 ? (
         userVotedEvals.map(
           ({
@@ -178,7 +178,7 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Link href="/evals" color="gray" fontWeight="bold">Browse evals to see what you'd like to upvote.</Link>
+        <Link href="/evals" color="gray" fontWeight="bold">Browse evals to see what you&apos;d like to upvote.</Link>
       )}
       </Box>
     </Box>

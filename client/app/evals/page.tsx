@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function BrowsePage() {
   return (
-    <Box>
-      <Heading size='lg' p={4}>Browse evals</Heading>
+    <Box m={8}>
+      <Heading size='lg'>Browse evals</Heading>
       <UpvoteEvalsComponent/>
     </Box>
   );

@@ -65,8 +65,8 @@ export default function ResultItem({
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        description: "Link copied to clipboard.",
-        status: "success",
+        description: "Copied link to eval",
+        status: 'success',
         duration: 8000,
       });
     } catch {
@@ -85,7 +85,7 @@ export default function ResultItem({
     copyTextToClipboard(link);
   };
 
-  const goToItemDetail = (e: React.MouseEvent<HTMLDivElement>) => {
+  const goToItemDetail = (e: React.MouseEvent<HTMLButtonElement|HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
     router.push(`/evals/${id}`);
@@ -157,9 +157,10 @@ export default function ResultItem({
         <HStack zIndex={1}>
           <Flex width="100%" justifyContent="space-between" alignItems="center">
             <HStack>
-              <VoteButton evalId={id} votes={upvotes} upvoted={upvoted} onVote={onVote} />
-              <Button onClick={shareEval} variant='outline'>Share</Button>
-              <Button onClick={goToEditor} variant="outline">Run Eval</Button>
+            <VoteButton evalId={id} votes={upvotes} upvoted={upvoted} onVote={onVote} />
+            <Button onClick={shareEval} variant='outline'>Share</Button>
+            <Button onClick={goToEditor} variant="outline">Try</Button>
+            <Button onClick={goToItemDetail} variant="outline">Details</Button>
               </HStack>
             {canDelete && (
               <Button

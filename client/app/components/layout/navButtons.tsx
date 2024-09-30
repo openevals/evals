@@ -72,7 +72,7 @@ export default function NavButtons({ direction = 'row' }: NavButtonsProps) {
     <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange}>
       <TabList as={Flex} flexDirection={direction}>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
-        <Tab>Contribute an eval (5 min) ⚒️</Tab>
+        <Tab>Create an eval (5 min) ⚒️</Tab>
         <Tab onClick={() => gotoPage('/evals')}>Browse evals 🌎</Tab>
       </TabList>
     </Tabs>

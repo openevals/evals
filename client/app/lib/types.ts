@@ -140,9 +140,9 @@ export interface DesktopEditorProps {
   setPanel1Collapsed: (collapsed: boolean) => void;
   panel2Collapsed: boolean;
   setPanel2Collapsed: (collapsed: boolean) => void;
-  handleKeyDown: (
-    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>,
-  ) => void;
+  panel3Collapsed: boolean;
+  setPanel3Collapsed: (collapsed: boolean) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => void;
   panel1Ref: React.RefObject<ImperativePanelHandle>;
   panel2Ref: React.RefObject<ImperativePanelHandle>;
   panel3Ref: React.RefObject<ImperativePanelHandle>;

@@ -86,7 +86,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
       toast({
-        title: "Link copied to clipboard",
+        title: "Copied link to eval",
         status: "success",
         duration: 2000,
         isClosable: true,
@@ -104,16 +104,16 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   return (
     <>
-      <Wrap>
-        <Box p={4} w={{base:"100%", md:"768px"}}>
+      <Wrap m={{ base: 0, md: 8 }}>
+        <Box p={4} pt={8} w={{base:"100%", md:"768px"}}>
           <Flex>
             <Heading size='lg'>{evalItem.name}</Heading>
             <Spacer />
             <div>
               <Button ml={4} minW='100px' onClick={tryEval}>Contribute Run</Button>
               <Button ml={2} variant="ghost" onClick={copyLink}>
-                <LinkIcon mr={2} />
-                {!isMobile && 'Share Link'}
+                <LinkIcon />
+                {!isMobile && <Text ml={2} >Copy Link</Text>}
               </Button>
             </div>
           </Flex>
