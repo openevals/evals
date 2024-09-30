@@ -22,6 +22,7 @@ import {
   Td,
   useBreakpointValue,
   useToast,
+  Link,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
@@ -164,7 +165,16 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               </Heading>
               <Text pt='2' fontSize='sm'>
                 {evalItem.authors.map((a, idx) => (
-                  <Text key={`author-item-${idx}`}>{a.username}</Text>
+                  <React.Fragment key={`author-item-${idx}`}>
+                    <Text>
+                      {a.username}
+                      {` (`}
+                      {a.githubLogin && (
+                        <Link isExternal href={`https://github.com/${a.githubLogin}`}>@{a.githubLogin}</Link >
+                      )}
+                      {`)`}
+                    </Text>
+                  </React.Fragment>
                 ))}
                 </Text>
               </Box>
