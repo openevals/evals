@@ -245,6 +245,8 @@ ModelProviderValidationModel = {
     ModelProviderType.OPENAI: "gpt-4o",
     ModelProviderType.ANTHROPIC: "claude-3-5-sonnet-20240620",
     ModelProviderType.GOOGLE: "gemini-1.5-flash",
+    ModelProviderType.OPENAI: "o1-preview",
+    ModelProviderType.OPENAI: "o1-mini",
 }
 
 MODEL_PROVIDER_MAP = {
