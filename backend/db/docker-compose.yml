@@ -24,4 +24,4 @@ services:
 volumes:
   openevals_db_data:
     name: openevals_db_data
-    driver: local
+    external: true
