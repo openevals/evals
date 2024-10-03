@@ -103,7 +103,7 @@ def create_eval(
         # Add author/eval relationship
         author = get_or_create_author(db, auth["user"])
         new_author_eval = eval_authors.insert().values(
-            author_id=author.id, eval_id=new_eval.id
+            author_id=author.id, eval_id=new_eval.id, is_principal=True
         )
         db.execute(new_author_eval)
         db.commit()
@@ -189,6 +189,22 @@ def get_user_evals(
     """
     author = get_or_create_author(db, auth["user"])
     evals = author.authored_evals
+    return get_evals_upvoted(evals, auth)
+
+
+@evals_router.get(
+    "/contributed",
+    response_model=List[EvalListItemResponseSchema],
+    status_code=200,
+)
+def get_user_contributed_evals(
+    db: Session = Depends(get_db), auth: dict = Depends(validate_token)
+) -> dict:
+    """
+    Get evals that a user has contributed to
+    """
+    author = get_or_create_author(db, auth["user"])
+    evals = author.contributed_evals
     return get_evals_upvoted(evals, auth)
 
 
