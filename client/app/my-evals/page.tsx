@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
 import {
   getUserCreatedEvals,
   getUserContributedEvals,
-  getUserUpvotedEvals,
 } from "../utils/getEvals";
 import { Heading, Box, Text } from "@chakra-ui/react";
 import ResultItem from "../components/resultItem";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
+import { deleteEval } from "../lib/store/dataSlice";
 
 export default function MyEvals() {
   const [userCreatedEvals, setUserCreatedEvals] = useState<
@@ -27,33 +27,40 @@ export default function MyEvals() {
   const evals = useSelector<IRootState, IEvalListItemResponse[]>(
     (state: IRootState) => state.data.evals,
   );
+  const dispatch = useDispatch();
+
+  const loadData = async () => {
+    if (accessToken) {
+      // Load user created evals
+      const uEvals: IEvalListItemResponse[] =
+        await getUserCreatedEvals(accessToken);
+      if (uEvals.length > 0) {
+        setUserCreatedEvals(uEvals);
+      }
+      // Load user contributed evals
+      const uContEvals: IEvalListItemResponse[] =
+        await getUserContributedEvals(accessToken);
+      if (uContEvals.length > 0) {
+        setUserContributedEvals(uContEvals);
+      }
+    }
+  };
 
   useEffect(() => {
-    if (accessToken) {
-      const getUserEvalInfo = async () => {
-        const uEvals: IEvalListItemResponse[] =
-          await getUserCreatedEvals(accessToken);
-        if (uEvals.length > 0) {
-          setUserCreatedEvals(uEvals);
-        }
-      };
-      const getUserContributedEvalInfo = async () => {
-        const uContEvals: IEvalListItemResponse[] =
-          await getUserContributedEvals(accessToken);
-        if (uContEvals.length > 0) {
-          setUserContributedEvals(uContEvals);
-        }
-      };
-
-      getUserEvalInfo();
-      getUserContributedEvalInfo();
-    }
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setUserVotedEvals(evals.filter((value) => value.upvoted));
   }, [evals]);
+
+  const onDeleteEval = (evalId: number) => {
+    setUserCreatedEvals((prevValues) => {
+      return prevValues.filter((value) => value.id !== evalId);
+    });
+    dispatch(deleteEval(evalId));
+  };
 
   const updateEvals = (payload: IVoteResult) => {
     setUserCreatedEvals((prevValues) => {
@@ -102,11 +109,13 @@ export default function MyEvals() {
               upvoted={upvoted}
               onVote={updateEvals}
               mainAuthor={authors[0]}
+              canDelete={true}
+              onDelete={onDeleteEval}
             />
           ),
         )
       ) : (
-        <Text ml={4} mt={4}>
+        <Text ml={4} my={4}>
           User has not created any evals
         </Text>
       )}
@@ -138,7 +147,7 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Text ml={4} mt={4}>
+        <Text ml={4} my={4}>
           User has not contributed to any evals
         </Text>
       )}
@@ -170,7 +179,7 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Text ml={4} mt={4}>
+        <Text ml={4} my={4}>
           User has not voted on any evals
         </Text>
       )}

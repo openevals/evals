@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { IModelResponse, IEvalListItemResponse, IEvalResponse } from '../types';
+import { createSlice } from "@reduxjs/toolkit";
+import { IModelResponse, IEvalListItemResponse, IEvalResponse } from "../types";
 
 const initialState: {
   models: IModelResponse[];
@@ -9,12 +9,12 @@ const initialState: {
 } = {
   models: [],
   evals: [],
-  search: '',
-  evalToTry: undefined
+  search: "",
+  evalToTry: undefined,
 };
 
 const dataSlice = createSlice({
-  name: 'data',
+  name: "data",
   initialState,
   reducers: {
     setModels(state, action) {
@@ -24,15 +24,18 @@ const dataSlice = createSlice({
       state.evals = action.payload;
     },
     addNewEval(state, action) {
-      state.evals = [...state.evals, {
-        id: action.payload.id,
-        name: action.payload.name,
-        description: action.payload.description,
-        validatorType: action.payload.validatorType,
-        upvotes: 0,
-        upvoted: false,
-        authors: action.payload.authors
-      }];
+      state.evals = [
+        ...state.evals,
+        {
+          id: action.payload.id,
+          name: action.payload.name,
+          description: action.payload.description,
+          validatorType: action.payload.validatorType,
+          upvotes: 0,
+          upvoted: false,
+          authors: action.payload.authors,
+        },
+      ];
     },
     setUpvotedEval(state, action) {
       state.evals = state.evals.map((value: any) => {
@@ -46,18 +49,31 @@ const dataSlice = createSlice({
       state.search = action.payload;
     },
     clearSearchTerm(state, action) {
-      state.search = '';
+      state.search = "";
     },
     setEvalToTry(state, action) {
       state.evalToTry = action.payload;
     },
     clearEvalToTry(state, action) {
       state.evalToTry = undefined;
-    }
+    },
+    deleteEval(state, action) {
+      state.evals = state.evals.filter(
+        (value: any) => value.id !== action.payload,
+      );
+    },
   },
 });
 
 export const {
-  setModels, setEvals, addNewEval, setUpvotedEval, setSearchTerm, clearSearchTerm, setEvalToTry, clearEvalToTry
+  setModels,
+  setEvals,
+  addNewEval,
+  setUpvotedEval,
+  setSearchTerm,
+  clearSearchTerm,
+  setEvalToTry,
+  clearEvalToTry,
+  deleteEval,
 } = dataSlice.actions;
 export default dataSlice.reducer;
