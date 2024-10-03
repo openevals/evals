@@ -259,7 +259,10 @@ export default function DesktopEditor({
                   <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                   <Text ml={2}>Add task instance</Text>
                 </Button>
-                <Button ml="auto" onClick={clickSubmitButton} minW="150px">
+                <Button variant='outline' ml='auto' onClick={onOpen} minW='150px'>
+                  <Text>Upload</Text>
+                </Button>
+                <Button ml='auto' onClick={clickSubmitButton} minW='150px'>
                   <Text>Submit</Text>
                 </Button>
               </HStack>
@@ -355,6 +358,39 @@ export default function DesktopEditor({
           )}
         </Box>
       </Panel>
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Convert Bulk Text</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Textarea
+              value={bulkText}  
+              onChange={(e) => setBulkText(e.target.value)}
+              placeholder="Paste your json or unstructured text here..."
+              size="lg"
+              height="300px"
+            />
+            <Button
+              leftIcon={<Icon as={FaRegClipboard} />}
+              onClick={() => {
+                navigator.clipboard.readText().then(
+                  text => setBulkText(text)
+                );
+              }}
+              mt={2}
+            >
+              Paste from Clipboard
+            </Button>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleUpload}>
+              Process
+            </Button>
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </PanelGroup>
   );
 }

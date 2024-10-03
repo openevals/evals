@@ -178,7 +178,7 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Link href="/evals" color="gray" fontWeight="bold" textDecoration="none">Browse evals to see what you'd like to upvote.</Link>
+        <Link href="/evals" color="gray" fontWeight="bold" textDecoration="none">Browse evals to see what you&apos;d like to upvote.</Link>
       )}
       </Box>
     </Box>

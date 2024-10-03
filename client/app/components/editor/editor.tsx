@@ -67,6 +67,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       setStep(2);
       setTabIndex(isMobile ? 3 : 2);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTryingEval]);
 
   /* Load the data from the model to try */
