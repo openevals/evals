@@ -8,6 +8,7 @@ import {
 } from "react-resizable-panels";
 import {
   Button,
+  Stack,
   HStack,
   Kbd,
   Heading,
@@ -49,6 +50,9 @@ import { useState } from 'react';
 import { FaRegClipboard } from "react-icons/fa";
 import useEvalResults from "../../lib/hooks/useEvalResults";
 import EditorModelItem from "./editorModel";
+import InfoPopover from "../infoPopover";
+import { VALIDATOR_TITLE, VALIDATOR_EXPLANATION, SYSTEM_PROMPT_TITLE, SYSTEM_PROMPT_EXPLANATION } from "../../lib/constants";
+
 
 export default function DesktopEditor({
   isTryingEval,
@@ -171,7 +175,13 @@ export default function DesktopEditor({
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size='sm'>Validator</Heading>
+                    <Stack direction={['row']} alignItems="center">
+                      <Text size='sm'>Validator</Text>
+                      <InfoPopover
+                        title={VALIDATOR_TITLE}
+                        content={VALIDATOR_EXPLANATION}
+                      />
+                    </Stack>
                   </FormLabel>
                   <Select 
                     placeholder='Select validator type' value={validator} 
@@ -188,7 +198,13 @@ export default function DesktopEditor({
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size='sm'>System Prompt (Recommended)</Heading>
+                    <Stack direction={['row']} alignItems="center">
+                      <Text size='sm'>System Prompt (Recommended)</Text>
+                      <InfoPopover
+                        title={SYSTEM_PROMPT_TITLE}
+                        content={SYSTEM_PROMPT_EXPLANATION}
+                      />
+                    </Stack>
                   </FormLabel>
                   <Textarea
                     placeholder='You are a mathematics professor at MIT.'

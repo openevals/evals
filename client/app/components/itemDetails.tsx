@@ -32,12 +32,13 @@ import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../lib/store';
-import { defaultEvalItem } from '../lib/constants';
+import { defaultEvalItem, SYSTEM_PROMPT_EXPLANATION, SYSTEM_PROMPT_TITLE, VALIDATOR_EXPLANATION, VALIDATOR_TITLE } from '../lib/constants';
 import { setEvalToTry } from '../lib/store/dataSlice';
 import { LinkIcon } from '@chakra-ui/icons';
 import { RunSummary, ResultsSummary, ByModel, ByTaskInstance } from './tables/tables';
 import useEvalResults from "../lib/hooks/useEvalResults";
 import RunModal from './runModal';
+import InfoPopover from './infoPopover';
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
@@ -61,7 +62,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   useEffect(() => {
     if (evalItem && evalItem.modelSystems) {
       const selectedModelIds = evalItem.modelSystems.map(system => system.modelId);
-      const selectedModels = models.filter(model => selectedModelIds.includes(model.id));
+      const selectedModels = models.filter((model: IModelResponse) => selectedModelIds.includes(model.id));
     }
   }, [evalItem, models]);
   
@@ -87,7 +88,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   useEffect(() => {
     const map: Record<number, string> = {};
-    models.forEach((model) => {
+    models.forEach((model: IModelResponse) => {
       map[model.id] = model.modelName;
     });
     setModelMap(map);
@@ -140,7 +141,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   const handleModelSelection = (modelId: number, isChecked: boolean) => {
     if (isChecked) {
-      const modelToAdd = models.find(model => model.id === modelId);
+      const modelToAdd = models.find((model:IModelResponse) => model.id === modelId);
       if (modelToAdd) {
         setRunModels(prevModels => [...prevModels, modelToAdd]);
       }
@@ -152,77 +153,92 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   return (
     <>
       <Wrap m={{ base: 0, md: 8 }}>
-        <Box p={4} pt={8} w={{base:"100%", md:"768px"}}>
-          <Flex>
-            <Heading size='lg'>{evalItem.name}</Heading>
-            <Spacer />
-            <HStack spacing={4}>
-              <Button minW='100px' variant="ghost" onClick={tryEval}>Edit</Button>
-              <Button variant="outline" onClick={copyLink}>
-                <LinkIcon />  
-                {!isMobile && <Text ml={2} >Copy Link</Text>}
-              </Button>
-              <RunModal evalItem={evalItem} models={models} runModels={runModels} handleModelSelection={handleModelSelection} />
-            </HStack>
-          </Flex>
-          <Stack divider={<StackDivider />} spacing='4' py={8}>
-            <Box>
-              <Heading size='xs'>
-                <Stack direction={['row']} alignItems="center">
-                  <Text>Validator: </Text>
+        <Stack direction={{ base: 'column', lg: 'row' }} p={4} pt={8} spacing={{ base: 8, md: 4 }}>
+          <Stack w={{ base: "100%", md: "768px" }}>
+            <Flex>
+              <Heading size='lg'>{evalItem.name}</Heading>
+              <Spacer />
+              <HStack spacing={4}>
+                <Button variant="ghost" width='fit-content' onClick={tryEval}>Edit</Button>
+                <Button variant="outline" onClick={copyLink}>
+                  <LinkIcon />  
+                  {!isMobile && <Text ml={2} >Copy Link</Text>}
+                </Button>
+                <RunModal evalItem={evalItem} models={models} runModels={runModels} handleModelSelection={handleModelSelection} />
+              </HStack>
+            </Flex>
+            <Stack divider={<StackDivider />} spacing='4' py={8}>
+              <Box>
+                <Heading size='xs'>
+                  <Stack direction={['row']} alignItems="center">
+                    <Text>Validator </Text>
+                    <InfoPopover
+                      title={VALIDATOR_TITLE}
+                      content={VALIDATOR_EXPLANATION}
+                    />
+                  </Stack>
+                </Heading>
+                <Text pt='2'>
                   <Tag>{evalItem.validatorType}</Tag>
-                </Stack>
-              </Heading>
-            </Box>
-            <Box>
-              <Heading size="xs">Description:</Heading>
-              <Text pt="2" fontSize="sm">
-                {evalItem.description}
-              </Text>
-            </Box>
-            <Box>
-              <Heading size='xs'>
-                System Prompt:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
-                {evalItem.taskInstances[0]?.systemPrompt ? (
-                  <Text>{evalItem.taskInstances[0].systemPrompt}</Text>
-                ) : (
-                  <Text>None</Text>
-                )}
-              </Text>
-            </Box>
-            <Box>
-              <Heading size='xs'>
-                Models tested:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
-                {evalItem.modelSystems.length > 0 ? (
-                  Array.from(new Set(evalItem.modelSystems.map((ms: any) => modelMap[ms.modelId]))).map((modelName: string) => (
-                    <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>{modelName}</Tag>
-                  ))
-                ) : (
-                  <Text>None</Text>
-                )}
-              </Text>
-            </Box>
-            <Box>
-              <Heading size='xs'>
-                Authors:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
-                {evalItem.authors.map((a, idx) => (
-                  <React.Fragment key={`author-item-${idx}`}>
-                    <Text>
-                      {a.username}
-                      {` (`}
-                      {a.githubLogin && (
-                        <Link isExternal href={`https://github.com/${a.githubLogin}`}>@{a.githubLogin}</Link >
-                      )}
-                      {`)`}
-                    </Text>
-                  </React.Fragment>
-                ))}
+                </Text>
+              </Box>
+              <Box>
+                <Heading size='xs'>
+                  Description
+                </Heading>
+                <Text pt='2' fontSize='sm'>
+                  {evalItem.description}
+                </Text>
+              </Box>
+              <Box>
+                <Heading size='xs'>
+                  <Stack direction={['row']} alignItems="center">
+                      <Text>System Prompt </Text>
+                      <InfoPopover
+                        title={SYSTEM_PROMPT_TITLE}
+                        content={SYSTEM_PROMPT_EXPLANATION}
+                      />
+                    </Stack>
+                </Heading>
+                <Text pt='2' fontSize='sm'>
+                  {evalItem.taskInstances[0]?.systemPrompt ? (
+                    <Text>{evalItem.taskInstances[0].systemPrompt}</Text>
+                  ) : (
+                    <Text>None</Text>
+                  )}
+                </Text>
+              </Box>
+              <Box>
+                <Heading size='xs'>
+                  Models tested
+                </Heading>
+                <Text pt='2' fontSize='sm'>
+                  {evalItem.modelSystems.length > 0 ? (
+                    Array.from(new Set(evalItem.modelSystems.map((ms: any) => modelMap[ms.modelId]))).map((modelName: string) => (
+                      <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>{modelName}</Tag>
+                    ))
+                  ) : (
+                    <Text>None</Text>
+                  )}
+                </Text>
+              </Box>
+              <Box>
+                <Heading size='xs'>
+                  Authors
+                </Heading>
+                <Text pt='2' fontSize='sm'>
+                  {evalItem.authors.map((a, idx) => (
+                    <React.Fragment key={`author-item-${idx}`}>
+                      <Text>
+                        {a.username}
+                        {` (`}
+                        {a.githubLogin && (
+                          <Link isExternal href={`https://github.com/${a.githubLogin}`}>@{a.githubLogin}</Link >
+                        )}
+                        {`)`}
+                      </Text>
+                    </React.Fragment>
+                  ))}
                 </Text>
               </Box>
               <Box>
@@ -233,10 +249,10 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 ))}
               </Text>
             </Box>
+            </Stack>
           </Stack>
-        </Box>
-        <Box
-          p={4}
+          <Box
+            p={4}
           w={{ base: "100%", lg: "70%" }}
           maxW={{ base: "100%", lg: "70%" }}
         >
@@ -290,17 +306,12 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             </TableContainer>
           </Box>
         </Box>
+
+        </Stack>
         <Stack p={8} pb={16} minW='100%' justifyContent="center" alignItems="center" spacing={12}>
           {runIds.length > 0 ? (
             <>
-              <Stack direction={['column', 'column', 'row']} spacing={8} width="100%">
-                <Box flex={1}>
-                  <ResultsSummary evalRuns={evalRuns} />
-                </Box>
-                <Box flex={1}>
-                  <RunSummary evalRuns={evalRuns} />
-                </Box>
-              </Stack>
+              <ResultsSummary evalRuns={evalRuns} />
               <ByTaskInstance 
                 evalRuns={evalRuns} 
                 taskInstances={evalItem.taskInstances} 
@@ -313,6 +324,9 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 setSelectedModel={setSelectedModel} 
                 taskMap={taskMap} 
               />
+              <Box flex={1}>
+                <RunSummary evalRuns={evalRuns} />
+              </Box>
             </>
           ) : (
             <Center>

@@ -58,6 +58,18 @@ export function BasicTable<Data extends object>({
     return colSizes;
   }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
+  const pageSizeOptions = React.useMemo(() => {
+    const totalRows = data.length;
+    const options = [10, 25, 50];
+    while (options[options.length - 1] < totalRows) {
+      options.push(options[options.length - 1] * 2);
+    }
+    if (!options.includes(totalRows)) {
+      options.push(totalRows);
+    }
+    return options.filter(option => option <= totalRows);
+  }, [data.length]);
+
   return (
     <Box overflowX="auto" width="100%">
       <Table 
@@ -171,14 +183,8 @@ export function BasicTable<Data extends object>({
               {'<'}
             </Button>
           </Flex>
-          <Flex alignItems="center">
-            <Text>
-              Page{' '}
-              <strong>
-                {table.getState().pagination.pageIndex + 1} of{' '}
-                {table.getPageCount()}
-              </strong>
-            </Text>
+          <Flex alignItems="center" width='auto'>
+            <Text>Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</Text>
             <Select
               value={table.getState().pagination.pageSize}
               onChange={e => {
@@ -186,7 +192,7 @@ export function BasicTable<Data extends object>({
               }}
               ml={2}
             >
-              {[10, 20, 30, 40, 50].map(pageSize => (
+              {pageSizeOptions.map(pageSize => (
                 <option key={pageSize} value={pageSize}>
                   Show {pageSize}
                 </option>
