@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Heading,
@@ -12,21 +12,30 @@ import {
   HStack,
   VStack,
   Center,
-} from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
-import { getEvalItem } from '../utils/getEvalItem';
-import { IEvalResponse, IModelResponse } from '../lib/types';
-import EvalRunResults from './evalRunResults';
-import { useParams, useRouter } from 'next/navigation';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../lib/store';
-import { defaultEvalItem } from '../lib/constants';
-import { setEvalToTry } from '../lib/store/dataSlice';
+  TableContainer,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+} from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import { getEvalItem } from "../utils/getEvalItem";
+import { IEvalResponse, IModelResponse } from "../lib/types";
+import EvalRunResults from "./evalRunResults";
+import { useParams, useRouter } from "next/navigation";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../lib/store";
+import { defaultEvalItem } from "../lib/constants";
+import { setEvalToTry } from "../lib/store/dataSlice";
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
-  const models = useSelector<IRootState, IModelResponse[]>((state: IRootState) => state.data.models);
+  const models = useSelector<IRootState, IModelResponse[]>(
+    (state: IRootState) => state.data.models,
+  );
   const [modelMap, setModelMap] = useState<Record<number, string>>({});
   const [runIds, setRunIds] = useState<number[]>([]);
   const params: { id: string } = useParams();
@@ -37,7 +46,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     /* Get the id parameter */
     const id = evalId ?? parseInt(params.id, 10);
     if (!Number.isInteger(id)) {
-      router.push('/');
+      router.push("/");
       return;
     }
 
@@ -61,67 +70,65 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   const tryEval = () => {
     dispatch(setEvalToTry(evalItem));
-    router.push('/');
+    router.push("/");
   };
 
   return (
     <>
       <Wrap>
-        <Box p={4} w={{base:"100%", md:"400px"}}>
+        <Box p={4} w={{ base: "100%", md: "400px" }}>
           <HStack>
-            <Heading size='lg'>{evalItem.name}</Heading>
-            <Button ml={2} minW='100px' onClick={tryEval}>Try Eval</Button>
+            <Heading size="lg">{evalItem.name}</Heading>
+            <Button ml={2} minW="100px" onClick={tryEval}>
+              Try Eval
+            </Button>
           </HStack>
-          <Stack divider={<StackDivider />} spacing='4' py={8}>
+          <Stack divider={<StackDivider />} spacing="4" py={8}>
             <Box>
-              <Heading size='xs'>
-                <Stack direction={['row']}>
+              <Heading size="xs">
+                <Stack direction={["row"]}>
                   <Text>Method to evaluate: </Text>
                   <Tag>{evalItem.validatorType}</Tag>
                 </Stack>
               </Heading>
             </Box>
             <Box>
-              <Heading size='xs'>
-                Description:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
+              <Heading size="xs">Description:</Heading>
+              <Text pt="2" fontSize="sm">
                 {evalItem.description}
               </Text>
             </Box>
             <Box>
-              <Heading size='xs'>
-                Models tested:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
-                {evalItem.modelSystems.length > 0 ? evalItem.modelSystems.map((ms: any) => (
-                  <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>{modelMap[ms.modelId]}</Tag>
-                )) : (
+              <Heading size="xs">Models tested:</Heading>
+              <Text pt="2" fontSize="sm">
+                {evalItem.modelSystems.length > 0 ? (
+                  evalItem.modelSystems.map((ms: any) => (
+                    <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>
+                      {modelMap[ms.modelId]}
+                    </Tag>
+                  ))
+                ) : (
                   <Text>None</Text>
-                )
-                }
-              </Text>
-            </Box>
-            <Box>
-              <Heading size='xs'>
-                Prompts used:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
-                {/* TODO: Right now this only queries the first */}
-                {evalItem.modelSystems.length > 0 && (
-                  evalItem.taskInstances[0]?.systemPrompt ? (
-                    <Text>System prompt: {evalItem.taskInstances[0].systemPrompt}</Text>
-                  ) : (
-                    <Text>None</Text>
-                  )
                 )}
               </Text>
             </Box>
             <Box>
-              <Heading size='xs'>
-                Authors:
-              </Heading>
-              <Text pt='2' fontSize='sm'>
+              <Heading size="xs">Prompts used:</Heading>
+              <Text pt="2" fontSize="sm">
+                {/* TODO: Right now this only queries the first */}
+                {evalItem.modelSystems.length > 0 &&
+                  (evalItem.taskInstances[0]?.systemPrompt ? (
+                    <Text>
+                      System prompt: {evalItem.taskInstances[0].systemPrompt}
+                    </Text>
+                  ) : (
+                    <Text>None</Text>
+                  ))}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size="xs">Authors:</Heading>
+              <Text pt="2" fontSize="sm">
                 {evalItem.authors.map((a, idx) => (
                   <Text key={`author-item-${idx}`}>{a.username}</Text>
                 ))}
@@ -129,7 +136,62 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             </Box>
           </Stack>
         </Box>
-        <Box p={4} minW='70%'>
+        <Box
+          p={4}
+          w={{ base: "100%", lg: "70%" }}
+          maxW={{ base: "100%", lg: "70%" }}
+        >
+          <Heading size="md" mb={6}>
+            Task Instances
+          </Heading>
+          <Box
+            maxH="60vh"
+            overflowY="auto"
+            border="1px"
+            borderRadius="md"
+            borderColor="lightgray"
+          >
+            <TableContainer maxW="100%">
+              <Box position="relative">
+                <Table layout="fixed" width="100%">
+                  <Thead
+                    position="sticky"
+                    top={0}
+                    bg="white"
+                    zIndex={2}
+                    boxShadow="0 2px 4px rgba(0,0,0,0.1)"
+                  >
+                    <Tr>
+                      <Th width="50%">Input</Th>
+                      <Th width="50%">Ideal Output</Th>
+                    </Tr>
+                  </Thead>
+                </Table>
+                <Box maxHeight="calc(60vh - 40px)" overflowY="auto">
+                  <Table layout="fixed" width="100%">
+                    <Tbody>
+                      {evalItem.taskInstances.map((instance) => (
+                        <Tr key={`task-instance-${instance.id}`}>
+                          <Td width="50%">
+                            <Box overflowWrap="break-word" whiteSpace="normal">
+                              {instance.input}
+                            </Box>
+                          </Td>
+                          <Td width="50%">
+                            <Box overflowWrap="break-word" whiteSpace="normal">
+                              {instance.ideal}
+                            </Box>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+              </Box>
+            </TableContainer>
+          </Box>
+        </Box>
+        <Box p={4} minW="70%">
           {runIds.length > 0 ? (
             <EvalRunResults
               evalId={evalItem.id}
@@ -140,8 +202,13 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
           ) : (
             <Center>
               <VStack>
-                <Text>No model systems have been tested on this eval yet. Would you like to be the first?</Text>
-                <Button ml={2} minW='100px' onClick={tryEval}>Try Eval</Button>
+                <Text>
+                  No model systems have been tested on this eval yet. Would you
+                  like to be the first?
+                </Text>
+                <Button ml={2} minW="100px" onClick={tryEval}>
+                  Try Eval
+                </Button>
               </VStack>
             </Center>
           )}
