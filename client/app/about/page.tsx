@@ -33,7 +33,6 @@ export default function About() {
               <Link
                 href="https://x.com/belindmo"
                 isExternal
-                textDecoration="underline"
               >{`@belindmo`}</Link>
             </ListItem>
             <ListItem>
@@ -41,7 +40,6 @@ export default function About() {
               <Link
                 href="https://x.com/justinlinw"
                 isExternal
-                textDecoration="underline"
               >{`@justinlinw`}</Link>
             </ListItem>
             <ListItem>
@@ -49,7 +47,6 @@ export default function About() {
               <Link
                 href="https://x.com/reiniermillo"
                 isExternal
-                textDecoration="underline"
               >{`@reiniermillo`}</Link>
             </ListItem>
           </UnorderedList>
@@ -59,7 +56,6 @@ export default function About() {
           <Link
             href="https://x.com/belindmo"
             isExternal
-            textDecoration="underline"
           >{`@belindmo`}</Link>
           {` on Twitter.`}
         </Text>

@@ -2,7 +2,7 @@ import { getTopEvals } from "../utils/getEvals";
 import { useEffect, useState } from "react";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 import { Heading } from "@chakra-ui/react";
-import ResultItem from "./resultItem";
+import ResultItem from "./search/resultItem";
 
 export default function Trending() {
   const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);

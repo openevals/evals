@@ -13,7 +13,7 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-import { TaskInstance } from '../lib/types';
+import { TaskInstance } from '../../lib/types';
 import { Dispatch, SetStateAction } from 'react';
 
 export default function InstancesTable({

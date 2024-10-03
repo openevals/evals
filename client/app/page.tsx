@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Editor from "./components/editor";
+import Editor from "./components/editor/editor";
 
 export const metadata: Metadata = {
-  title: "OpenEvals - Create new evals",
+  title: "OpenEvals - Create an eval",
   description: "Evals for the public",
 };
 

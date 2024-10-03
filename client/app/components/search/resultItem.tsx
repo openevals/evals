@@ -16,16 +16,16 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
 } from "@chakra-ui/react";
-import VoteButton from "./voteButton";
+import VoteButton from "../voteButton";
 import { useRouter } from "next/navigation";
-import { IAuthorResponse, IVoteResult } from "../lib/types";
-import { getEvalItem } from "../utils/getEvalItem";
+import { IAuthorResponse, IVoteResult } from "../../lib/types";
+import { getEvalItem } from "../../utils/getEvalItem";
 import { useDispatch, useSelector } from "react-redux";
-import { setEvalToTry } from "../lib/store/dataSlice";
+import { setEvalToTry } from "../../lib/store/dataSlice";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useRef } from "react";
-import { deleteEval } from "../utils/getEvals";
-import { IRootState } from "../lib/store";
+import { deleteEval } from "../../utils/getEvals";
+import { IRootState } from "../../lib/store";
 
 export default function ResultItem({
   id,

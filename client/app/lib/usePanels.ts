@@ -28,7 +28,6 @@ export default function usePanels(step: number) {
     setPanel2Collapsed,
     panel3Collapsed,
     setPanel3Collapsed
-    
   ] as [
     React.RefObject<ImperativePanelHandle>,
     React.RefObject<ImperativePanelHandle>,

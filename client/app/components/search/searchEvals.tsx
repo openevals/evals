@@ -1,10 +1,10 @@
 'use client';
 
-import { searchEvals } from "../utils/getEvals";
+import { searchEvals } from "../../utils/getEvals";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { IRootState } from "../lib/store";
-import { IEvalListItemResponse } from "../lib/types";
+import { IRootState } from "../../lib/store";
+import { IEvalListItemResponse } from "../../lib/types";
 import Results from './results';
 import React from "react";
 

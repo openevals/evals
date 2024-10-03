@@ -3,42 +3,25 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
-  UnorderedList,
-  ListItem,
   useBreakpointValue,
-  Text,
   useToast,
-} from "@chakra-ui/react";
-import { addNewEvalRuns, postNewEval } from "@/app/utils/getEvalRun";
-import { defaultEvalItem, MIN_INSTANCES } from "@/app/lib/constants";
-import {
-  ModelSystem,
-  ValidatorType,
-  TaskInstance,
-  IModelResponse,
-  IEvalResponse,
-} from "@/app/lib/types";
-import usePanels from "../lib/usePanels";
-import { IRootState } from "../lib/store";
+} from '@chakra-ui/react';
+import { addNewEvalRuns, postNewEval } from '@/app/utils/getEvalRun';
+import { defaultEvalItem, MIN_INSTANCES } from '@/app/lib/constants';
+import { ModelSystem, ValidatorType, TaskInstance, IModelResponse, IEvalResponse } from '@/app/lib/types';
+import usePanels from "../../lib/usePanels";
+import { IRootState } from "../../lib/store";
 import { useDispatch, useSelector } from "react-redux";
-import { addNewEval, clearEvalToTry } from "../lib/store/dataSlice";
-import MobileEditor from "./editorMobile";
-import DesktopEditor from "./editorDesktop";
-import { useModelStorageContext } from "../lib/providers/model-storage";
+import { addNewEval, clearEvalToTry } from "../../lib/store/dataSlice";
+import MobileEditor from './editorMobile';
+import DesktopEditor from './editorDesktop';
+import SubmitModal from './submitModal';
+import { useRouter } from 'next/navigation';
+import { useModelStorageContext } from "../../lib/providers/model-storage";
 
-export default function Editor({
-  initialEval,
-}: {
-  initialEval?: IEvalResponse;
-}) {
+export default function Editor({ initialEval }: { initialEval?: IEvalResponse }) {
+  const router = useRouter();
   const { openAIKey, anthropicKey, geminiKey } = useModelStorageContext();
   // step 1 = enter meta info
   // step 2 = add task instances
@@ -156,6 +139,9 @@ export default function Editor({
 
   const confirmSubmit = async () => {
     onClose();
+    setStep(3);
+    
+
     const checkedModels = models.filter((model) => model.checked);
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
       modelId: model.id,
@@ -194,10 +180,22 @@ export default function Editor({
       setIsTryingEval(true);
     }
 
+    // Route to the itemdetail for the new eval
+    router.push(`/evals/${newEval.id}`);
+
+    let toastMessage = isTryingEval ? "💛 Eval edited!" : "🎉 Eval created!";
+    toast({
+      title: toastMessage,
+      description: "We are running your eval. Refresh the page to see the updated results.",
+      status: "success",
+      isClosable: true,
+      duration: 12000,
+    });    
+    
     /* Show results and keep polling until eval run is finished */
-    setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
-    setTabIndex(isMobile ? 3 : 2);
-    setStep(3);
+    // setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
+    // setTabIndex(isMobile ? 3 : 2);
+
   };
 
   const addInstance = () => {
@@ -346,48 +344,7 @@ export default function Editor({
           instanceInputRef={instanceInputRef}
         />
       )}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Please confirm the following:</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <UnorderedList spacing={2}>
-              <ListItem>
-                <Text>
-                  My eval solves a useful task in a format that is easy for
-                  humans to understand.
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  {`I've`} double checked that my task instances are correct.
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  To the best of my knowledge, my task instances are not easily
-                  available online in their task format.
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  To the best of my knowledge, I {`won't`} share private task
-                  instance data publicly. If I do, I will delete my eval from
-                  the OpenEvals platform.
-                </Text>
-              </ListItem>
-            </UnorderedList>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button mr={3} onClick={onClose}>
-              Back
-            </Button>
-            <Button onClick={confirmSubmit}>I confirm, submit</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <SubmitModal isOpen={isOpen} onClose={onClose} onConfirm={confirmSubmit} />
     </>
   );
 }

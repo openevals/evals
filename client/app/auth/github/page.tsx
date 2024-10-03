@@ -85,12 +85,7 @@ export default function GithubCallback() {
           textAlign="center"
         >
           <Text fontWeight="bold">{errorDescription}</Text>
-          <Text mt={4}>
-            You will be redirected automatically to{" "}
-            <Link href="/" fontWeight="bold">
-              home screen
-            </Link>
-          </Text>
+          <Text mt={4}>You will be redirected automatically to <Link href="/" textDecoration="none" fontWeight="bold">home screen</Link></Text>
         </Alert>
       ) : (
         <Box m="auto" display="flex" alignItems="center">

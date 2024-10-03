@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, chakra, Box } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, chakra, Box, Button, Flex, Text, Select } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
   useReactTable,
@@ -7,30 +7,41 @@ import {
   getCoreRowModel,
   ColumnDef,
   SortingState,
-  getSortedRowModel
+  getSortedRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 
 export type DataTableProps<Data extends object> = {
   data: Data[];
   columns: ColumnDef<Data, any>[];
+  maxRows?: number;
 };
 
 export function BasicTable<Data extends object>({
   data,
-  columns
+  columns,
+  maxRows = 10
 }: DataTableProps<Data>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: maxRows,
+  });
+
   const table = useReactTable({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     state: {
-      sorting
+      sorting,
+      pagination,
     },
     defaultColumn: {
-      minSize: 30,
+      minSize: 20,
       maxSize: 400,
     },
     columnResizeMode: 'onChange',
@@ -48,7 +59,7 @@ export function BasicTable<Data extends object>({
   }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
   return (
-    <Box overflowX="auto">
+    <Box overflowX="auto" width="100%">
       <Table 
         variant="simple" 
         borderWidth="1px" 
@@ -56,7 +67,7 @@ export function BasicTable<Data extends object>({
         borderColor="gray.200"
         style={{
           ...columnSizeVars,
-          width: table.getTotalSize(),
+          width: '100%',
         }}
       >
         <Thead>
@@ -70,7 +81,7 @@ export function BasicTable<Data extends object>({
                     onClick={header.column.getToggleSortingHandler()}
                     isNumeric={meta?.isNumeric}
                     style={{
-                      width: `calc(var(--header-${header.id}-size) * 1px)`,
+                      width: meta?.width || `calc(var(--header-${header.id}-size) * 1px)`,
                       position: 'relative',
                       borderRight: '1px solid',
                       borderColor: 'inherit',
@@ -130,7 +141,7 @@ export function BasicTable<Data extends object>({
                     key={cell.id} 
                     isNumeric={meta?.isNumeric}
                     style={{
-                      width: `calc(var(--col-${cell.column.id}-size) * 1px)`,
+                      width: meta?.width || `calc(var(--col-${cell.column.id}-size) * 1px)`,
                       borderRight: '1px solid',
                       borderColor: 'inherit',
                     }}
@@ -143,6 +154,62 @@ export function BasicTable<Data extends object>({
           ))}
         </Tbody>
       </Table>
+      {data.length > maxRows && (
+        <Flex justifyContent="space-between" alignItems="center" mt={4}>
+          <Flex>
+            <Button
+              onClick={() => table.setPageIndex(0)}
+              isDisabled={!table.getCanPreviousPage()}
+            >
+              {'<<'}
+            </Button>
+            <Button
+              onClick={() => table.previousPage()}
+              isDisabled={!table.getCanPreviousPage()}
+              ml={2}
+            >
+              {'<'}
+            </Button>
+          </Flex>
+          <Flex alignItems="center">
+            <Text>
+              Page{' '}
+              <strong>
+                {table.getState().pagination.pageIndex + 1} of{' '}
+                {table.getPageCount()}
+              </strong>
+            </Text>
+            <Select
+              value={table.getState().pagination.pageSize}
+              onChange={e => {
+                table.setPageSize(Number(e.target.value))
+              }}
+              ml={2}
+            >
+              {[10, 20, 30, 40, 50].map(pageSize => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </Select>
+          </Flex>
+          <Flex>
+            <Button
+              onClick={() => table.nextPage()}
+              isDisabled={!table.getCanNextPage()}
+              mr={2}
+            >
+              {'>'}
+            </Button>
+            <Button
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              isDisabled={!table.getCanNextPage()}
+            >
+              {'>>'}
+            </Button>
+          </Flex>
+        </Flex>
+      )}
     </Box>
   );
 }

@@ -7,12 +7,12 @@ import {
   getUserContributedEvals,
 } from "../utils/getEvals";
 import { Heading, Box, Text, Link } from "@chakra-ui/react";
-import ResultItem from "../components/resultItem";
+import ResultItem from "../components/search/resultItem";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 import { deleteEval } from "../lib/store/dataSlice";
 
 export default function MyEvals() {
-  const [userCreatedEvals, setUserCreatedEvals] = useState<
+  const [userEvals, setUserEvals] = useState<
     IEvalListItemResponse[]
   >([]);
   const [userContributedEvals, setUserContributedEvals] = useState<
@@ -35,7 +35,7 @@ export default function MyEvals() {
       const uEvals: IEvalListItemResponse[] =
         await getUserCreatedEvals(accessToken);
       if (uEvals.length > 0) {
-        setUserCreatedEvals(uEvals);
+        setUserEvals(uEvals);
       }
       // Load user contributed evals
       const uContEvals: IEvalListItemResponse[] =
@@ -56,14 +56,14 @@ export default function MyEvals() {
   }, [evals]);
 
   const onDeleteEval = (evalId: number) => {
-    setUserCreatedEvals((prevValues) => {
+    setUserEvals((prevValues) => {
       return prevValues.filter((value) => value.id !== evalId);
     });
     dispatch(deleteEval(evalId));
   };
 
   const updateEvals = (payload: IVoteResult) => {
-    setUserCreatedEvals((prevValues) => {
+    setUserEvals((prevValues) => {
       return prevValues.map((value) => {
         if (value.id === payload.id) {
           value.upvotes = payload.upvotes;
@@ -87,8 +87,8 @@ export default function MyEvals() {
     <Box w='100%' p={4} maxW="1200px" margin="0 auto">
       <Heading size='lg' mb={8} textAlign="center">My Evals</Heading>
       <Box>
-      {userCreatedEvals?.length > 0 ? (
-        userCreatedEvals.map(
+      {userEvals?.length > 0 ? (
+        userEvals.map(
           ({
             id,
             name,
@@ -107,7 +107,7 @@ export default function MyEvals() {
               upvotes={upvotes}
               upvoted={upvoted}
               onVote={updateEvals}
-              mainAuthor={authors[0]}
+              mainAuthor={authors[0] ?? null}
               canDelete={true}
               onDelete={onDeleteEval}
               onClick='ItemDetail'
@@ -115,7 +115,7 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Link href="/" color="gray" fontWeight="bold">Create your first eval!</Link>
+        <Link href="/" color="gray" fontWeight="bold" textDecoration="none">Create your first eval!</Link>
       )}
       </Box>
       <Heading size="lg" my={8} textAlign="center">Contributed Evals</Heading>
@@ -178,7 +178,7 @@ export default function MyEvals() {
           ),
         )
       ) : (
-        <Link href="/evals" color="gray" fontWeight="bold">Browse evals to see what you&apos;d like to upvote.</Link>
+        <Link href="/evals" color="gray" fontWeight="bold" textDecoration="none">Browse evals to see what you'd like to upvote.</Link>
       )}
       </Box>
     </Box>

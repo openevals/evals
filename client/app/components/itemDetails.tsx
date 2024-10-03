@@ -5,6 +5,7 @@ import {
   Text,
   Button,
   Stack,
+  HStack,
   StackDivider,
   Box,
   Tag,
@@ -22,12 +23,11 @@ import {
   Td,
   useBreakpointValue,
   useToast,
-  Link,
+  Link
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { getEvalItem } from '../utils/getEvalItem';
 import { IEvalResponse, IModelResponse } from '../lib/types';
-import EvalRunResults from './evalRunResults';
 import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,6 +35,9 @@ import { IRootState } from '../lib/store';
 import { defaultEvalItem } from '../lib/constants';
 import { setEvalToTry } from '../lib/store/dataSlice';
 import { LinkIcon } from '@chakra-ui/icons';
+import { RunSummary, ResultsSummary, ByModel, ByTaskInstance } from './tables/tables';
+import useEvalResults from "../lib/hooks/useEvalResults";
+import RunModal from './runModal';
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
@@ -48,9 +51,21 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   const dispatch = useDispatch();
   const toast = useToast();
 
+  const [runModels, setRunModels] = useState<IModelResponse[]>([]);
+  const [selectedTaskInstance, setSelectedTaskInstance] = useState<number | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string>('');
+
+  const { evalRuns, allRunsCompleted } = useEvalResults(evalItem.id, runIds);
+  const [taskMap, setTaskMap] = useState<Record<number, any>>({});
+
+  useEffect(() => {
+    if (evalItem && evalItem.modelSystems) {
+      const selectedModelIds = evalItem.modelSystems.map(system => system.modelId);
+      const selectedModels = models.filter(model => selectedModelIds.includes(model.id));
+    }
+  }, [evalItem, models]);
   
   const isMobile = useBreakpointValue({ base: true, sm: true, md: false });
-
 
   useEffect(() => {
     /* Get the id parameter */
@@ -78,6 +93,26 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     setModelMap(map);
   }, [models]);
 
+  useEffect(() => {
+    const map: Record<number, any> = {};
+    evalItem.taskInstances.forEach((value) => {
+      map[value.id] = value;
+    });
+    setTaskMap(map);
+  }, [evalItem.taskInstances]);
+
+  useEffect(() => {
+    if (evalRuns.length > 0) {
+      setSelectedModel(evalRuns[0].model.id.toString());
+    }
+  }, [evalRuns]);
+
+  useEffect(() => {
+    if (evalItem.taskInstances.length > 0) {
+      setSelectedTaskInstance(evalItem.taskInstances[0].id);
+    }
+  }, [evalItem.taskInstances]);
+
   const tryEval = () => {
     dispatch(setEvalToTry(evalItem));
     router.push("/");
@@ -103,6 +138,17 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     });
   };
 
+  const handleModelSelection = (modelId: number, isChecked: boolean) => {
+    if (isChecked) {
+      const modelToAdd = models.find(model => model.id === modelId);
+      if (modelToAdd) {
+        setRunModels(prevModels => [...prevModels, modelToAdd]);
+      }
+    } else {
+      setRunModels(prevModels => prevModels.filter(model => model.id !== modelId));
+    }
+  };
+
   return (
     <>
       <Wrap m={{ base: 0, md: 8 }}>
@@ -110,19 +156,20 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
           <Flex>
             <Heading size='lg'>{evalItem.name}</Heading>
             <Spacer />
-            <div>
-              <Button ml={4} minW='100px' onClick={tryEval}>Contribute Run</Button>
-              <Button ml={2} variant="ghost" onClick={copyLink}>
-                <LinkIcon />
+            <HStack spacing={4}>
+              <Button minW='100px' variant="ghost" onClick={tryEval}>Edit</Button>
+              <Button variant="outline" onClick={copyLink}>
+                <LinkIcon />  
                 {!isMobile && <Text ml={2} >Copy Link</Text>}
               </Button>
-            </div>
+              <RunModal evalItem={evalItem} models={models} runModels={runModels} handleModelSelection={handleModelSelection} />
+            </HStack>
           </Flex>
           <Stack divider={<StackDivider />} spacing='4' py={8}>
             <Box>
               <Heading size='xs'>
                 <Stack direction={['row']} alignItems="center">
-                  <Text>Method to evaluate: </Text>
+                  <Text>Validator: </Text>
                   <Tag>{evalItem.validatorType}</Tag>
                 </Stack>
               </Heading>
@@ -138,7 +185,6 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 System Prompt:
               </Heading>
               <Text pt='2' fontSize='sm'>
-                {/* TODO: Right now this only queries the first */}
                 {evalItem.taskInstances[0]?.systemPrompt ? (
                   <Text>{evalItem.taskInstances[0].systemPrompt}</Text>
                 ) : (
@@ -151,12 +197,13 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 Models tested:
               </Heading>
               <Text pt='2' fontSize='sm'>
-                {evalItem.modelSystems.length > 0 ? evalItem.modelSystems.map((ms: any) => (
-                  <Tag key={`model-tag-${ms.id}`} mr={2} mb={2}>{modelMap[ms.modelId]}</Tag>
-                )) : (
+                {evalItem.modelSystems.length > 0 ? (
+                  Array.from(new Set(evalItem.modelSystems.map((ms: any) => modelMap[ms.modelId]))).map((modelName: string) => (
+                    <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>{modelName}</Tag>
+                  ))
+                ) : (
                   <Text>None</Text>
-                )
-                }
+                )}
               </Text>
             </Box>
             <Box>
@@ -243,14 +290,30 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             </TableContainer>
           </Box>
         </Box>
-        <Box p={8} pb={16} minW='70%'>
+        <Stack p={8} pb={16} minW='100%' justifyContent="center" alignItems="center" spacing={12}>
           {runIds.length > 0 ? (
-            <EvalRunResults
-              evalId={evalItem.id}
-              evalName={evalItem.name}
-              evalRunIds={runIds}
-              taskInstances={evalItem.taskInstances}
-            />
+            <>
+              <Stack direction={['column', 'column', 'row']} spacing={8} width="100%">
+                <Box flex={1}>
+                  <ResultsSummary evalRuns={evalRuns} />
+                </Box>
+                <Box flex={1}>
+                  <RunSummary evalRuns={evalRuns} />
+                </Box>
+              </Stack>
+              <ByTaskInstance 
+                evalRuns={evalRuns} 
+                taskInstances={evalItem.taskInstances} 
+                selectedTaskInstance={selectedTaskInstance} 
+                setSelectedTaskInstance={setSelectedTaskInstance} 
+              />
+              <ByModel 
+                evalRuns={evalRuns} 
+                selectedModel={selectedModel} 
+                setSelectedModel={setSelectedModel} 
+                taskMap={taskMap} 
+              />
+            </>
           ) : (
             <Center>
               <VStack>
@@ -259,7 +322,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               </VStack>
             </Center>
           )}
-        </Box>
+        </Stack>
       </Wrap>
     </>
   );

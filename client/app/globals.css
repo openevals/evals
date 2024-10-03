@@ -1,0 +1,10 @@
+
+/* Ensure all Chakra UI Link components are underlined */
+.chakra-link {
+  text-decoration: underline !important;
+}
+
+/* Maintain underline on hover */
+.chakra-link:hover {
+  text-decoration: underline !important;
+}

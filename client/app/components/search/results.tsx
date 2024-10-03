@@ -2,7 +2,7 @@
 
 import ResultItem from "./resultItem";
 import { Box, Text, Flex, } from "@chakra-ui/react";
-import { IEvalListItemResponse, IVoteResult } from "../lib/types";
+import { IEvalListItemResponse, IVoteResult } from "../../lib/types";
 
 export default function Results({ evals, onVote }: { evals: IEvalListItemResponse[], onVote?: (payload: IVoteResult) => void }) {
   return (

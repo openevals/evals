@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../lib/store";
 import { setEvals } from '../lib/store/dataSlice';
 import { IEvalListItemResponse } from "../lib/types";
-import Results from './results';
+import Results from './search/results';
 import React from "react";
 
 export default function UpvoteEvalsComponent() {

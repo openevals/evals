@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import React from "react";
-import SearchEvalsComponent from "../../components/searchEvals";
+import SearchEvalsComponent from "../../components/search/searchEvals";
 import { Box, Heading } from '@chakra-ui/react';
 
 export const metadata: Metadata = {

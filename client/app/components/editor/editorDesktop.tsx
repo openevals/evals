@@ -30,15 +30,25 @@ import {
   Card,
   CardBody,
   Center,
-} from "@chakra-ui/react";
-import { MIN_INSTANCES } from "@/app/lib/constants";
-import { ValidatorType, DesktopEditorProps } from "@/app/lib/types";
-import EvalRunResults from "./evalRunResults";
-import InstancesTable from "./instancesTable";
-import Trending from "./trending";
+  Icon,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure
+} from '@chakra-ui/react';
+import { MIN_INSTANCES } from '@/app/lib/constants';
+import { ValidatorType, DesktopEditorProps } from '@/app/lib/types';
+import InstancesTable from "../tables/instancesTable";
+import Trending from "../trending";
+import RobotoHeader from "../robotoHeader";
+import { useState } from 'react';
+import { FaRegClipboard } from "react-icons/fa";
+import useEvalResults from "../../lib/hooks/useEvalResults";
 import EditorModelItem from "./editorModel";
-import { useEffect } from "react";
-import RobotoHeader from "./robotoHeader";
 
 export default function DesktopEditor({
   isTryingEval,
@@ -79,6 +89,20 @@ export default function DesktopEditor({
   systemPrompt,
   setSystemPrompt,
 }: DesktopEditorProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [bulkText, setBulkText] = useState('');
+  const [selectedModel, setSelectedModel] = useState('');
+  const [selectedTaskInstance, setSelectedTaskInstance] = useState<number | null>(null);
+  const { evalRuns, allRunsCompleted } = useEvalResults(evalObj.id, evalRunIds);
+
+  const handleUpload = async () => {
+    // Here you would implement the logic to send the bulkText to GPT
+    // and process the response to create input-output pairs
+    // For now, we'll just close the modal
+    onClose();
+    // Reset the bulkText
+    setBulkText('');
+  };
 
   return (
     <PanelGroup direction="horizontal">
@@ -106,7 +130,7 @@ export default function DesktopEditor({
             <>
               <VStack spacing={6} align="stretch" px={2}>
                 <HStack alignItems="center">
-                  <RobotoHeader>{isTryingEval ? "Contribute model runs to an existing eval" : "Make a new eval"}</RobotoHeader>
+                  <RobotoHeader>{isTryingEval ? "Edit an eval" : "Create an eval"}</RobotoHeader>
                   <Spacer/>
                   {step === 1 && panel2Collapsed && (
                     <Button onClick={() => { if (step === 1) setStep(2); }} minW='180px'>
@@ -118,7 +142,7 @@ export default function DesktopEditor({
                   )}
                 </HStack>
                 {isTryingEval && (
-                    <Text>Your setting API keys will be used. Thank you for your contribution 💛</Text>
+                    <Text>Note: this is a clone of the original eval. Only the public task instances are shown here.</Text>
                   )}
                 <FormControl>
                   <FormLabel>
@@ -147,7 +171,7 @@ export default function DesktopEditor({
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size="sm">Method to evaluate</Heading>
+                    <Heading size='sm'>Validator</Heading>
                   </FormLabel>
                   <Select 
                     placeholder='Select validator type' value={validator} 
@@ -278,7 +302,6 @@ export default function DesktopEditor({
               </Box>
             </>
           )}
-
         </Box>
       </Panel>
       <PanelResizeHandle />
@@ -306,20 +329,19 @@ export default function DesktopEditor({
               <TabList>
                 <Tab>Contribute</Tab>
                 <Tab>Try an eval</Tab>
-                <Tab>Results</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
                   <Card variant='outline'>
                     <CardBody>
                       <Heading size='md'>Welcome to OpenEvals, a practical evals database that anyone can contribute to. 💛</Heading>
-                      <Text my={4}>An <b>eval</b> is a task that grades an AI {`system's`} output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system." textDecoration="underline">[1]</Link></Text>
+                      <Text my={4}>An <b>eval</b> is a task that grades an AI {`system's`} output. It takes in a specific type of <b>input</b> and generates a specific type of <b>output</b>. <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system.">[1]</Link></Text>
                       <Text my={4}>This is an editor to make your own textual evals.</Text>
                       <Heading size='md' my={4}>Tips:</Heading>
                       <Text>1. Choose an eval topic that you know well, e.g. a topic you would be comfortable teaching.</Text>
                       <Text my={4}>2. Compare results between at least 3 AI <b>models</b>.</Text>
                       <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
-                      <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations." textDecoration="underline">[2]</Link></Text>
+                      <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations.">[2]</Link></Text>
                       <Text>5. Double check ideal outputs for task instances.</Text>
                       <Text my={4}>{`That's all! Have fun~`}</Text>
                     </CardBody>
@@ -327,13 +349,6 @@ export default function DesktopEditor({
                 </TabPanel>
                 <TabPanel textAlign='left'>
                   <Trending />
-                </TabPanel>
-                <TabPanel>
-                  {step === 3 ? (
-                    <EvalRunResults evalName={evalObj.name} evalId={evalObj.id} evalRunIds={evalRunIds} taskInstances={evalObj.taskInstances} />
-                  ) : (
-                    <Center py={4}>Your evaluation results will appear here 🌱</Center>
-                  )}
                 </TabPanel>
               </TabPanels>
             </Tabs>

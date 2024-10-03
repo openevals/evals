@@ -14,10 +14,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { AIProvider, IModelResponse } from "@/app/lib/types";
-import { useModelStorageContext } from "../lib/providers/model-storage";
+import { useModelStorageContext } from "../../lib/providers/model-storage";
 import { useEffect, useState } from "react";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
-import { AI_PROVIDER_NAME, AI_PROVIDER_A_AN } from "../lib/constants";
+import { AI_PROVIDER_NAME, AI_PROVIDER_A_AN } from "../../lib/constants";
 
 export default function EditorModelItem({
   model,
