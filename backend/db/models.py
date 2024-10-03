@@ -3,7 +3,7 @@ from enum import Enum
 from db import Base
 from sqlalchemy import Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlalchemy import Float, ForeignKey, Integer, String, Table
+from sqlalchemy import Float, ForeignKey, Integer, String, Table, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -12,6 +12,10 @@ eval_authors = Table(
     Base.metadata,
     Column("author_id", Integer, ForeignKey("authors.id"), primary_key=True),
     Column("eval_id", Integer, ForeignKey("evals.id"), primary_key=True),
+    Column(
+        "is_principal", Boolean, nullable=False, default=False, server_default="False"
+    ),
+    UniqueConstraint("author_id", "eval_id", name="uq_author_eval"),
 )
 
 
@@ -52,7 +56,16 @@ class Author(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="author")
     authored_evals = relationship(
-        "Eval", secondary=eval_authors, back_populates="authors"
+        "Eval",
+        secondary=eval_authors,
+        back_populates="authors",
+        primaryjoin="and_(Author.id==eval_authors.c.author_id, eval_authors.c.is_principal==True)",
+    )
+    contributed_evals = relationship(
+        "Eval",
+        secondary=eval_authors,
+        back_populates="contributors",
+        primaryjoin="and_(Author.id==eval_authors.c.author_id, eval_authors.c.is_principal==False)",
     )
     created_at = Column(DateTime, server_default=func.now())
 
@@ -76,7 +89,16 @@ class Eval(Base):
     upvotes = Column(Integer, nullable=False, default=0)
     primary_author = Column(String, nullable=True)
     authors = relationship(
-        "Author", secondary=eval_authors, back_populates="authored_evals"
+        "Author",
+        secondary=eval_authors,
+        back_populates="authored_evals",
+        primaryjoin="and_(Eval.id==eval_authors.c.eval_id, eval_authors.c.is_principal==True)",
+    )
+    contributors = relationship(
+        "Author",
+        secondary=eval_authors,
+        back_populates="contributed_evals",
+        primaryjoin="and_(Eval.id==eval_authors.c.eval_id, eval_authors.c.is_principal==False)",
     )
     task_instances = relationship("TaskInstance", back_populates="eval")
     eval_runs = relationship("EvalRun", back_populates="eval")

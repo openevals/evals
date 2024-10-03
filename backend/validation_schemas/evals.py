@@ -74,6 +74,7 @@ class EvalResponseSchema(BaseModel):
         ..., serialization_alias="modelSystems"
     )
     authors: List[EvalAuthorResponse]
+    contributors: List[EvalAuthorResponse]
     upvotes: int
 
 
