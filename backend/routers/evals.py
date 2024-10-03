@@ -365,7 +365,8 @@ def delete_eval(
     if not eval:
         raise HTTPException(status_code=404, detail={"error": "eval-not-found"})
 
-    if auth["user"] not in eval.authors:
+    author = get_or_create_author(db, auth["user"])
+    if author not in eval.authors:
         raise HTTPException(status_code=403, detail={"error": "not-authorized"})
 
     try:
