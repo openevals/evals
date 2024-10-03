@@ -13,7 +13,7 @@ export const RunSummary = ({ evalRuns }: { evalRuns: any[] }) => (
       }))} 
       columns={[
         { header: 'Model', accessorKey: 'model' },
-        { header: 'F1 Score', accessorKey: 'averageScore' },
+        { header: 'Score', accessorKey: 'averageScore' },
         { header: 'Status', accessorKey: 'status' },
       ]} 
     />
@@ -41,7 +41,7 @@ export const ResultsSummary = ({ evalRuns }: { evalRuns: any[] }) => {
         columns={[
           { header: 'Model', accessorKey: 'model' },
           { header: 'Number of Runs', accessorKey: 'numberOfRuns' },
-          { header: 'Average F1 Score', accessorKey: 'averageScore' },
+          { header: 'Average Score', accessorKey: 'averageScore' },
           { header: 'Date Last Ran', accessorKey: 'dateLastRan' },
         ]} 
       />

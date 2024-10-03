@@ -99,14 +99,6 @@ export default function DesktopEditor({
   const [selectedTaskInstance, setSelectedTaskInstance] = useState<number | null>(null);
   const { evalRuns, allRunsCompleted } = useEvalResults(evalObj.id, evalRunIds);
 
-  const handleUpload = async () => {
-    // Here you would implement the logic to send the bulkText to GPT
-    // and process the response to create input-output pairs
-    // For now, we'll just close the modal
-    onClose();
-    // Reset the bulkText
-    setBulkText('');
-  };
 
   return (
     <PanelGroup direction="horizontal">
@@ -275,9 +267,6 @@ export default function DesktopEditor({
                   <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
                   <Text ml={2}>Add task instance</Text>
                 </Button>
-                <Button variant='outline' ml='auto' onClick={onOpen} minW='150px'>
-                  <Text>Upload</Text>
-                </Button>
                 <Button ml='auto' onClick={clickSubmitButton} minW='150px'>
                   <Text>Submit</Text>
                 </Button>
@@ -374,39 +363,6 @@ export default function DesktopEditor({
           )}
         </Box>
       </Panel>
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Convert Bulk Text</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Textarea
-              value={bulkText}  
-              onChange={(e) => setBulkText(e.target.value)}
-              placeholder="Paste your json or unstructured text here..."
-              size="lg"
-              height="300px"
-            />
-            <Button
-              leftIcon={<Icon as={FaRegClipboard} />}
-              onClick={() => {
-                navigator.clipboard.readText().then(
-                  text => setBulkText(text)
-                );
-              }}
-              mt={2}
-            >
-              Paste from Clipboard
-            </Button>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleUpload}>
-              Process
-            </Button>
-            <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </PanelGroup>
   );
 }
