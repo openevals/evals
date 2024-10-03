@@ -259,11 +259,15 @@ class OpenAIIntegration:
 
                             # Register authors
                             openai_author_eval = eval_authors.insert().values(
-                                author_id=openai_author.id, eval_id=eval_obj.id
+                                author_id=openai_author.id,
+                                eval_id=eval_obj.id,
+                                is_principal=True,
                             )
                             db.execute(openai_author_eval)
                             author_eval = eval_authors.insert().values(
-                                author_id=author.id, eval_id=eval_obj.id
+                                author_id=author.id,
+                                eval_id=eval_obj.id,
+                                is_principal=True,
                             )
                             db.execute(author_eval)
                             db.commit()
