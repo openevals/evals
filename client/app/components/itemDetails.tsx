@@ -129,8 +129,16 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             <Box>
               <Heading size="xs">Authors:</Heading>
               <Text pt="2" fontSize="sm">
-                {evalItem.authors.map((a, idx) => (
-                  <Text key={`author-item-${idx}`}>{a.username}</Text>
+                {evalItem.authors.map((a) => (
+                  <Text key={`author-item-${a.id}`}>{a.username}</Text>
+                ))}
+              </Text>
+            </Box>
+            <Box>
+              <Heading size="xs">Contributors:</Heading>
+              <Text pt="2" fontSize="sm">
+                {evalItem.contributors.map((a) => (
+                  <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
                 ))}
               </Text>
             </Box>
