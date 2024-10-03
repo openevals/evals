@@ -198,7 +198,7 @@ def get_user_evals(
     status_code=200,
 )
 def get_user_contributed_evals(
-    db: Session = Depends(get_db), auth: dict = Depends(validate_token)
+    db: Session = Depends(get_db), auth: dict = Depends(validate_token)  # noqa: B008
 ) -> dict:
     """
     Get evals that a user has contributed to
