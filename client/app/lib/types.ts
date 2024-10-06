@@ -203,3 +203,7 @@ export interface MobileEditorProps {
   systemPrompt: string;
   setSystemPrompt: (prompt: string) => void;
 }
+
+export interface IKeyValidationResponse {
+  isValid: boolean;
+}

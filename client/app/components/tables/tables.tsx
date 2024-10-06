@@ -24,7 +24,7 @@ export const RunSummary = ({ evalRuns }: { evalRuns: any[] }) => (
 
 export const ResultsSummary = ({ evalRuns }: { evalRuns: any[] }) => {
   const uniqueModels = evalRuns.reduce((acc, run) => {
-    if (!acc.find((item) => item.model.id === run.model.id)) {
+    if (!acc.find((item: any) => item.model.id === run.model.id)) {
       acc.push(run);
     }
     return acc;
@@ -36,7 +36,7 @@ export const ResultsSummary = ({ evalRuns }: { evalRuns: any[] }) => {
         Summary
       </Heading>
       <BasicTable
-        data={uniqueModels.map((run) => ({
+        data={uniqueModels.map((run: any) => ({
           model: run.model.modelName,
           numberOfRuns: evalRuns.filter((r) => r.model.id === run.model.id)
             .length,
@@ -104,7 +104,7 @@ export const ByModel = ({
         data={
           evalRuns
             .find((run) => run.model.id === Number(selectedModel))
-            ?.taskInstanceOutputs.map((output) => ({
+            ?.taskInstanceOutputs.map((output: any) => ({
               input: taskMap[output.taskInstanceId]?.input || "",
               modelResponse: output.output,
               ideal: taskMap[output.taskInstanceId]?.ideal || "",
@@ -177,7 +177,7 @@ export const ByTaskInstance = ({
             },
             ...evalRuns.map((run) => {
               const output = run.taskInstanceOutputs.find(
-                (output) => output.taskInstanceId === selectedTaskInstance,
+                (output: any) => output.taskInstanceId === selectedTaskInstance,
               );
               return {
                 model: run.model.modelName,

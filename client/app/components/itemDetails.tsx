@@ -25,11 +25,10 @@ import {
   useToast,
   Link,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getEvalItem } from "../utils/getEvalItem";
-import { IEvalResponse, IModelResponse } from "../lib/types";
+import { IEvalResponse, IModelResponse, TaskInstance } from "../lib/types";
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../lib/store";
 import {
@@ -75,7 +74,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   useEffect(() => {
     if (evalItem && evalItem.modelSystems) {
       const selectedModelIds = evalItem.modelSystems.map(
-        (system) => system.modelId,
+        (system: any) => system.modelId,
       );
       const selectedModels = models.filter((model: IModelResponse) =>
         selectedModelIds.includes(model.id),
@@ -113,7 +112,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   useEffect(() => {
     const map: Record<number, any> = {};
-    evalItem.taskInstances.forEach((value) => {
+    evalItem.taskInstances.forEach((value: any) => {
       map[value.id] = value;
     });
     setTaskMap(map);
@@ -159,21 +158,6 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
       });
   };
 
-  const handleModelSelection = (modelId: number, isChecked: boolean) => {
-    if (isChecked) {
-      const modelToAdd = models.find(
-        (model: IModelResponse) => model.id === modelId,
-      );
-      if (modelToAdd) {
-        setRunModels((prevModels) => [...prevModels, modelToAdd]);
-      }
-    } else {
-      setRunModels((prevModels) =>
-        prevModels.filter((model) => model.id !== modelId),
-      );
-    }
-  };
-
   return (
     <>
       <Wrap m={{ base: 0, md: 8 }}>
@@ -199,7 +183,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                   evalItem={evalItem}
                   models={models}
                   runModels={runModels}
-                  handleModelSelection={handleModelSelection}
+                  setModels={setRunModels}
                 />
               </HStack>
             </Flex>
@@ -252,7 +236,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                           (ms: any) => modelMap[ms.modelId],
                         ),
                       ),
-                    ).map((modelName: string) => (
+                    ).map((modelName: any) => (
                       <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>
                         {modelName}
                       </Tag>
@@ -265,7 +249,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Box>
                 <Heading size="xs">Authors</Heading>
                 <Text pt="2" fontSize="sm">
-                  {evalItem.authors.map((a, idx) => (
+                  {evalItem.authors.map((a: any, idx: number) => (
                     <React.Fragment key={`author-item-${idx}`}>
                       <Text>
                         {a.username}
@@ -287,7 +271,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Box>
                 <Heading size="xs">Contributors:</Heading>
                 <Text pt="2" fontSize="sm">
-                  {evalItem.contributors.map((a) => (
+                  {evalItem.contributors.map((a: any) => (
                     <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
                   ))}
                 </Text>
@@ -328,7 +312,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                   <Box maxHeight="calc(60vh - 40px)" overflowY="auto">
                     <Table layout="fixed" width="100%">
                       <Tbody>
-                        {evalItem.taskInstances.map((instance) => (
+                        {evalItem.taskInstances.map((instance: any) => (
                           <Tr key={`task-instance-${instance.id}`}>
                             <Td width="50%">
                               <Box

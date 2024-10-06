@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, SetStateAction } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -24,21 +24,24 @@ import { useSelector } from "react-redux";
 import { IRootState } from "../lib/store";
 import { addNewEvalRuns } from "../utils/getEvalRun";
 import { useRouter } from "next/navigation";
+import { useModelStorageContext } from "../lib/providers/model-storage";
+import EditorModelItem from "./editor/editorModel";
 
 interface RunModalProps {
   evalItem: IEvalResponse;
   models: IModelResponse[];
   runModels: IModelResponse[];
-  handleModelSelection: (modelId: number, isChecked: boolean) => void;
+  setModels: (models: IModelResponse[]) => void;
 }
 
 const RunModal: React.FC<RunModalProps> = ({
   evalItem,
   models,
   runModels,
-  handleModelSelection,
-}) => {
+  setModels,
+}: RunModalProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { openAIKey, anthropicKey, geminiKey } = useModelStorageContext();
   const toast = useToast();
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
@@ -49,15 +52,22 @@ const RunModal: React.FC<RunModalProps> = ({
   const handleRunEval = async () => {
     setIsRunning(true);
 
-    const modelSystems: ModelSystem[] = runModels.map((model) => ({
-      modelId: model.id,
-      systemPrompt: evalItem.taskInstances[0]?.systemPrompt ?? "",
-    }));
+    const modelSystems: ModelSystem[] = runModels.map(
+      (model: IModelResponse) => ({
+        modelId: model.id,
+        systemPrompt: evalItem.taskInstances[0]?.systemPrompt ?? "",
+      }),
+    );
 
     try {
       const newEval = await addNewEvalRuns(
         accessToken,
         evalItem.id,
+        {
+          openai: openAIKey,
+          anthropic: anthropicKey,
+          google: geminiKey,
+        },
         modelSystems,
       );
 
@@ -106,17 +116,14 @@ const RunModal: React.FC<RunModalProps> = ({
                   <Heading size="sm">Models</Heading>
                 </FormLabel>
                 <Wrap direction="column">
-                  {models?.map((model) => (
-                    <WrapItem key={model.modelName}>
-                      <Checkbox
-                        isChecked={runModels.some((m) => m.id === model.id)}
-                        onChange={(e) =>
-                          handleModelSelection(model.id, e.target.checked)
-                        }
-                      >
-                        {model.modelName}
-                      </Checkbox>
-                    </WrapItem>
+                  {models?.map((model: IModelResponse) => (
+                    <EditorModelItem
+                      key={`model-${model.id}`}
+                      model={model}
+                      modelUpdated={() => {
+                        setModels([...models]);
+                      }}
+                    />
                   ))}
                 </Wrap>
               </FormControl>

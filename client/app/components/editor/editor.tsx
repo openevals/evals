@@ -135,13 +135,13 @@ export default function Editor({
     if (!Object.values(ValidatorType).includes(validator as ValidatorType)) {
       errors.push("Evaluation method is required");
     }
-    if (!models.some((model) => model.checked)) {
+    if (!models.some((model: IModelResponse) => model.checked)) {
       errors.push("At least one model must be selected");
     }
     if (instances.length < 2) {
       errors.push(`At least ${MIN_INSTANCES} task instances are required`);
     }
-    if (!instances.some((instance) => instance.isPublic)) {
+    if (!instances.some((instance: TaskInstance) => instance.isPublic)) {
       errors.push("At least one task instance must be marked as public");
     }
 
@@ -162,11 +162,15 @@ export default function Editor({
     onClose();
     setStep(3);
 
-    const checkedModels = models.filter((model) => model.checked);
-    const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
-      modelId: model.id,
-      systemPrompt: systemPrompt,
-    }));
+    const checkedModels = models.filter(
+      (model: IModelResponse) => model.checked,
+    );
+    const modelSystems: ModelSystem[] = checkedModels.map(
+      (model: IModelResponse) => ({
+        modelId: model.id,
+        systemPrompt: systemPrompt,
+      }),
+    );
 
     const newEval = isTryingEval
       ? await addNewEvalRuns(

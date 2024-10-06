@@ -23,7 +23,7 @@ const SubmitModal: React.FC<SubmitModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-}) => {
+}: any) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -40,7 +40,7 @@ const SubmitModal: React.FC<SubmitModalProps> = ({
             </ListItem>
             <ListItem>
               <Text>
-                I've double checked that my task instances are correct.
+                I&apos;ve double checked that my task instances are correct.
               </Text>
             </ListItem>
             <ListItem>
@@ -51,9 +51,9 @@ const SubmitModal: React.FC<SubmitModalProps> = ({
             </ListItem>
             <ListItem>
               <Text>
-                To the best of my knowledge, I won't share private task instance
-                data publicly. If I do, I will delete my eval from the OpenEvals
-                platform.
+                To the best of my knowledge, I won&apos;t share private task
+                instance data publicly. If I do, I will delete my eval from the
+                OpenEvals platform.
               </Text>
             </ListItem>
           </UnorderedList>
