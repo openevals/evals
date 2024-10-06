@@ -60,7 +60,7 @@ def run_eval_task(eval_id, keys: ModelKeysSchema, eval_run_ids=None):
                             # Generate the output object
                             task_instance_output = TaskInstanceOutput(
                                 output=output_data.value,
-                                status=EvalRunStatus.Finished,
+                                status=EvalRunStatus.Done,
                                 task_instance_id=task_instance.id,
                                 model_id=eval_run.model.id,
                                 num_tokens=input_data.num_tokens
@@ -89,7 +89,7 @@ def run_eval_task(eval_id, keys: ModelKeysSchema, eval_run_ids=None):
                         else 0
                     )
                     eval_run.datetime = datetime.now()
-                    eval_run.status = EvalRunStatus.Finished
+                    eval_run.status = EvalRunStatus.Done
                     db.commit()
                 except Exception as e:
                     print(f"Error processing the eval run: {e}")

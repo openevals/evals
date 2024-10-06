@@ -143,7 +143,7 @@ class EvalRunStatus(Enum):
     Queued = "Queued"
     Running = "Running"
     Failed = "Failed"
-    Finished = "Finished"
+    Done = "Done"
 
 
 class TaskInstanceOutput(Base):

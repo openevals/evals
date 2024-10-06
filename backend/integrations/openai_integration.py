@@ -288,7 +288,7 @@ class OpenAIIntegration:
                     logger.error(f"Error processing {yaml_file.name}: {str(e)}")
                     logger.error("Continuing with next eval.")
 
-        logger.info("Finished processing all evals.")
+        logger.info("Done processing all evals.")
 
 
 if __name__ == "__main__":
