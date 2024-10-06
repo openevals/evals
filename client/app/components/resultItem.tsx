@@ -100,7 +100,7 @@ export default function ResultItem({
         toast({
           description: "Eval deleted successfully.",
           status: "success",
-          duration: 5000,
+          duration: 8000,
         });
         if (onDelete) onDelete(id);
       })
@@ -108,7 +108,7 @@ export default function ResultItem({
         toast({
           description: "Error deleting eval.",
           status: "error",
-          duration: 5000,
+          duration: 8000,
         });
       });
   };
