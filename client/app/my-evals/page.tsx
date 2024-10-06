@@ -1,27 +1,52 @@
-'use client';
+"use client";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
-import { getUserEvals, getUserUpvotedEvals } from "../utils/getEvals";
-import { Heading, Box } from "@chakra-ui/react";
+import {
+  getUserCreatedEvals,
+  getUserContributedEvals,
+  getUserUpvotedEvals,
+} from "../utils/getEvals";
+import { Heading, Box, Text } from "@chakra-ui/react";
 import ResultItem from "../components/resultItem";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 
 export default function MyEvals() {
-  const [userEvals, setUserEvals] = useState<IEvalListItemResponse[]>([]);
-  const [userVotedEvals, setUserVotedEvals] = useState<IEvalListItemResponse[]>([]);
-  const accessToken = useSelector<IRootState, string>((state: IRootState) => state.auth.token);
-  const evals = useSelector<IRootState, IEvalListItemResponse[]>((state: IRootState) => state.data.evals);
+  const [userCreatedEvals, setUserCreatedEvals] = useState<
+    IEvalListItemResponse[]
+  >([]);
+  const [userContributedEvals, setUserContributedEvals] = useState<
+    IEvalListItemResponse[]
+  >([]);
+  const [userVotedEvals, setUserVotedEvals] = useState<IEvalListItemResponse[]>(
+    [],
+  );
+  const accessToken = useSelector<IRootState, string>(
+    (state: IRootState) => state.auth.token,
+  );
+  const evals = useSelector<IRootState, IEvalListItemResponse[]>(
+    (state: IRootState) => state.data.evals,
+  );
 
   useEffect(() => {
     if (accessToken) {
       const getUserEvalInfo = async () => {
-        const uEvals: IEvalListItemResponse[] = await getUserEvals(accessToken);
+        const uEvals: IEvalListItemResponse[] =
+          await getUserCreatedEvals(accessToken);
         if (uEvals.length > 0) {
-          setUserEvals(uEvals);
+          setUserCreatedEvals(uEvals);
         }
       };
+      const getUserContributedEvalInfo = async () => {
+        const uContEvals: IEvalListItemResponse[] =
+          await getUserContributedEvals(accessToken);
+        if (uContEvals.length > 0) {
+          setUserContributedEvals(uContEvals);
+        }
+      };
+
       getUserEvalInfo();
+      getUserContributedEvalInfo();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -31,7 +56,16 @@ export default function MyEvals() {
   }, [evals]);
 
   const updateEvals = (payload: IVoteResult) => {
-    setUserEvals(prevValues => {
+    setUserCreatedEvals((prevValues) => {
+      return prevValues.map((value) => {
+        if (value.id === payload.id) {
+          value.upvotes = payload.upvotes;
+          value.upvoted = payload.upvoted;
+        }
+        return value;
+      });
+    });
+    setUserContributedEvals((prevValues) => {
       return prevValues.map((value) => {
         if (value.id === payload.id) {
           value.upvotes = payload.upvotes;
@@ -43,39 +77,103 @@ export default function MyEvals() {
   };
 
   return (
-    <Box w='100%' p={4}>
-      <Heading ml={4} size='lg'>My Created Evals</Heading>
-      {userEvals && userEvals.map(({
-        id, name, description, validatorType, upvotes, upvoted, authors
-      }) => (
-        <ResultItem
-          key={`my-evals-${id}`}
-          name={name}
-          id={id}
-          description={description ?? ''}
-          validatorType={validatorType}
-          upvotes={upvotes}
-          upvoted={upvoted}
-          onVote={updateEvals}
-          mainAuthor={authors[0]}
-        />
-      ))}
-      <Heading ml={4} size='lg'>My Upvotes</Heading>
-      {userVotedEvals && userVotedEvals.map(({
-        id, name, description, validatorType, upvotes, upvoted, authors
-      }) => (
-        <ResultItem
-          key={`voted-evals-${id}`}
-          id={id}
-          name={name}
-          description={description ?? ''}
-          validatorType={validatorType}
-          upvotes={upvotes}
-          upvoted={upvoted}
-          onVote={updateEvals}
-          mainAuthor={authors[0]}
-        />
-      ))}
+    <Box w="100%" p={4}>
+      <Heading ml={4} size="lg">
+        My Created Evals
+      </Heading>
+      {userCreatedEvals?.length > 0 ? (
+        userCreatedEvals.map(
+          ({
+            id,
+            name,
+            description,
+            validatorType,
+            upvotes,
+            upvoted,
+            authors,
+          }) => (
+            <ResultItem
+              key={`my-evals-${id}`}
+              name={name}
+              id={id}
+              description={description ?? ""}
+              validatorType={validatorType}
+              upvotes={upvotes}
+              upvoted={upvoted}
+              onVote={updateEvals}
+              mainAuthor={authors[0]}
+            />
+          ),
+        )
+      ) : (
+        <Text ml={4} mt={4}>
+          User has not created any evals
+        </Text>
+      )}
+      <Heading ml={4} size="lg">
+        My Contributed Evals
+      </Heading>
+      {userContributedEvals?.length > 0 ? (
+        userContributedEvals.map(
+          ({
+            id,
+            name,
+            description,
+            validatorType,
+            upvotes,
+            upvoted,
+            authors,
+          }) => (
+            <ResultItem
+              key={`my-contributed-evals-${id}`}
+              name={name}
+              id={id}
+              description={description ?? ""}
+              validatorType={validatorType}
+              upvotes={upvotes}
+              upvoted={upvoted}
+              onVote={updateEvals}
+              mainAuthor={authors[0]}
+            />
+          ),
+        )
+      ) : (
+        <Text ml={4} mt={4}>
+          User has not contributed to any evals
+        </Text>
+      )}
+      <Heading ml={4} size="lg">
+        My Upvotes
+      </Heading>
+      {userVotedEvals?.length > 0 ? (
+        userVotedEvals.map(
+          ({
+            id,
+            name,
+            description,
+            validatorType,
+            upvotes,
+            upvoted,
+            authors,
+          }) => (
+            <ResultItem
+              key={`voted-evals-${id}`}
+              id={id}
+              name={name}
+              description={description ?? ""}
+              validatorType={validatorType}
+              upvotes={upvotes}
+              upvoted={upvoted}
+              onVote={updateEvals}
+              mainAuthor={authors[0]}
+            />
+          ),
+        )
+      ) : (
+        <Text ml={4} mt={4}>
+          User has not voted on any evals
+        </Text>
+      )}
     </Box>
   );
 }

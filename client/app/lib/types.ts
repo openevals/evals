@@ -87,6 +87,7 @@ export interface IEvalResponse {
   taskInstances: ITaskInstanceResponse[];
   modelSystems: IModelSystemResponse[];
   authors: IAuthorResponse[];
+  contributors: IAuthorResponse[];
 }
 
 export interface ITaskInstanceOutputResponse {

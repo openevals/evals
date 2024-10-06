@@ -17,6 +17,7 @@ export const defaultEvalItem = {
   taskInstances: [],
   modelSystems: [],
   authors: [],
+  contributors: [],
 };
 
 export const AI_PROVIDER_A_AN = {
