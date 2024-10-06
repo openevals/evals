@@ -38,7 +38,7 @@ export const AI_PROVIDER_URL = {
   google: "https://ai.google.dev/gemini-api/docs/api-key",
 };
 
-export const VALIDATOR_TITLE="Validator";
+export const VALIDATOR_TITLE = "Validator";
 
 export const VALIDATOR_EXPLANATION = `A validator function determines the correctness of the model output.
 
@@ -46,8 +46,9 @@ Types:
 - Includes: Checks if the input contains a specific value.
 - ExactMatch: Verifies if the input exactly matches a given value
 - FuzzyMatch: Allows for approximate matching, tolerating minor differences.
-`
+`;
 
-export const SYSTEM_PROMPT_TITLE='System Prompt'
+export const SYSTEM_PROMPT_TITLE = "System Prompt";
 
-export const SYSTEM_PROMPT_EXPLANATION='This system prompt is applied at the beginning of each run of a task instance.'
+export const SYSTEM_PROMPT_EXPLANATION =
+  "This system prompt is applied at the beginning of each run of a task instance.";

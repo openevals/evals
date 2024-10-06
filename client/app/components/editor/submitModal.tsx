@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Button,
   Modal,
@@ -11,7 +11,7 @@ import {
   UnorderedList,
   ListItem,
   Text,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 interface SubmitModalProps {
   isOpen: boolean;
@@ -19,7 +19,11 @@ interface SubmitModalProps {
   onConfirm: () => void;
 }
 
-const SubmitModal: React.FC<SubmitModalProps> = ({ isOpen, onClose, onConfirm }) => {
+const SubmitModal: React.FC<SubmitModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+}) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -29,16 +33,28 @@ const SubmitModal: React.FC<SubmitModalProps> = ({ isOpen, onClose, onConfirm })
         <ModalBody>
           <UnorderedList spacing={2}>
             <ListItem>
-              <Text>My eval solves a useful task in a format that is easy for humans to understand.</Text>
+              <Text>
+                My eval solves a useful task in a format that is easy for humans
+                to understand.
+              </Text>
             </ListItem>
             <ListItem>
-              <Text>I've double checked that my task instances are correct.</Text>
+              <Text>
+                I've double checked that my task instances are correct.
+              </Text>
             </ListItem>
             <ListItem>
-              <Text>To the best of my knowledge, my task instances are not easily available online in their task format.</Text>
+              <Text>
+                To the best of my knowledge, my task instances are not easily
+                available online in their task format.
+              </Text>
             </ListItem>
             <ListItem>
-              <Text>To the best of my knowledge, I won't share private task instance data publicly. If I do, I will delete my eval from the OpenEvals platform.</Text>
+              <Text>
+                To the best of my knowledge, I won't share private task instance
+                data publicly. If I do, I will delete my eval from the OpenEvals
+                platform.
+              </Text>
             </ListItem>
           </UnorderedList>
         </ModalBody>

@@ -141,7 +141,9 @@ export interface DesktopEditorProps {
   setPanel2Collapsed: (collapsed: boolean) => void;
   panel3Collapsed: boolean;
   setPanel3Collapsed: (collapsed: boolean) => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => void;
+  handleKeyDown: (
+    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>,
+  ) => void;
   panel1Ref: React.RefObject<ImperativePanelHandle>;
   panel2Ref: React.RefObject<ImperativePanelHandle>;
   panel3Ref: React.RefObject<ImperativePanelHandle>;
@@ -170,12 +172,14 @@ export interface DesktopEditorProps {
 }
 
 export interface MobileEditorProps {
-  isTryingEval: boolean,
+  isTryingEval: boolean;
   name: string;
   setName: (name: string) => void;
   step: number;
   setStep: (step: 1 | 2 | 3) => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>) => void;
+  handleKeyDown: (
+    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLDivElement>,
+  ) => void;
   addInstance: () => void;
   onInstancesChange: () => void;
   clickSubmitButton: () => void;
@@ -192,8 +196,8 @@ export interface MobileEditorProps {
   evalRunIds: number[];
   description: string;
   setDescription: (description: string) => void;
-  validator: ValidatorType | '';
-  setValidator: (validator: ValidatorType | '') => void;
+  validator: ValidatorType | "";
+  setValidator: (validator: ValidatorType | "") => void;
   models: IModelResponse[];
   setModels: (models: IModelResponse[]) => void;
   systemPrompt: string;

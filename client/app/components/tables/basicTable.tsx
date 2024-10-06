@@ -1,5 +1,18 @@
 import * as React from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, chakra, Box, Button, Flex, Text, Select } from "@chakra-ui/react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  chakra,
+  Box,
+  Button,
+  Flex,
+  Text,
+  Select,
+} from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
   useReactTable,
@@ -20,7 +33,7 @@ export type DataTableProps<Data extends object> = {
 export function BasicTable<Data extends object>({
   data,
   columns,
-  maxRows = 10
+  maxRows = 10,
 }: DataTableProps<Data>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
@@ -44,7 +57,7 @@ export function BasicTable<Data extends object>({
       minSize: 20,
       maxSize: 400,
     },
-    columnResizeMode: 'onChange',
+    columnResizeMode: "onChange",
   });
 
   const columnSizeVars = React.useMemo(() => {
@@ -67,19 +80,19 @@ export function BasicTable<Data extends object>({
     if (!options.includes(totalRows)) {
       options.push(totalRows);
     }
-    return options.filter(option => option <= totalRows);
+    return options.filter((option) => option <= totalRows);
   }, [data.length]);
 
   return (
     <Box overflowX="auto" width="100%">
-      <Table 
-        variant="simple" 
-        borderWidth="1px" 
+      <Table
+        variant="simple"
+        borderWidth="1px"
         borderRadius="lg"
         borderColor="gray.200"
         style={{
           ...columnSizeVars,
-          width: '100%',
+          width: "100%",
         }}
       >
         <Thead>
@@ -93,11 +106,13 @@ export function BasicTable<Data extends object>({
                     onClick={header.column.getToggleSortingHandler()}
                     isNumeric={meta?.isNumeric}
                     style={{
-                      width: meta?.width || `calc(var(--header-${header.id}-size) * 1px)`,
-                      position: 'relative',
-                      borderRight: '1px solid',
-                      borderColor: 'inherit',
-                      cursor: 'pointer',
+                      width:
+                        meta?.width ||
+                        `calc(var(--header-${header.id}-size) * 1px)`,
+                      position: "relative",
+                      borderRight: "1px solid",
+                      borderColor: "inherit",
+                      cursor: "pointer",
                     }}
                     _hover={{
                       backgroundColor: "gray.100",
@@ -105,7 +120,7 @@ export function BasicTable<Data extends object>({
                   >
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
 
                     <Box
@@ -149,13 +164,15 @@ export function BasicTable<Data extends object>({
               {row.getVisibleCells().map((cell) => {
                 const meta: any = cell.column.columnDef.meta;
                 return (
-                  <Td 
-                    key={cell.id} 
+                  <Td
+                    key={cell.id}
                     isNumeric={meta?.isNumeric}
                     style={{
-                      width: meta?.width || `calc(var(--col-${cell.column.id}-size) * 1px)`,
-                      borderRight: '1px solid',
-                      borderColor: 'inherit',
+                      width:
+                        meta?.width ||
+                        `calc(var(--col-${cell.column.id}-size) * 1px)`,
+                      borderRight: "1px solid",
+                      borderColor: "inherit",
                     }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -173,26 +190,29 @@ export function BasicTable<Data extends object>({
               onClick={() => table.setPageIndex(0)}
               isDisabled={!table.getCanPreviousPage()}
             >
-              {'<<'}
+              {"<<"}
             </Button>
             <Button
               onClick={() => table.previousPage()}
               isDisabled={!table.getCanPreviousPage()}
               ml={2}
             >
-              {'<'}
+              {"<"}
             </Button>
           </Flex>
-          <Flex alignItems="center" width='auto'>
-            <Text>Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</Text>
+          <Flex alignItems="center" width="auto">
+            <Text>
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </Text>
             <Select
               value={table.getState().pagination.pageSize}
-              onChange={e => {
-                table.setPageSize(Number(e.target.value))
+              onChange={(e) => {
+                table.setPageSize(Number(e.target.value));
               }}
               ml={2}
             >
-              {pageSizeOptions.map(pageSize => (
+              {pageSizeOptions.map((pageSize) => (
                 <option key={pageSize} value={pageSize}>
                   Show {pageSize}
                 </option>
@@ -205,13 +225,13 @@ export function BasicTable<Data extends object>({
               isDisabled={!table.getCanNextPage()}
               mr={2}
             >
-              {'>'}
+              {">"}
             </Button>
             <Button
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               isDisabled={!table.getCanNextPage()}
             >
-              {'>>'}
+              {">>"}
             </Button>
           </Flex>
         </Flex>

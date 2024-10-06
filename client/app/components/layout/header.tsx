@@ -1,8 +1,18 @@
 "use client";
 
 import {
-  Input, HStack, Button, Spacer, Box, Flex, Avatar,
-  Menu, MenuButton, MenuList, MenuItem, MenuDivider,
+  Input,
+  HStack,
+  Button,
+  Spacer,
+  Box,
+  Flex,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -87,8 +97,10 @@ export default function HeaderComponent() {
   const fetchSuggestions = (value: string) => {
     value = value.toLowerCase();
     if (evals.length > 0 && value.length > 0) {
-      const filteredSuggestions = evals.filter((obj: IEvalListItemResponse) =>
-        obj.name.toLowerCase().includes(value) || obj.description?.toLowerCase().includes(value)
+      const filteredSuggestions = evals.filter(
+        (obj: IEvalListItemResponse) =>
+          obj.name.toLowerCase().includes(value) ||
+          obj.description?.toLowerCase().includes(value),
       );
       setSuggestions(filteredSuggestions);
       setIsOpen(true);
@@ -223,8 +235,16 @@ export default function HeaderComponent() {
           </Button>
           <Spacer />
           {isDesktop && <NavButtons />}
-          <Button mx={8} variant="link" onClick={() => router.push('/about')}>About</Button>
-          <Button mr={8} variant="link" onClick={() => router.push('/my-evals')}>My Evals</Button>
+          <Button mx={8} variant="link" onClick={() => router.push("/about")}>
+            About
+          </Button>
+          <Button
+            mr={8}
+            variant="link"
+            onClick={() => router.push("/my-evals")}
+          >
+            My Evals
+          </Button>
           {isAuthenticated && profile ? (
             <Menu>
               <MenuButton
@@ -242,7 +262,18 @@ export default function HeaderComponent() {
                   {profile.email}
                 </MenuItem>
                 <MenuDivider />
-                <MenuItem as={Box} onClick={() => window.open(`https://www.github.com/${profile.githubLogin}`, "_blank")} cursor="pointer">Github profile</MenuItem>
+                <MenuItem
+                  as={Box}
+                  onClick={() =>
+                    window.open(
+                      `https://www.github.com/${profile.githubLogin}`,
+                      "_blank",
+                    )
+                  }
+                  cursor="pointer"
+                >
+                  Github profile
+                </MenuItem>
                 <MenuDivider />
                 <MenuItem
                   as={Box}
@@ -310,7 +341,7 @@ const MobileHeader = ({
   isOpen,
   setIsOpen,
   setSuggestions,
-  setInputValue
+  setInputValue,
 }: MobileHeaderProps) => {
   const { isOpen: isDrawerOpen, onOpen, onClose } = useDisclosure();
 
@@ -409,7 +440,7 @@ const MobileHeader = ({
                   value={inputValue}
                   onChange={handleChange}
                   onKeyDown={handleKeyDown}
-                  autoComplete='off'
+                  autoComplete="off"
                   flex={1}
                   mr={2}
                   ref={mobileInputRef}
@@ -421,24 +452,25 @@ const MobileHeader = ({
                   }}
                 />
               </PopoverTrigger>
-              <PopoverContent maxH='60vh' overflowY='auto'>
+              <PopoverContent maxH="60vh" overflowY="auto">
                 <PopoverBody>
                   {suggestions.map((suggestion, index) => (
                     <Box
                       key={index}
                       p={2}
-                      _hover={{ bg: 'gray.100' }}
+                      _hover={{ bg: "gray.100" }}
                       cursor="pointer"
                       onClick={() => {
                         router.push(`/evals/${suggestion.id}`);
                         setIsOpen(false);
                         setSuggestions([]);
-                        setInputValue('');
+                        setInputValue("");
                         setIsSearchOpen(false);
                       }}
                     >
                       {index > 0 && <hr />}
-                      <b>{suggestion.name}</b><br />
+                      <b>{suggestion.name}</b>
+                      <br />
                       {suggestion.description}
                     </Box>
                   ))}

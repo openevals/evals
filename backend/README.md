@@ -1,6 +1,6 @@
 # OpenEvals Backend
 
-# Requirements
+## Requirements
 
 To run the backend service, ensure the following tools are installed on your computer:
 
@@ -17,7 +17,7 @@ To install the database server, check the following links:
 
 To install the `poetry` package manager, refer to the [Poetry Documentation](https://python-poetry.org/docs/).
 
-### Getting the project
+## Getting the project
 
 Clone the repository:
 
@@ -26,7 +26,7 @@ git clone git@github.com:openevals/evals.git
 cd evals/backend
 ```
 
-### Activating the Poetry environment
+## Activating the Poetry environment
 
 To run the server, it is recommended to use a virtual environment for installing all dependencies. To create and activate a virtual environment for `poetry`, run the following command:
 
@@ -36,7 +36,7 @@ poetry shell
 
 A new virtual environment will be created for the current project. If there is a pre-existing environment for the project, it will be activated.
 
-### Installing dependencies
+## Installing dependencies
 
 To install dependencies and pre-commit hooks, run the following commands:
 
@@ -45,11 +45,11 @@ poetry install
 poetry run pre-commit install
 ```
 
-### Setting up the service
+## Setting up the service
 
 To run the service, some environment variables must be configured. Variables can be set as operating system variables or use a `.env` file (see `.env.example` in the project root) to provide the service with the variables. Note that in some operating system environment variables take precedence over variables defined in the `.env` file.
 
-#### Database configuration
+### Database configuration
 
 To set up the database connection for the service, define the following environment variables:
 
@@ -60,7 +60,7 @@ To set up the database connection for the service, define the following environm
 
 Database configuration is mandatory for the service to run.
 
-#### OAuth configuration
+### OAuth configuration
 
 This service utilizes GitHub OAuth for managing user accounts. To set this up, you need to configure the following GitHub client environment variables:
 
@@ -87,7 +87,7 @@ cat private_key.pem | base64 | tr -d '\n'
 cat public_key.pem | base64 | tr -d '\n'
 ```
 
-#### Running database migrations
+### Running database migrations
 
 After configuring the environment variables, database migrations should be applied to ensure the service is working with the latest database version. Migrations can be applied with the following command:
 
@@ -103,7 +103,7 @@ alembic revision --autogenerate -m "<migration_message>"
 
 If there are no new updates, the command will return without applying any changes.
 
-#### Running the service
+### Running the service
 
 To run the API service, use one of the following commands:
 
@@ -117,9 +117,7 @@ For development, the first option is most effective as it will reload the servic
 
 After running the service, API documentation can be viewed at [OpenEvals Backend API Documentation](http://localhost:8000/docs).
 
-#### Running the service with Docker
-
-### Testing
+## Testing
 
 To run the test AI model keys should defined in `.env` file:
 

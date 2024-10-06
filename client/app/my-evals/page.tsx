@@ -12,9 +12,7 @@ import { IEvalListItemResponse, IVoteResult } from "../lib/types";
 import { deleteEval } from "../lib/store/dataSlice";
 
 export default function MyEvals() {
-  const [userEvals, setUserEvals] = useState<
-    IEvalListItemResponse[]
-  >([]);
+  const [userEvals, setUserEvals] = useState<IEvalListItemResponse[]>([]);
   const [userContributedEvals, setUserContributedEvals] = useState<
     IEvalListItemResponse[]
   >([]);
@@ -52,7 +50,9 @@ export default function MyEvals() {
   }, []);
 
   useEffect(() => {
-    setUserVotedEvals(evals.filter((value: IEvalListItemResponse) => value.upvoted));
+    setUserVotedEvals(
+      evals.filter((value: IEvalListItemResponse) => value.upvoted),
+    );
   }, [evals]);
 
   const onDeleteEval = (evalId: number) => {
@@ -84,102 +84,117 @@ export default function MyEvals() {
   };
 
   return (
-    <Box w='100%' p={4} maxW="1200px" margin="0 auto">
-      <Heading size='lg' mb={8} textAlign="center">My Evals</Heading>
+    <Box w="100%" p={4} maxW="1200px" margin="0 auto">
+      <Heading size="lg" mb={8} textAlign="center">
+        My Evals
+      </Heading>
       <Box>
-      {userEvals?.length > 0 ? (
-        userEvals.map(
-          ({
-            id,
-            name,
-            description,
-            validatorType,
-            upvotes,
-            upvoted,
-            authors,
-          }) => (
-            <ResultItem
-              key={`my-evals-${id}`}
-              name={name}
-              id={id}
-              description={description ?? ""}
-              validatorType={validatorType}
-              upvotes={upvotes}
-              upvoted={upvoted}
-              onVote={updateEvals}
-              mainAuthor={authors[0] ?? null}
-              canDelete={true}
-              onDelete={onDeleteEval}
-              onClick='ItemDetail'
-            />
-          ),
-        )
-      ) : (
-        <Link href="/" color="gray" fontWeight="bold" textDecoration="none">Create your first eval!</Link>
-      )}
+        {userEvals?.length > 0 ? (
+          userEvals.map(
+            ({
+              id,
+              name,
+              description,
+              validatorType,
+              upvotes,
+              upvoted,
+              authors,
+            }) => (
+              <ResultItem
+                key={`my-evals-${id}`}
+                name={name}
+                id={id}
+                description={description ?? ""}
+                validatorType={validatorType}
+                upvotes={upvotes}
+                upvoted={upvoted}
+                onVote={updateEvals}
+                mainAuthor={authors[0] ?? null}
+                canDelete={true}
+                onDelete={onDeleteEval}
+                onClick="ItemDetail"
+              />
+            ),
+          )
+        ) : (
+          <Link href="/" color="gray" fontWeight="bold" textDecoration="none">
+            Create your first eval!
+          </Link>
+        )}
       </Box>
-      <Heading size="lg" my={8} textAlign="center">Contributed Evals</Heading>
+      <Heading size="lg" my={8} textAlign="center">
+        Contributed Evals
+      </Heading>
       <Box>
-      {userContributedEvals?.length > 0 ? (
-        userContributedEvals.map(
-          ({
-            id,
-            name,
-            description,
-            validatorType,
-            upvotes,
-            upvoted,
-            authors,
-          }) => (
-            <ResultItem
-              key={`my-contributed-evals-${id}`}
-              name={name}
-              id={id}
-              description={description ?? ""}
-              validatorType={validatorType}
-              upvotes={upvotes}
-              upvoted={upvoted}
-              onVote={updateEvals}
-              mainAuthor={authors[0]}
-              onClick='ItemDetail'
-            />
-          ),
-        )
-      ) : (
-        <Text ml={4} my={4}>
-          User has not contributed to any evals
-        </Text>
-      )}
+        {userContributedEvals?.length > 0 ? (
+          userContributedEvals.map(
+            ({
+              id,
+              name,
+              description,
+              validatorType,
+              upvotes,
+              upvoted,
+              authors,
+            }) => (
+              <ResultItem
+                key={`my-contributed-evals-${id}`}
+                name={name}
+                id={id}
+                description={description ?? ""}
+                validatorType={validatorType}
+                upvotes={upvotes}
+                upvoted={upvoted}
+                onVote={updateEvals}
+                mainAuthor={authors[0]}
+                onClick="ItemDetail"
+              />
+            ),
+          )
+        ) : (
+          <Text ml={4} my={4}>
+            User has not contributed to any evals
+          </Text>
+        )}
       </Box>
-      <Heading size="lg" my={8} textAlign="center">Liked Evals</Heading>
+      <Heading size="lg" my={8} textAlign="center">
+        Liked Evals
+      </Heading>
       <Box>
-      {userVotedEvals?.length > 0 ? (
-        userVotedEvals.map(
-          ({
-            id,
-            name,
-            description,
-            validatorType,
-            upvotes,
-            upvoted,
-            authors,
-          }) => (
-            <ResultItem
-              key={`voted-evals-${id}`}
-              id={id}
-              name={name}
-              description={description ?? ""}
-              validatorType={validatorType}
-              upvotes={upvotes}
-              upvoted={upvoted}
-              onVote={updateEvals}
-              mainAuthor={authors[0]}
-            />
-          ),
-        )
-      ) : (
-        <Link href="/evals" color="gray" fontWeight="bold" textDecoration="none">Browse evals to see what you&apos;d like to upvote.</Link>
-      )}
+        {userVotedEvals?.length > 0 ? (
+          userVotedEvals.map(
+            ({
+              id,
+              name,
+              description,
+              validatorType,
+              upvotes,
+              upvoted,
+              authors,
+            }) => (
+              <ResultItem
+                key={`voted-evals-${id}`}
+                id={id}
+                name={name}
+                description={description ?? ""}
+                validatorType={validatorType}
+                upvotes={upvotes}
+                upvoted={upvoted}
+                onVote={updateEvals}
+                mainAuthor={authors[0]}
+              />
+            ),
+          )
+        ) : (
+          <Link
+            href="/evals"
+            color="gray"
+            fontWeight="bold"
+            textDecoration="none"
+          >
+            Browse evals to see what you&apos;d like to upvote.
+          </Link>
+        )}
       </Box>
     </Box>
   );

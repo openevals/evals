@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return (<Editor />);
+  return <Editor />;
 }

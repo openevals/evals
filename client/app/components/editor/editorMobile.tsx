@@ -20,15 +20,20 @@ import {
   Card,
   CardBody,
   Center,
-  Box
-} from '@chakra-ui/react';
-import { MIN_INSTANCES } from '@/app/lib/constants';
-import { ValidatorType, MobileEditorProps } from '@/app/lib/types';
-import { RunSummary, ResultsSummary, ByModel, ByTaskInstance } from "../tables/tables";
+  Box,
+} from "@chakra-ui/react";
+import { MIN_INSTANCES } from "@/app/lib/constants";
+import { ValidatorType, MobileEditorProps } from "@/app/lib/types";
+import {
+  RunSummary,
+  ResultsSummary,
+  ByModel,
+  ByTaskInstance,
+} from "../tables/tables";
 import InstancesTable from "../tables/instancesTable";
-import RobotoHeader from '../robotoHeader';
+import RobotoHeader from "../robotoHeader";
 import useEvalResults from "../../lib/hooks/useEvalResults";
-import { useState } from 'react';
+import { useState } from "react";
 import EditorModelItem from "./editorModel";
 
 export default function MobileEditor({
@@ -61,16 +66,25 @@ export default function MobileEditor({
   systemPrompt,
   setSystemPrompt,
 }: MobileEditorProps) {
-  const [selectedModel, setSelectedModel] = useState('');
-  const [selectedTaskInstance, setSelectedTaskInstance] = useState<number | null>(null);
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedTaskInstance, setSelectedTaskInstance] = useState<
+    number | null
+  >(null);
   const { evalRuns, allRunsCompleted } = useEvalResults(evalObj.id, evalRunIds);
 
   return (
     <VStack spacing={4} align="stretch" w="100%">
       <Center>
-        <RobotoHeader size='md'>{isTryingEval ? "Edit an eval" : "Create an eval"}</RobotoHeader>
+        <RobotoHeader size="md">
+          {isTryingEval ? "Edit an eval" : "Create an eval"}
+        </RobotoHeader>
       </Center>
-      <Tabs index={tabIndex} onChange={handleTabsChange} variant="enclosed" isFitted>
+      <Tabs
+        index={tabIndex}
+        onChange={handleTabsChange}
+        variant="enclosed"
+        isFitted
+      >
         <TabList>
           <Tab>🌎</Tab>
           <Tab>Meta</Tab>
@@ -81,11 +95,28 @@ export default function MobileEditor({
           <TabPanel>
             <Card>
               <CardBody>
-                <Text fontWeight="bold" mb={4}>Tips to create an eval:</Text>
-                <Text my={4}>1. Give your eval a <b>name</b> and <b>description</b>.</Text>
-                <Text my={4}>2. Choose an <b>evaluation method</b> and <b>models</b> to test.</Text>
-                <Text my={4}>3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task instance is one input-output pair for an eval.</Text>
-                <Text my={4}>4. Mark at least 1 task instance as a public example. Task instances are private by default to avoid <b>data contamination</b>. <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations.">[2]</Link></Text>
+                <Text fontWeight="bold" mb={4}>
+                  Tips to create an eval:
+                </Text>
+                <Text my={4}>
+                  1. Give your eval a <b>name</b> and <b>description</b>.
+                </Text>
+                <Text my={4}>
+                  2. Choose an <b>evaluation method</b> and <b>models</b> to
+                  test.
+                </Text>
+                <Text my={4}>
+                  3. Add at least {MIN_INSTANCES} <b>task instances</b>. A task
+                  instance is one input-output pair for an eval.
+                </Text>
+                <Text my={4}>
+                  4. Mark at least 1 task instance as a public example. Task
+                  instances are private by default to avoid{" "}
+                  <b>data contamination</b>.{" "}
+                  <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations.">
+                    [2]
+                  </Link>
+                </Text>
                 <Text>5. Double check ideal outputs for task instances.</Text>
                 <Text my={4}>{`That's all! Have fun~`}</Text>
                 <Text>{`(Note: this editor is easier to use on desktop)`}</Text>
@@ -224,19 +255,24 @@ export default function MobileEditor({
               <Box>
                 <RunSummary evalRuns={evalRuns} />
                 <ResultsSummary evalRuns={evalRuns} />
-                <ByModel 
-                  evalRuns={evalRuns} 
-                  selectedModel={selectedModel} 
-                  setSelectedModel={setSelectedModel} 
-                  taskMap={evalObj.taskInstances.reduce((acc, task) => ({...acc, [task.id]: task}), {})}
+                <ByModel
+                  evalRuns={evalRuns}
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
+                  taskMap={evalObj.taskInstances.reduce(
+                    (acc, task) => ({ ...acc, [task.id]: task }),
+                    {},
+                  )}
                 />
-                <ByTaskInstance 
-                  evalRuns={evalRuns} 
-                  taskInstances={evalObj.taskInstances} 
-                  selectedTaskInstance={selectedTaskInstance} 
-                  setSelectedTaskInstance={setSelectedTaskInstance} 
+                <ByTaskInstance
+                  evalRuns={evalRuns}
+                  taskInstances={evalObj.taskInstances}
+                  selectedTaskInstance={selectedTaskInstance}
+                  setSelectedTaskInstance={setSelectedTaskInstance}
                 />
-                <Button onClick={() => handleTabsChange(tabIndex - 1)} mt={4}>Previous</Button>
+                <Button onClick={() => handleTabsChange(tabIndex - 1)} mt={4}>
+                  Previous
+                </Button>
               </Box>
             ) : (
               <Center py={4}>

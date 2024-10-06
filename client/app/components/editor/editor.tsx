@@ -6,21 +6,31 @@ import {
   useDisclosure,
   useBreakpointValue,
   useToast,
-} from '@chakra-ui/react';
-import { addNewEvalRuns, postNewEval } from '@/app/utils/getEvalRun';
-import { defaultEvalItem, MIN_INSTANCES } from '@/app/lib/constants';
-import { ModelSystem, ValidatorType, TaskInstance, IModelResponse, IEvalResponse } from '@/app/lib/types';
+} from "@chakra-ui/react";
+import { addNewEvalRuns, postNewEval } from "@/app/utils/getEvalRun";
+import { defaultEvalItem, MIN_INSTANCES } from "@/app/lib/constants";
+import {
+  ModelSystem,
+  ValidatorType,
+  TaskInstance,
+  IModelResponse,
+  IEvalResponse,
+} from "@/app/lib/types";
 import usePanels from "../../lib/usePanels";
 import { IRootState } from "../../lib/store";
 import { useDispatch, useSelector } from "react-redux";
 import { addNewEval, clearEvalToTry } from "../../lib/store/dataSlice";
-import MobileEditor from './editorMobile';
-import DesktopEditor from './editorDesktop';
-import SubmitModal from './submitModal';
-import { useRouter } from 'next/navigation';
+import MobileEditor from "./editorMobile";
+import DesktopEditor from "./editorDesktop";
+import SubmitModal from "./submitModal";
+import { useRouter } from "next/navigation";
 import { useModelStorageContext } from "../../lib/providers/model-storage";
 
-export default function Editor({ initialEval }: { initialEval?: IEvalResponse }) {
+export default function Editor({
+  initialEval,
+}: {
+  initialEval?: IEvalResponse;
+}) {
   const router = useRouter();
   const { openAIKey, anthropicKey, geminiKey } = useModelStorageContext();
   // step 1 = enter meta info
@@ -51,7 +61,17 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     (state: IRootState) => state.data.models,
   );
 
-  const [panel1Ref, panel2Ref, panel3Ref, panel1Collapsed, setPanel1Collapsed, panel2Collapsed, setPanel2Collapsed, panel3Collapsed, setPanel3Collapsed] = usePanels(step);
+  const [
+    panel1Ref,
+    panel2Ref,
+    panel3Ref,
+    panel1Collapsed,
+    setPanel1Collapsed,
+    panel2Collapsed,
+    setPanel2Collapsed,
+    panel3Collapsed,
+    setPanel3Collapsed,
+  ] = usePanels(step);
   const [tabIndex, setTabIndex] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure(); // modal
 
@@ -67,7 +87,7 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
       setStep(2);
       setTabIndex(isMobile ? 3 : 2);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTryingEval]);
 
   /* Load the data from the model to try */
@@ -141,7 +161,6 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
   const confirmSubmit = async () => {
     onClose();
     setStep(3);
-    
 
     const checkedModels = models.filter((model) => model.checked);
     const modelSystems: ModelSystem[] = checkedModels.map((model) => ({
@@ -187,16 +206,16 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
     let toastMessage = isTryingEval ? "💛 Eval edited!" : "🎉 Eval created!";
     toast({
       title: toastMessage,
-      description: "We are running your eval. Refresh the page to see the updated results.",
+      description:
+        "We are running your eval. Refresh the page to see the updated results.",
       status: "success",
       isClosable: true,
       duration: 12000,
-    });    
-    
+    });
+
     /* Show results and keep polling until eval run is finished */
     // setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
     // setTabIndex(isMobile ? 3 : 2);
-
   };
 
   const addInstance = () => {
@@ -345,7 +364,11 @@ export default function Editor({ initialEval }: { initialEval?: IEvalResponse })
           instanceInputRef={instanceInputRef}
         />
       )}
-      <SubmitModal isOpen={isOpen} onClose={onClose} onConfirm={confirmSubmit} />
+      <SubmitModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={confirmSubmit}
+      />
     </>
   );
 }

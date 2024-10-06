@@ -14,6 +14,7 @@ If you are looking to make evals without any setup, use the deployed version at 
 ## Contributing
 
 We welcome your contributions! In particular, hwe would love help with:
+
 - [ ] Support for more models, especially open-source ones (Integration with Together.ai, etc.)
 - [ ] Model-graded validators
 - [ ] Additional validators
@@ -23,6 +24,7 @@ We welcome your contributions! In particular, hwe would love help with:
 Please [message @belindmo](https://x.com/belindmo) on X/Twitter or [join our Discord](https://discord.gg/C5uhzejmZk) if you have any questions or would like to contribute.
 
 ## Team
+
 - Belinda Mo, [@belindmo](https://x.com/belindmo)
 - Justin Lin, [@justinlinw](https://x.com/justinlinw)
 - Reinier Millo-Sanchez, [@reiniermillo](https://x.com/reiniermillo)

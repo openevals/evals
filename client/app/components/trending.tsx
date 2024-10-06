@@ -16,7 +16,7 @@ export default function Trending() {
   }, []);
 
   const updateEvals = (payload: IVoteResult) => {
-    setEvals(prevValues => {
+    setEvals((prevValues) => {
       return prevValues.map((value) => {
         if (value.id === payload.id) {
           value.upvotes = payload.upvotes;
@@ -29,23 +29,33 @@ export default function Trending() {
 
   return (
     <>
-      <Heading size='md' textAlign="center" py={4}>Trending evals</Heading>
-      {evals.map(({
-        id, name, description, validatorType, upvotes, upvoted, authors
-      }) => (
-        <ResultItem
-          key={`trending-eval-${id}`}
-          id={id}
-          name={name}
-          description={description ?? ''}
-          validatorType={validatorType}
-          upvotes={upvotes}
-          upvoted={upvoted}
-          onVote={updateEvals}
-          mainAuthor={authors?.[0] ?? null }
-          onClick='Editor'
-        />
-      ))}
+      <Heading size="md" textAlign="center" py={4}>
+        Trending evals
+      </Heading>
+      {evals.map(
+        ({
+          id,
+          name,
+          description,
+          validatorType,
+          upvotes,
+          upvoted,
+          authors,
+        }) => (
+          <ResultItem
+            key={`trending-eval-${id}`}
+            id={id}
+            name={name}
+            description={description ?? ""}
+            validatorType={validatorType}
+            upvotes={upvotes}
+            upvoted={upvoted}
+            onVote={updateEvals}
+            mainAuthor={authors?.[0] ?? null}
+            onClick="Editor"
+          />
+        ),
+      )}
     </>
   );
 }

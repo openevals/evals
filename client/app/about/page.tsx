@@ -53,10 +53,7 @@ export default function About() {
         </Center>
         <Text>
           {`If you'd like to contribute, message `}
-          <Link
-            href="https://x.com/belindmo"
-            isExternal
-          >{`@belindmo`}</Link>
+          <Link href="https://x.com/belindmo" isExternal>{`@belindmo`}</Link>
           {` on Twitter.`}
         </Text>
         <Text>{`Made in San Francisco, CA 💛`}</Text>

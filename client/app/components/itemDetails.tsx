@@ -23,22 +23,33 @@ import {
   Td,
   useBreakpointValue,
   useToast,
-  Link
-} from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
-import { getEvalItem } from '../utils/getEvalItem';
-import { IEvalResponse, IModelResponse } from '../lib/types';
-import { useParams, useRouter } from 'next/navigation';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../lib/store';
-import { defaultEvalItem, SYSTEM_PROMPT_EXPLANATION, SYSTEM_PROMPT_TITLE, VALIDATOR_EXPLANATION, VALIDATOR_TITLE } from '../lib/constants';
-import { setEvalToTry } from '../lib/store/dataSlice';
-import { LinkIcon } from '@chakra-ui/icons';
-import { RunSummary, ResultsSummary, ByModel, ByTaskInstance } from './tables/tables';
+  Link,
+} from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import { getEvalItem } from "../utils/getEvalItem";
+import { IEvalResponse, IModelResponse } from "../lib/types";
+import { useParams, useRouter } from "next/navigation";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../lib/store";
+import {
+  defaultEvalItem,
+  SYSTEM_PROMPT_EXPLANATION,
+  SYSTEM_PROMPT_TITLE,
+  VALIDATOR_EXPLANATION,
+  VALIDATOR_TITLE,
+} from "../lib/constants";
+import { setEvalToTry } from "../lib/store/dataSlice";
+import { LinkIcon } from "@chakra-ui/icons";
+import {
+  RunSummary,
+  ResultsSummary,
+  ByModel,
+  ByTaskInstance,
+} from "./tables/tables";
 import useEvalResults from "../lib/hooks/useEvalResults";
-import RunModal from './runModal';
-import InfoPopover from './infoPopover';
+import RunModal from "./runModal";
+import InfoPopover from "./infoPopover";
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
@@ -53,19 +64,25 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   const toast = useToast();
 
   const [runModels, setRunModels] = useState<IModelResponse[]>([]);
-  const [selectedTaskInstance, setSelectedTaskInstance] = useState<number | null>(null);
-  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [selectedTaskInstance, setSelectedTaskInstance] = useState<
+    number | null
+  >(null);
+  const [selectedModel, setSelectedModel] = useState<string>("");
 
   const { evalRuns, allRunsCompleted } = useEvalResults(evalItem.id, runIds);
   const [taskMap, setTaskMap] = useState<Record<number, any>>({});
 
   useEffect(() => {
     if (evalItem && evalItem.modelSystems) {
-      const selectedModelIds = evalItem.modelSystems.map(system => system.modelId);
-      const selectedModels = models.filter((model: IModelResponse) => selectedModelIds.includes(model.id));
+      const selectedModelIds = evalItem.modelSystems.map(
+        (system) => system.modelId,
+      );
+      const selectedModels = models.filter((model: IModelResponse) =>
+        selectedModelIds.includes(model.id),
+      );
     }
   }, [evalItem, models]);
-  
+
   const isMobile = useBreakpointValue({ base: true, sm: true, md: false });
 
   useEffect(() => {
@@ -121,56 +138,75 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   const copyLink = () => {
     const currentUrl = window.location.href;
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      toast({
-        title: "Copied link to eval",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
+    navigator.clipboard
+      .writeText(currentUrl)
+      .then(() => {
+        toast({
+          title: "Copied link to eval",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+        toast({
+          title: "Failed to copy link",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
       });
-    }).catch((err) => {
-      console.error('Failed to copy: ', err);
-      toast({
-        title: "Failed to copy link",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    });
   };
 
   const handleModelSelection = (modelId: number, isChecked: boolean) => {
     if (isChecked) {
-      const modelToAdd = models.find((model:IModelResponse) => model.id === modelId);
+      const modelToAdd = models.find(
+        (model: IModelResponse) => model.id === modelId,
+      );
       if (modelToAdd) {
-        setRunModels(prevModels => [...prevModels, modelToAdd]);
+        setRunModels((prevModels) => [...prevModels, modelToAdd]);
       }
     } else {
-      setRunModels(prevModels => prevModels.filter(model => model.id !== modelId));
+      setRunModels((prevModels) =>
+        prevModels.filter((model) => model.id !== modelId),
+      );
     }
   };
 
   return (
     <>
       <Wrap m={{ base: 0, md: 8 }}>
-        <Stack direction={{ base: 'column', lg: 'row' }} p={4} pt={8} spacing={{ base: 8, md: 4 }}>
+        <Stack
+          direction={{ base: "column", lg: "row" }}
+          p={4}
+          pt={8}
+          spacing={{ base: 8, md: 4 }}
+        >
           <Stack w={{ base: "100%", md: "768px" }}>
             <Flex>
-              <Heading size='lg'>{evalItem.name}</Heading>
+              <Heading size="lg">{evalItem.name}</Heading>
               <Spacer />
               <HStack spacing={4}>
-                <Button variant="ghost" width='fit-content' onClick={tryEval}>Edit</Button>
-                <Button variant="outline" onClick={copyLink}>
-                  <LinkIcon />  
-                  {!isMobile && <Text ml={2} >Copy Link</Text>}
+                <Button variant="ghost" width="fit-content" onClick={tryEval}>
+                  Edit
                 </Button>
-                <RunModal evalItem={evalItem} models={models} runModels={runModels} handleModelSelection={handleModelSelection} />
+                <Button variant="outline" onClick={copyLink}>
+                  <LinkIcon />
+                  {!isMobile && <Text ml={2}>Copy Link</Text>}
+                </Button>
+                <RunModal
+                  evalItem={evalItem}
+                  models={models}
+                  runModels={runModels}
+                  handleModelSelection={handleModelSelection}
+                />
               </HStack>
             </Flex>
-            <Stack divider={<StackDivider />} spacing='4' py={8}>
+            <Stack divider={<StackDivider />} spacing="4" py={8}>
               <Box>
-                <Heading size='xs'>
-                  <Stack direction={['row']} alignItems="center">
+                <Heading size="xs">
+                  <Stack direction={["row"]} alignItems="center">
                     <Text>Validator </Text>
                     <InfoPopover
                       title={VALIDATOR_TITLE}
@@ -178,29 +214,27 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                     />
                   </Stack>
                 </Heading>
-                <Text pt='2'>
+                <Text pt="2">
                   <Tag>{evalItem.validatorType}</Tag>
                 </Text>
               </Box>
               <Box>
-                <Heading size='xs'>
-                  Description
-                </Heading>
-                <Text pt='2' fontSize='sm'>
+                <Heading size="xs">Description</Heading>
+                <Text pt="2" fontSize="sm">
                   {evalItem.description}
                 </Text>
               </Box>
               <Box>
-                <Heading size='xs'>
-                  <Stack direction={['row']} alignItems="center">
-                      <Text>System Prompt </Text>
-                      <InfoPopover
-                        title={SYSTEM_PROMPT_TITLE}
-                        content={SYSTEM_PROMPT_EXPLANATION}
-                      />
-                    </Stack>
+                <Heading size="xs">
+                  <Stack direction={["row"]} alignItems="center">
+                    <Text>System Prompt </Text>
+                    <InfoPopover
+                      title={SYSTEM_PROMPT_TITLE}
+                      content={SYSTEM_PROMPT_EXPLANATION}
+                    />
+                  </Stack>
                 </Heading>
-                <Text pt='2' fontSize='sm'>
+                <Text pt="2" fontSize="sm">
                   {evalItem.taskInstances[0]?.systemPrompt ? (
                     <Text>{evalItem.taskInstances[0].systemPrompt}</Text>
                   ) : (
@@ -209,13 +243,19 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 </Text>
               </Box>
               <Box>
-                <Heading size='xs'>
-                  Models tested
-                </Heading>
-                <Text pt='2' fontSize='sm'>
+                <Heading size="xs">Models tested</Heading>
+                <Text pt="2" fontSize="sm">
                   {evalItem.modelSystems.length > 0 ? (
-                    Array.from(new Set(evalItem.modelSystems.map((ms: any) => modelMap[ms.modelId]))).map((modelName: string) => (
-                      <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>{modelName}</Tag>
+                    Array.from(
+                      new Set(
+                        evalItem.modelSystems.map(
+                          (ms: any) => modelMap[ms.modelId],
+                        ),
+                      ),
+                    ).map((modelName: string) => (
+                      <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>
+                        {modelName}
+                      </Tag>
                     ))
                   ) : (
                     <Text>None</Text>
@@ -223,17 +263,20 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 </Text>
               </Box>
               <Box>
-                <Heading size='xs'>
-                  Authors
-                </Heading>
-                <Text pt='2' fontSize='sm'>
+                <Heading size="xs">Authors</Heading>
+                <Text pt="2" fontSize="sm">
                   {evalItem.authors.map((a, idx) => (
                     <React.Fragment key={`author-item-${idx}`}>
                       <Text>
                         {a.username}
                         {` (`}
                         {a.githubLogin && (
-                          <Link isExternal href={`https://github.com/${a.githubLogin}`}>@{a.githubLogin}</Link >
+                          <Link
+                            isExternal
+                            href={`https://github.com/${a.githubLogin}`}
+                          >
+                            @{a.githubLogin}
+                          </Link>
                         )}
                         {`)`}
                       </Text>
@@ -246,83 +289,95 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 <Text pt="2" fontSize="sm">
                   {evalItem.contributors.map((a) => (
                     <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
-                ))}
-              </Text>
-            </Box>
+                  ))}
+                </Text>
+              </Box>
             </Stack>
           </Stack>
           <Box
             p={4}
-          w={{ base: "100%", lg: "70%" }}
-          maxW={{ base: "100%", lg: "70%" }}
-        >
-          <Heading size="md" mb={6}>
-            Task Instances
-          </Heading>
-          <Box
-            maxH="60vh"
-            overflowY="auto"
-            border="1px"
-            borderRadius="md"
-            borderColor="lightgray"
+            w={{ base: "100%", lg: "70%" }}
+            maxW={{ base: "100%", lg: "70%" }}
           >
-            <TableContainer maxW="100%">
-              <Box position="relative">
-                <Table layout="fixed" width="100%">
-                  <Thead
-                    position="sticky"
-                    top={0}
-                    bg="white"
-                    zIndex={2}
-                    boxShadow="0 2px 4px rgba(0,0,0,0.1)"
-                  >
-                    <Tr>
-                      <Th width="50%">Input</Th>
-                      <Th width="50%">Ideal Output</Th>
-                    </Tr>
-                  </Thead>
-                </Table>
-                <Box maxHeight="calc(60vh - 40px)" overflowY="auto">
+            <Heading size="md" mb={6}>
+              Task Instances
+            </Heading>
+            <Box
+              maxH="60vh"
+              overflowY="auto"
+              border="1px"
+              borderRadius="md"
+              borderColor="lightgray"
+            >
+              <TableContainer maxW="100%">
+                <Box position="relative">
                   <Table layout="fixed" width="100%">
-                    <Tbody>
-                      {evalItem.taskInstances.map((instance) => (
-                        <Tr key={`task-instance-${instance.id}`}>
-                          <Td width="50%">
-                            <Box overflowWrap="break-word" whiteSpace="normal">
-                              {instance.input}
-                            </Box>
-                          </Td>
-                          <Td width="50%">
-                            <Box overflowWrap="break-word" whiteSpace="normal">
-                              {instance.ideal}
-                            </Box>
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
+                    <Thead
+                      position="sticky"
+                      top={0}
+                      bg="white"
+                      zIndex={2}
+                      boxShadow="0 2px 4px rgba(0,0,0,0.1)"
+                    >
+                      <Tr>
+                        <Th width="50%">Input</Th>
+                        <Th width="50%">Ideal Output</Th>
+                      </Tr>
+                    </Thead>
                   </Table>
+                  <Box maxHeight="calc(60vh - 40px)" overflowY="auto">
+                    <Table layout="fixed" width="100%">
+                      <Tbody>
+                        {evalItem.taskInstances.map((instance) => (
+                          <Tr key={`task-instance-${instance.id}`}>
+                            <Td width="50%">
+                              <Box
+                                overflowWrap="break-word"
+                                whiteSpace="normal"
+                              >
+                                {instance.input}
+                              </Box>
+                            </Td>
+                            <Td width="50%">
+                              <Box
+                                overflowWrap="break-word"
+                                whiteSpace="normal"
+                              >
+                                {instance.ideal}
+                              </Box>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </Box>
                 </Box>
-              </Box>
-            </TableContainer>
+              </TableContainer>
+            </Box>
           </Box>
-        </Box>
-
         </Stack>
-        <Stack p={8} pb={16} minW='100%' justifyContent="center" alignItems="center" spacing={12}>
+        <Stack
+          p={8}
+          pb={16}
+          minW="100%"
+          justifyContent="center"
+          alignItems="center"
+          spacing={12}
+        >
           {runIds.length > 0 ? (
             <>
               <ResultsSummary evalRuns={evalRuns} />
-              <ByTaskInstance 
-                evalRuns={evalRuns} 
-                taskInstances={evalItem.taskInstances} 
-                selectedTaskInstance={selectedTaskInstance} 
-                setSelectedTaskInstance={setSelectedTaskInstance} 
+              <ByTaskInstance
+                evalRuns={evalRuns}
+                taskInstances={evalItem.taskInstances}
+                selectedTaskInstance={selectedTaskInstance}
+                setSelectedTaskInstance={setSelectedTaskInstance}
               />
-              <ByModel 
-                evalRuns={evalRuns} 
-                selectedModel={selectedModel} 
-                setSelectedModel={setSelectedModel} 
-                taskMap={taskMap} 
+              <ByModel
+                evalRuns={evalRuns}
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+                taskMap={taskMap}
               />
               <Box flex={1}>
                 <RunSummary evalRuns={evalRuns} />
@@ -331,8 +386,13 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
           ) : (
             <Center>
               <VStack>
-                <Text>No models have been tested on this eval yet. Would you like to be the first?</Text>
-                <Button ml={2} minW='100px' onClick={tryEval}>Contribute Run</Button>
+                <Text>
+                  No models have been tested on this eval yet. Would you like to
+                  be the first?
+                </Text>
+                <Button ml={2} minW="100px" onClick={tryEval}>
+                  Contribute Run
+                </Button>
               </VStack>
             </Center>
           )}
