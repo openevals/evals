@@ -131,3 +131,21 @@ export async function searchEvals(
     throw e;
   }
 }
+
+export async function deleteEval(evalId: number, accessToken: string) {
+  try {
+    const res = await fetch(`${API_URL}/evals/${evalId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.status !== 200) {
+      throw new Error("Failed to delete eval");
+    }
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
