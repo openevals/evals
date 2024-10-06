@@ -120,20 +120,22 @@ export default function ResultItem({
         textAlign="start"
         _hover={{ backgroundColor: "gray.100", cursor: "pointer" }}
       >
-        <HStack>
-          <Avatar
-            size="xs"
-            name={mainAuthor?.username ?? "Unknown"}
-            src={
-              mainAuthor?.avatar ??
-              "https://www.svgrepo.com/show/448095/person-circle.svg"
-            }
-          />
-          <Stack spacing={0}>
-            <Text fontSize="sm">{mainAuthor?.username ?? "Unknown"}</Text>
-            <Text fontSize="xs">@{mainAuthor?.githubLogin ?? ""}</Text>
-          </Stack>
-        </HStack>
+        {mainAuthor && (
+          <HStack>
+            <Avatar
+              size="xs"
+              name={mainAuthor.username ?? "Unknown"}
+              src={
+                mainAuthor.avatar ??
+                "https://www.svgrepo.com/show/448095/person-circle.svg"
+              }
+            />
+            <Stack spacing={0}>
+              <Text fontSize="sm">{mainAuthor.username ?? "Unknown"}</Text>
+              <Text fontSize="xs">@{mainAuthor.githubLogin ?? ""}</Text>
+            </Stack>
+          </HStack>
+        )}
         <Heading size="md">{name}</Heading>
         <Text>{description}</Text>
         <HStack>
