@@ -1,10 +1,19 @@
-import { Stack, Heading, Text, Button, Tag, HStack, Avatar, useToast } from '@chakra-ui/react';
-import VoteButton from './voteButton';
-import { useRouter } from 'next/navigation';
-import { IAuthorResponse, IVoteResult } from '../lib/types';
-import { getEvalItem } from '../utils/getEvalItem';
-import { useDispatch } from 'react-redux';
-import { setEvalToTry } from '../lib/store/dataSlice';
+import {
+  Stack,
+  Heading,
+  Text,
+  Button,
+  Tag,
+  HStack,
+  Avatar,
+  useToast,
+} from "@chakra-ui/react";
+import VoteButton from "./voteButton";
+import { useRouter } from "next/navigation";
+import { IAuthorResponse, IVoteResult } from "../lib/types";
+import { getEvalItem } from "../utils/getEvalItem";
+import { useDispatch } from "react-redux";
+import { setEvalToTry } from "../lib/store/dataSlice";
 
 export default function ResultItem({
   id,
@@ -34,14 +43,14 @@ export default function ResultItem({
       await navigator.clipboard.writeText(text);
       toast({
         description: "Link copied to clipboard.",
-        status: 'success',
-        duration: 5000,
+        status: "success",
+        duration: 8000,
       });
     } catch {
       toast({
         description: "Error copying link to clipboard.",
-        status: 'error',
-        duration: 5000,
+        status: "error",
+        duration: 8000,
       });
     }
   };
@@ -59,7 +68,7 @@ export default function ResultItem({
 
     const evalDetails = await getEvalItem(id);
     dispatch(setEvalToTry(evalDetails));
-    router.push('/');
+    router.push("/");
   };
 
   return (
@@ -67,27 +76,41 @@ export default function ResultItem({
       <Stack
         p={4}
         my={4}
-        textAlign='start'
-        _hover={{ backgroundColor: 'gray.100', cursor: 'pointer' }}
+        textAlign="start"
+        _hover={{ backgroundColor: "gray.100", cursor: "pointer" }}
       >
         <HStack>
-          <Avatar size='xs' name={mainAuthor?.username ?? 'Unknown'} src={mainAuthor?.avatar ?? 'https://www.svgrepo.com/show/448095/person-circle.svg'} />
+          <Avatar
+            size="xs"
+            name={mainAuthor?.username ?? "Unknown"}
+            src={
+              mainAuthor?.avatar ??
+              "https://www.svgrepo.com/show/448095/person-circle.svg"
+            }
+          />
           <Stack spacing={0}>
-            <Text fontSize='sm'>{mainAuthor?.username ?? 'Unknown'}</Text>
-            <Text fontSize='xs'>@{mainAuthor?.githubLogin ?? ''}</Text>
+            <Text fontSize="sm">{mainAuthor?.username ?? "Unknown"}</Text>
+            <Text fontSize="xs">@{mainAuthor?.githubLogin ?? ""}</Text>
           </Stack>
         </HStack>
-        <Heading size='md'>{name}</Heading>
-        <Text>
-          {description}
-        </Text>
+        <Heading size="md">{name}</Heading>
+        <Text>{description}</Text>
         <HStack>
-          <Tag size='md'>{validatorType}</Tag>
+          <Tag size="md">{validatorType}</Tag>
         </HStack>
         <HStack>
-          <VoteButton evalId={id} votes={upvotes} upvoted={upvoted} onVote={onVote} />
-          <Button onClick={shareEval} variant='outline'>Share</Button>
-          <Button onClick={tryEval} variant="outline">Try</Button>
+          <VoteButton
+            evalId={id}
+            votes={upvotes}
+            upvoted={upvoted}
+            onVote={onVote}
+          />
+          <Button onClick={shareEval} variant="outline">
+            Share
+          </Button>
+          <Button onClick={tryEval} variant="outline">
+            Try
+          </Button>
         </HStack>
       </Stack>
     </>

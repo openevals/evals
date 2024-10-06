@@ -5,6 +5,7 @@ import {
   ModalBody,
   Grid,
   GridItem,
+  useToast,
 } from "@chakra-ui/react";
 
 import { SmallCloseIcon, ExternalLinkIcon } from "@chakra-ui/icons";
@@ -23,6 +24,7 @@ export default function BaseKeysSettings({
 }) {
   const [keyValue, setKeyValue] = useState(aiKey || "");
   const [keySaved, setKeySaved] = useState(aiKey?.length > 0);
+  const toast = useToast();
 
   /**
    * Track the changes for the key
@@ -40,10 +42,23 @@ export default function BaseKeysSettings({
     const isValid = await isValidAIModelKey(provider, keyValue);
     if (!isValid) {
       setKeySaved(false);
+      toast({
+        title: "Invalid key",
+        description: `Please provide a working key for ${AI_PROVIDER_NAME[provider]}.`,
+        status: "error",
+        duration: 8000,
+        isClosable: true,
+      });
       return;
     }
     setAiKey(keyValue);
     setKeySaved(true);
+    toast({
+      description: `${AI_PROVIDER_NAME[provider]} key saved`,
+      status: "success",
+      duration: 8000,
+      isClosable: true,
+    });
   };
 
   /**

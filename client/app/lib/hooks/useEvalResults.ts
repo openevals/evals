@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { getEvalRun } from '../../utils/getEvalRun';
-import { IEvalRunResponse } from '../types';
+import { useEffect, useRef, useState } from "react";
+import { getEvalRun } from "../../utils/getEvalRun";
+import { IEvalRunResponse } from "../types";
 
-
-const FINISHED_STATUS = ['Failed', 'Finished'];
+const FINISHED_STATUS = ["Failed", "Done"];
 
 const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   const [evalRuns, setEvalRuns] = useState<IEvalRunResponse[]>([]);
   const [allRunsCompleted, setAllRunsCompleted] = useState(false);
   const evalRunsRef = useRef<any[]>();
+  const waitResultsRef = useRef(false);
 
   /* Keeps reference updated */
   useEffect(() => {
@@ -19,15 +19,17 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   const updateObjState = (obj: any) => {
     if (!evalRunsRef.current) return;
     /* Update object state */
-    setEvalRuns(prevData => {
+    setEvalRuns((prevData) => {
       return prevData.map((value) => {
-        return (value.id === obj.id) ? obj : value;
+        return value.id === obj.id ? obj : value;
       });
     });
   };
 
-
   useEffect(() => {
+    /* Ensure that actions are called only once */
+    waitResultsRef.current = true;
+
     if (evalRunIds.length === 0) return;
 
     let completedRuns = 0;
@@ -38,7 +40,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
       let obj = await getEvalRun(evalId, evalRunId, 0);
       let lastStatus = obj.status;
       updateObjState(obj);
-      while (!FINISHED_STATUS.includes(lastStatus)) {
+      while (waitResultsRef.current && !FINISHED_STATUS.includes(lastStatus)) {
         obj = await getEvalRun(evalId, evalRunId, latency + 1000 * itr);
         lastStatus = obj.status;
         itr += 1;
@@ -47,6 +49,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
       completedRuns++;
       if (completedRuns === evalRunIds.length) {
         setAllRunsCompleted(true);
+        waitResultsRef.current = false;
       }
     };
 
@@ -56,7 +59,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
         model: {
           id: 0,
           modelDeveloper: "",
-          modelName: ""
+          modelName: "",
         },
         systemPrompt: "",
         userPrompt: "",
@@ -65,7 +68,7 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
         validatorType: "",
         status: "",
         evalId: 0,
-        taskInstanceOutputs: []
+        taskInstanceOutputs: [],
       };
     });
     setEvalRuns(newObjs);
@@ -74,9 +77,10 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
       loadUntilFinished(id, 1000 * (idx + 1));
     });
 
-    return () => { };
+    return () => {
+      waitResultsRef.current = false;
+    };
   }, [evalId, evalRunIds]);
-
 
   return { evalRuns, allRunsCompleted };
 };
