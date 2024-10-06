@@ -44,9 +44,9 @@ export default function BaseKeysSettings({
       setKeySaved(false);
       toast({
         title: "Invalid key",
-        description: `${AI_PROVIDER_NAME[provider]} key is invalid`,
+        description: `Please provide a working key for ${AI_PROVIDER_NAME[provider]}.`,
         status: "error",
-        duration: 5000,
+        duration: 8000,
         isClosable: true,
       });
       return;
@@ -56,7 +56,7 @@ export default function BaseKeysSettings({
     toast({
       description: `${AI_PROVIDER_NAME[provider]} key saved`,
       status: "success",
-      duration: 5000,
+      duration: 8000,
       isClosable: true,
     });
   };
