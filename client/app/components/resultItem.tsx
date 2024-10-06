@@ -94,11 +94,10 @@ export default function ResultItem({
 
   const deleteEvalOnConfirm = async () => {
     onClose();
-    console.log("deleting eval", id);
     deleteEval(id, accessToken)
       .then(() => {
         toast({
-          description: "Eval deleted successfully.",
+          description: "Eval deleted!.",
           status: "success",
           duration: 8000,
         });
