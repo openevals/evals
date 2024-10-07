@@ -16,11 +16,11 @@ const useEvalResults = (evalId: number, evalRunIds: number[]) => {
   }, [evalRuns]);
 
   /* Keep the object state updated */
-  const updateObjState = (obj: any) => {
+  const updateObjState = (obj: IEvalRunResponse) => {
     if (!evalRunsRef.current) return;
     /* Update object state */
-    setEvalRuns((prevData) => {
-      return prevData.map((value) => {
+    setEvalRuns((prevData: IEvalRunResponse[]) => {
+      return prevData.map((value: IEvalRunResponse) => {
         return value.id === obj.id ? obj : value;
       });
     });

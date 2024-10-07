@@ -23,7 +23,7 @@ const SubmitModal: React.FC<SubmitModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-}: any) => {
+}: SubmitModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

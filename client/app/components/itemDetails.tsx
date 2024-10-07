@@ -27,7 +27,14 @@ import {
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import { getEvalItem } from "../utils/getEvalItem";
-import { IEvalResponse, IModelResponse, TaskInstance } from "../lib/types";
+import {
+  IAuthorResponse,
+  IEvalResponse,
+  IModelResponse,
+  IModelSystemResponse,
+  ITaskInstanceResponse,
+  TaskInstance,
+} from "../lib/types";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../lib/store";
@@ -74,7 +81,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
   useEffect(() => {
     if (evalItem && evalItem.modelSystems) {
       const selectedModelIds = evalItem.modelSystems.map(
-        (system: any) => system.modelId,
+        (system: IModelSystemResponse) => system.modelId,
       );
       const selectedModels = models.filter((model: IModelResponse) =>
         selectedModelIds.includes(model.id),
@@ -96,7 +103,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
     const getEvalInfo = async () => {
       const e = await getEvalItem(id);
       setEvalItem(e);
-      setRunIds(e.modelSystems.map((value: any) => value.id));
+      setRunIds(e.modelSystems.map((value: IModelSystemResponse) => value.id));
     };
     getEvalInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +119,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   useEffect(() => {
     const map: Record<number, any> = {};
-    evalItem.taskInstances.forEach((value: any) => {
+    evalItem.taskInstances.forEach((value: ITaskInstanceResponse) => {
       map[value.id] = value;
     });
     setTaskMap(map);
@@ -230,15 +237,19 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 <Heading size="xs">Models tested</Heading>
                 <Text pt="2" fontSize="sm">
                   {evalItem.modelSystems.length > 0 ? (
-                    Array.from(
+                    Array.from<string>(
                       new Set(
                         evalItem.modelSystems.map(
-                          (ms: any) => modelMap[ms.modelId],
+                          (ms: IModelSystemResponse) => modelMap[ms.modelId],
                         ),
                       ),
-                    ).map((modelName: any) => (
-                      <Tag key={`model-tag-${modelName}`} mr={2} mb={2}>
-                        {modelName}
+                    ).map((modelName: string) => (
+                      <Tag
+                        key={`model-tag-${modelName as string}`}
+                        mr={2}
+                        mb={2}
+                      >
+                        {modelName as string}
                       </Tag>
                     ))
                   ) : (
@@ -249,8 +260,8 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Box>
                 <Heading size="xs">Authors</Heading>
                 <Text pt="2" fontSize="sm">
-                  {evalItem.authors.map((a: any, idx: number) => (
-                    <React.Fragment key={`author-item-${idx}`}>
+                  {evalItem.authors.map((a: IAuthorResponse) => (
+                    <React.Fragment key={`author-item-${a.id}`}>
                       <Text>
                         {a.username}
                         {` (`}
@@ -271,7 +282,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Box>
                 <Heading size="xs">Contributors:</Heading>
                 <Text pt="2" fontSize="sm">
-                  {evalItem.contributors.map((a: any) => (
+                  {evalItem.contributors.map((a: IAuthorResponse) => (
                     <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
                   ))}
                 </Text>
@@ -312,26 +323,28 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                   <Box maxHeight="calc(60vh - 40px)" overflowY="auto">
                     <Table layout="fixed" width="100%">
                       <Tbody>
-                        {evalItem.taskInstances.map((instance: any) => (
-                          <Tr key={`task-instance-${instance.id}`}>
-                            <Td width="50%">
-                              <Box
-                                overflowWrap="break-word"
-                                whiteSpace="normal"
-                              >
-                                {instance.input}
-                              </Box>
-                            </Td>
-                            <Td width="50%">
-                              <Box
-                                overflowWrap="break-word"
-                                whiteSpace="normal"
-                              >
-                                {instance.ideal}
-                              </Box>
-                            </Td>
-                          </Tr>
-                        ))}
+                        {evalItem.taskInstances.map(
+                          (instance: ITaskInstanceResponse) => (
+                            <Tr key={`task-instance-${instance.id}`}>
+                              <Td width="50%">
+                                <Box
+                                  overflowWrap="break-word"
+                                  whiteSpace="normal"
+                                >
+                                  {instance.input}
+                                </Box>
+                              </Td>
+                              <Td width="50%">
+                                <Box
+                                  overflowWrap="break-word"
+                                  whiteSpace="normal"
+                                >
+                                  {instance.ideal}
+                                </Box>
+                              </Td>
+                            </Tr>
+                          ),
+                        )}
                       </Tbody>
                     </Table>
                   </Box>

@@ -1,12 +1,11 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { searchEvals } from "../../utils/getEvals";
-import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "../../lib/store";
-import { IEvalListItemResponse } from "../../lib/types";
+import { IEvalListItemResponse, IVoteResult } from "../../lib/types";
 import Results from "./results";
-import React from "react";
 
 export default function SearchEvalsComponent() {
   const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);
@@ -25,9 +24,9 @@ export default function SearchEvalsComponent() {
     retrieveEvals();
   }, [accessToken, search]);
 
-  const setUpvoted = (payload: any) => {
+  const setUpvoted = (payload: IVoteResult) => {
     setEvals(
-      evals.map((value: any) => {
+      evals.map((value: IEvalListItemResponse) => {
         if (value.id !== payload.id) return value;
         value.upvotes = payload.upvotes;
         value.upvoted = payload.upvoted;

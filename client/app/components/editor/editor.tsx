@@ -218,7 +218,7 @@ export default function Editor({
     });
 
     /* Show results and keep polling until eval run is finished */
-    // setEvalRunIds(newEval.modelSystems.map((value: any) => value.id));
+    // setEvalRunIds(newEval.modelSystems.map((value: IModelSystemResponse) => value.id));
     // setTabIndex(isMobile ? 3 : 2);
   };
 

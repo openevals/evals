@@ -17,7 +17,11 @@ import {
 } from "@chakra-ui/react";
 
 import useEvalResults from "../lib/hooks/useEvalResults";
-import { ITaskInstanceResponse } from "../lib/types";
+import {
+  IEvalRunResponse,
+  ITaskInstanceResponse,
+  ITaskInstanceOutputResponse,
+} from "../lib/types";
 
 export default function EvalRunResults({
   evalId,
@@ -70,7 +74,7 @@ export default function EvalRunResults({
               </Tr>
             </Thead>
             <Tbody>
-              {evalRuns.map((run: any) => (
+              {evalRuns.map((run: IEvalRunResponse) => (
                 <Tr key={`eval-run-result-${run.id}`}>
                   <Td>{run.model.modelName}</Td>
                   <Td>{run.score}</Td>
@@ -92,7 +96,7 @@ export default function EvalRunResults({
               <Tr>
                 <Th>Model</Th>
                 {evalRuns[0]?.taskInstanceOutputs.map(
-                  (_: any, index: number) => (
+                  (_: ITaskInstanceOutputResponse, index: number) => (
                     <Th key={`input-${index}`}>Input {index + 1}</Th>
                   ),
                 )}
@@ -103,7 +107,7 @@ export default function EvalRunResults({
               <Tr>
                 <Td>Ideal Output</Td>
                 {evalRuns[0]?.taskInstanceOutputs.map(
-                  (output: any, index: number) => (
+                  (output: ITaskInstanceOutputResponse, index: number) => (
                     <Td key={`ideal-${index}`}>
                       {taskMap[output.taskInstanceId]?.ideal}
                     </Td>
@@ -111,16 +115,18 @@ export default function EvalRunResults({
                 )}
                 <Td>N/A</Td>
               </Tr>
-              {evalRuns.map((run: any) => (
+              {evalRuns.map((run: IEvalRunResponse) => (
                 <Tr key={`eval-run-result-${run.id}`}>
                   <Td>{run.model.modelName}</Td>
-                  {run.taskInstanceOutputs.map((output: any, index: number) => (
-                    <Td key={`output-${run.id}-${index}`}>{output.output}</Td>
-                  ))}
+                  {run.taskInstanceOutputs.map(
+                    (output: ITaskInstanceOutputResponse, index: number) => (
+                      <Td key={`output-${run.id}-${index}`}>{output.output}</Td>
+                    ),
+                  )}
                   <Td>
                     {
                       run.taskInstanceOutputs.filter(
-                        (output: any) =>
+                        (output: ITaskInstanceOutputResponse) =>
                           output.output ===
                           taskMap[output.taskInstanceId]?.ideal,
                       ).length

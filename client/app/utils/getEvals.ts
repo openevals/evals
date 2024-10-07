@@ -5,7 +5,7 @@ export async function getEvals(
   accessToken?: string,
 ): Promise<IEvalListItemResponse[]> {
   try {
-    const headers: any = {
+    const headers: Record<string, string> = {
       "Content-type": "application/json",
     };
     if (accessToken) {
@@ -78,7 +78,7 @@ export async function getTopEvals(
   accessToken?: string,
 ): Promise<IEvalListItemResponse[]> {
   try {
-    const headers: any = {
+    const headers: Record<string, string> = {
       "Content-type": "application/json",
     };
     if (accessToken) {
@@ -109,7 +109,7 @@ export async function searchEvals(
   searchText?: string,
 ): Promise<IEvalListItemResponse[]> {
   try {
-    const headers: any = {
+    const headers: Record<string, string> = {
       "Content-type": "application/json",
     };
     if (accessToken) {

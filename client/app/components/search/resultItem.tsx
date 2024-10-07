@@ -1,3 +1,4 @@
+import React, { useRef, RefObject } from "react";
 import {
   Stack,
   Heading,
@@ -23,7 +24,6 @@ import { getEvalItem } from "../../utils/getEvalItem";
 import { useDispatch, useSelector } from "react-redux";
 import { setEvalToTry } from "../../lib/store/dataSlice";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { useRef } from "react";
 import { deleteEval } from "../../utils/getEvals";
 import { IRootState } from "../../lib/store";
 
@@ -56,7 +56,7 @@ export default function ResultItem({
   const toast = useToast();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef: any = useRef();
+  const cancelRef = useRef<any>(null);
   const accessToken = useSelector<IRootState, string>(
     (state: IRootState) => state.auth.token,
   );

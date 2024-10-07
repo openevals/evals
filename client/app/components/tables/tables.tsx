@@ -1,8 +1,12 @@
 import { Box, Heading, Select, Text, Center } from "@chakra-ui/react";
 import { BasicTable } from "./basicTable";
-import { ITaskInstanceResponse } from "../../lib/types";
+import {
+  IEvalRunResponse,
+  ITaskInstanceOutputResponse,
+  ITaskInstanceResponse,
+} from "../../lib/types";
 
-export const RunSummary = ({ evalRuns }: { evalRuns: any[] }) => (
+export const RunSummary = ({ evalRuns }: { evalRuns: IEvalRunResponse[] }) => (
   <Box width="100%">
     <Heading size="md" pb={4} textAlign="center">
       Model Runs
@@ -22,13 +26,22 @@ export const RunSummary = ({ evalRuns }: { evalRuns: any[] }) => (
   </Box>
 );
 
-export const ResultsSummary = ({ evalRuns }: { evalRuns: any[] }) => {
-  const uniqueModels = evalRuns.reduce((acc, run) => {
-    if (!acc.find((item: any) => item.model.id === run.model.id)) {
-      acc.push(run);
-    }
-    return acc;
-  }, []);
+export const ResultsSummary = ({
+  evalRuns,
+}: {
+  evalRuns: IEvalRunResponse[];
+}) => {
+  const uniqueModels = evalRuns.reduce(
+    (acc: IEvalRunResponse[], run: IEvalRunResponse) => {
+      if (
+        !acc.find((item: IEvalRunResponse) => item.model.id === run.model.id)
+      ) {
+        acc.push(run);
+      }
+      return acc;
+    },
+    [],
+  );
 
   return (
     <Box width="100%">
@@ -36,7 +49,7 @@ export const ResultsSummary = ({ evalRuns }: { evalRuns: any[] }) => {
         Summary
       </Heading>
       <BasicTable
-        data={uniqueModels.map((run: any) => ({
+        data={uniqueModels.map((run: IEvalRunResponse) => ({
           model: run.model.modelName,
           numberOfRuns: evalRuns.filter((r) => r.model.id === run.model.id)
             .length,
@@ -71,7 +84,7 @@ export const ByModel = ({
   setSelectedModel,
   taskMap,
 }: {
-  evalRuns: any[];
+  evalRuns: IEvalRunResponse[];
   selectedModel: string;
   setSelectedModel: (value: string) => void;
   taskMap: Record<number, ITaskInstanceResponse>;
@@ -104,15 +117,17 @@ export const ByModel = ({
         data={
           evalRuns
             .find((run) => run.model.id === Number(selectedModel))
-            ?.taskInstanceOutputs.map((output: any) => ({
-              input: taskMap[output.taskInstanceId]?.input || "",
-              modelResponse: output.output,
-              ideal: taskMap[output.taskInstanceId]?.ideal || "",
-              isCorrect:
-                output.output === taskMap[output.taskInstanceId]?.ideal
-                  ? "Correct"
-                  : "Incorrect",
-            })) || []
+            ?.taskInstanceOutputs.map(
+              (output: ITaskInstanceOutputResponse) => ({
+                input: taskMap[output.taskInstanceId]?.input || "",
+                modelResponse: output.output,
+                ideal: taskMap[output.taskInstanceId]?.ideal || "",
+                isCorrect:
+                  output.output === taskMap[output.taskInstanceId]?.ideal
+                    ? "Correct"
+                    : "Incorrect",
+              }),
+            ) || []
         }
         columns={[
           { header: "Input", accessorKey: "input" },
@@ -131,7 +146,7 @@ export const ByTaskInstance = ({
   selectedTaskInstance,
   setSelectedTaskInstance,
 }: {
-  evalRuns: any[];
+  evalRuns: IEvalRunResponse[];
   taskInstances: ITaskInstanceResponse[];
   selectedTaskInstance: number | null;
   setSelectedTaskInstance: (value: number) => void;
@@ -177,7 +192,8 @@ export const ByTaskInstance = ({
             },
             ...evalRuns.map((run) => {
               const output = run.taskInstanceOutputs.find(
-                (output: any) => output.taskInstanceId === selectedTaskInstance,
+                (output: ITaskInstanceOutputResponse) =>
+                  output.taskInstanceId === selectedTaskInstance,
               );
               return {
                 model: run.model.modelName,

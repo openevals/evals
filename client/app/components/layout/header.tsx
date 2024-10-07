@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useRef, useState } from "react";
 import {
   Input,
   HStack,
@@ -28,7 +28,6 @@ import GithubLoginButton from "@/app/components/auth/github";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/app/lib/store";
 import { IEvalListItemResponse, IUserProfileResponse } from "@/app/lib/types";
-import { useEffect, useRef, useState } from "react";
 import { getUserProfile } from "@/app/utils/account";
 import { setUserProfile, logoutUser } from "@/app/lib/store/authSlice";
 import { getSupportedModels } from "@/app/utils/getEvalRun";
@@ -110,7 +109,7 @@ export default function HeaderComponent() {
     }
   };
 
-  const handleChange = (event: any) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setInputValue(value);
     fetchSuggestions(value);
@@ -131,7 +130,7 @@ export default function HeaderComponent() {
     }
   };
 
-  const handleKeyDown = (event: any) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       doSearch();
     }
@@ -171,8 +170,6 @@ export default function HeaderComponent() {
           gotoHome={gotoHome}
           isAuthenticated={isAuthenticated}
           profile={profile}
-          dispatch={dispatch}
-          router={router}
           suggestions={suggestions}
           isOpen={isOpen}
           setIsOpen={setIsOpen}
@@ -208,25 +205,27 @@ export default function HeaderComponent() {
               overflowY="auto"
             >
               <PopoverBody p={0}>
-                {suggestions.map((suggestion, index) => (
-                  <Box
-                    key={index}
-                    p={2}
-                    _hover={{ bg: "gray.100" }}
-                    cursor="pointer"
-                    onClick={() => {
-                      router.push(`/evals/${suggestion.id}`);
-                      setIsOpen(false);
-                      setSuggestions([]);
-                      setInputValue("");
-                    }}
-                  >
-                    {index > 0 && <hr />}
-                    <b>{suggestion.name}</b>
-                    <br />
-                    {suggestion.description}
-                  </Box>
-                ))}
+                {suggestions.map(
+                  (suggestion: IEvalListItemResponse, index: number) => (
+                    <Box
+                      key={index}
+                      p={2}
+                      _hover={{ bg: "gray.100" }}
+                      cursor="pointer"
+                      onClick={() => {
+                        router.push(`/evals/${suggestion.id}`);
+                        setIsOpen(false);
+                        setSuggestions([]);
+                        setInputValue("");
+                      }}
+                    >
+                      {index > 0 && <hr />}
+                      <b>{suggestion.name}</b>
+                      <br />
+                      {suggestion.description}
+                    </Box>
+                  ),
+                )}
               </PopoverBody>
             </PopoverContent>
           </Popover>
@@ -305,8 +304,6 @@ interface MobileHeaderProps {
   gotoHome: () => void;
   isAuthenticated: boolean;
   profile: IUserProfileResponse | null;
-  dispatch: any; // Consider using a more specific type if possible
-  router: any; // Consider using a more specific type if possible
   suggestions: IEvalListItemResponse[];
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -335,8 +332,6 @@ const MobileHeader = ({
   gotoHome,
   isAuthenticated,
   profile,
-  dispatch,
-  router,
   suggestions,
   isOpen,
   setIsOpen,
@@ -344,6 +339,8 @@ const MobileHeader = ({
   setInputValue,
 }: MobileHeaderProps) => {
   const { isOpen: isDrawerOpen, onOpen, onClose } = useDisclosure();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   return (
     <>
