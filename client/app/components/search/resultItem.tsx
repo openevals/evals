@@ -1,3 +1,4 @@
+import React, { useRef, RefObject } from "react";
 import {
   Stack,
   Heading,
@@ -16,16 +17,15 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
 } from "@chakra-ui/react";
-import VoteButton from "./voteButton";
+import VoteButton from "../voteButton";
 import { useRouter } from "next/navigation";
-import { IAuthorResponse, IVoteResult } from "../lib/types";
-import { getEvalItem } from "../utils/getEvalItem";
+import { IAuthorResponse, IVoteResult } from "../../lib/types";
+import { getEvalItem } from "../../utils/getEvalItem";
 import { useDispatch, useSelector } from "react-redux";
-import { setEvalToTry } from "../lib/store/dataSlice";
+import { setEvalToTry } from "../../lib/store/dataSlice";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { useRef } from "react";
-import { deleteEval } from "../utils/getEvals";
-import { IRootState } from "../lib/store";
+import { deleteEval } from "../../utils/getEvals";
+import { IRootState } from "../../lib/store";
 
 export default function ResultItem({
   id,
@@ -38,6 +38,7 @@ export default function ResultItem({
   mainAuthor,
   canDelete,
   onDelete,
+  onClick,
 }: {
   id: number;
   name: string;
@@ -46,15 +47,16 @@ export default function ResultItem({
   upvotes: number;
   upvoted: boolean;
   onVote?: (payload: IVoteResult) => void;
-  mainAuthor?: IAuthorResponse;
+  mainAuthor?: IAuthorResponse | null;
   canDelete?: boolean;
   onDelete?: (evalId: number) => void;
+  onClick?: "ItemDetail" | "Editor";
 }) {
   const router = useRouter();
   const toast = useToast();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef: any = useRef();
+  const cancelRef = useRef<any>(null);
   const accessToken = useSelector<IRootState, string>(
     (state: IRootState) => state.auth.token,
   );
@@ -63,7 +65,7 @@ export default function ResultItem({
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        description: "Link copied to clipboard.",
+        description: "Copied link to eval",
         status: "success",
         duration: 8000,
       });
@@ -83,9 +85,19 @@ export default function ResultItem({
     copyTextToClipboard(link);
   };
 
-  const tryEval = async (ev: React.MouseEvent<HTMLButtonElement>) => {
-    ev.stopPropagation();
-    ev.preventDefault();
+  const goToItemDetail = (
+    e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>,
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+    router.push(`/evals/${id}`);
+  };
+
+  const goToEditor = async (
+    e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>,
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
 
     const evalDetails = await getEvalItem(id);
     dispatch(setEvalToTry(evalDetails));
@@ -119,20 +131,30 @@ export default function ResultItem({
         my={4}
         textAlign="start"
         _hover={{ backgroundColor: "gray.100", cursor: "pointer" }}
+        borderWidth="1px"
+        borderRadius="lg"
+        borderColor="lightgray"
+        onClick={(e) => {
+          if (onClick === "ItemDetail") {
+            goToItemDetail(e);
+          } else {
+            goToEditor(e);
+          }
+        }}
       >
         {mainAuthor && (
           <HStack>
             <Avatar
               size="xs"
-              name={mainAuthor.username ?? "Unknown"}
+              name={mainAuthor?.username ?? "Unknown"}
               src={
-                mainAuthor.avatar ??
+                mainAuthor?.avatar ??
                 "https://www.svgrepo.com/show/448095/person-circle.svg"
               }
             />
             <Stack spacing={0}>
-              <Text fontSize="sm">{mainAuthor.username ?? "Unknown"}</Text>
-              <Text fontSize="xs">@{mainAuthor.githubLogin ?? ""}</Text>
+              <Text fontSize="sm">{mainAuthor?.username ?? "Unknown"}</Text>
+              <Text fontSize="xs">@{mainAuthor?.githubLogin ?? ""}</Text>
             </Stack>
           </HStack>
         )}
@@ -141,7 +163,7 @@ export default function ResultItem({
         <HStack>
           <Tag size="md">{validatorType}</Tag>
         </HStack>
-        <HStack>
+        <HStack zIndex={1}>
           <Flex width="100%" justifyContent="space-between" alignItems="center">
             <HStack>
               <VoteButton
@@ -153,8 +175,11 @@ export default function ResultItem({
               <Button onClick={shareEval} variant="outline">
                 Share
               </Button>
-              <Button onClick={tryEval} variant="outline">
+              <Button onClick={goToEditor} variant="outline">
                 Try
+              </Button>
+              <Button onClick={goToItemDetail} variant="outline">
+                Details
               </Button>
             </HStack>
             {canDelete && (

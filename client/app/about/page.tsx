@@ -19,7 +19,7 @@ export default function About() {
           About OpenEvals
         </Text>
         <Text>{`Hi there! OpenEvals is a project to help make evals more legible, reproducible, and less data-contaminated.`}</Text>
-        <Text>{`Shiny new model scores 89 on MMLU? What does that mean for your use case? Find out by contributing your own evals for tasks you care about. Worried about data contamination? OpenEvals is private by default and you can customize eval visibility.`}</Text>
+        <Text>{`Shiny new model scores 89 on MMLU? What does that mean for your use case? Find out by contributing your own evals for tasks you care about. Worried about data contamination? OpenEvals task instances are private by default and you can customize eval visibility.`}</Text>
         <Text
           fontSize="xl"
           as="b"
@@ -33,7 +33,6 @@ export default function About() {
               <Link
                 href="https://x.com/belindmo"
                 isExternal
-                textDecoration="underline"
               >{`@belindmo`}</Link>
             </ListItem>
             <ListItem>
@@ -41,7 +40,6 @@ export default function About() {
               <Link
                 href="https://x.com/justinlinw"
                 isExternal
-                textDecoration="underline"
               >{`@justinlinw`}</Link>
             </ListItem>
             <ListItem>
@@ -49,18 +47,13 @@ export default function About() {
               <Link
                 href="https://x.com/reiniermillo"
                 isExternal
-                textDecoration="underline"
               >{`@reiniermillo`}</Link>
             </ListItem>
           </UnorderedList>
         </Center>
         <Text>
           {`If you'd like to contribute, message `}
-          <Link
-            href="https://x.com/belindmo"
-            isExternal
-            textDecoration="underline"
-          >{`@belindmo`}</Link>
+          <Link href="https://x.com/belindmo" isExternal>{`@belindmo`}</Link>
           {` on Twitter.`}
         </Text>
         <Text>{`Made in San Francisco, CA 💛`}</Text>

@@ -87,7 +87,7 @@ export default function GithubCallback() {
           <Text fontWeight="bold">{errorDescription}</Text>
           <Text mt={4}>
             You will be redirected automatically to{" "}
-            <Link href="/" fontWeight="bold">
+            <Link href="/" textDecoration="none" fontWeight="bold">
               home screen
             </Link>
           </Text>

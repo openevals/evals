@@ -8,6 +8,7 @@ import {
 } from "react-resizable-panels";
 import {
   Button,
+  Stack,
   HStack,
   Kbd,
   Heading,
@@ -30,13 +31,32 @@ import {
   Card,
   CardBody,
   Center,
+  Icon,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { MIN_INSTANCES } from "@/app/lib/constants";
 import { ValidatorType, DesktopEditorProps } from "@/app/lib/types";
-import EvalRunResults from "./evalRunResults";
-import InstancesTable from "./instancesTable";
-import Trending from "./trending";
+import InstancesTable from "../tables/instancesTable";
+import Trending from "../trending";
+import RobotoHeader from "../robotoHeader";
+import { useState } from "react";
+import { FaRegClipboard } from "react-icons/fa";
+import useEvalResults from "../../lib/hooks/useEvalResults";
 import EditorModelItem from "./editorModel";
+import InfoPopover from "../infoPopover";
+import {
+  VALIDATOR_TITLE,
+  VALIDATOR_EXPLANATION,
+  SYSTEM_PROMPT_TITLE,
+  SYSTEM_PROMPT_EXPLANATION,
+} from "../../lib/constants";
 
 export default function DesktopEditor({
   isTryingEval,
@@ -48,6 +68,8 @@ export default function DesktopEditor({
   setPanel1Collapsed,
   panel2Collapsed,
   setPanel2Collapsed,
+  panel3Collapsed,
+  setPanel3Collapsed,
   handleKeyDown,
   panel1Ref,
   panel2Ref,
@@ -75,11 +97,19 @@ export default function DesktopEditor({
   systemPrompt,
   setSystemPrompt,
 }: DesktopEditorProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [bulkText, setBulkText] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedTaskInstance, setSelectedTaskInstance] = useState<
+    number | null
+  >(null);
+  const { evalRuns, allRunsCompleted } = useEvalResults(evalObj.id, evalRunIds);
+
   return (
     <PanelGroup direction="horizontal">
       <Panel
         collapsible={true}
-        collapsedSize={2}
+        collapsedSize={3}
         defaultSize={64}
         minSize={24}
         ref={panel1Ref as React.RefObject<ImperativePanelHandle>}
@@ -100,37 +130,42 @@ export default function DesktopEditor({
           {!panel1Collapsed && (
             <>
               <VStack spacing={6} align="stretch" px={2}>
-                <Heading size="md">
-                  {isTryingEval ? "Contributing to eval" : "Create new eval"}
-                </Heading>
+                <HStack alignItems="center">
+                  <RobotoHeader>
+                    {isTryingEval ? "Edit an eval" : "Create an eval"}
+                  </RobotoHeader>
+                  <Spacer />
+                  {step === 1 && panel2Collapsed && (
+                    <Button
+                      onClick={() => {
+                        if (step === 1) setStep(2);
+                      }}
+                      minW="180px"
+                    >
+                      <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
+                      <Text ml={2}>Next</Text>
+                    </Button>
+                  )}
+                </HStack>
+                {isTryingEval && (
+                  <Text>
+                    Note: this is a clone of the original eval. Only the public
+                    task instances are shown here.
+                  </Text>
+                )}
                 <FormControl>
-                  <HStack top={0}>
-                    <FormLabel htmlFor="evalName" srOnly>
-                      Evaluation Name
-                    </FormLabel>
-                    <Input
-                      id="evalName"
-                      size="lg"
-                      variant="flushed"
-                      placeholder={`Eval name, e.g. "Linear algebra problems"`}
-                      maxW="384px"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                    <Spacer />
-                    {step === 1 && panel2Collapsed && (
-                      <Button
-                        float="right"
-                        onClick={() => {
-                          if (step === 1) setStep(2);
-                        }}
-                        minW="180px"
-                      >
-                        <Kbd>cmd</Kbd> + <Kbd>enter</Kbd>
-                        <Text ml={2}>Next</Text>
-                      </Button>
-                    )}
-                  </HStack>
+                  <FormLabel>
+                    <Heading size="sm">Name</Heading>
+                  </FormLabel>
+                  <Input
+                    id="evalName"
+                    size="lg"
+                    variant="flushed"
+                    placeholder={`Eval name, e.g. "Linear algebra problems"`}
+                    maxW="384px"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </FormControl>
                 <FormControl>
                   <FormLabel>
@@ -145,7 +180,13 @@ export default function DesktopEditor({
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size="sm">Method to evaluate</Heading>
+                    <Stack direction={["row"]} alignItems="center">
+                      <Text size="sm">Validator</Text>
+                      <InfoPopover
+                        title={VALIDATOR_TITLE}
+                        content={VALIDATOR_EXPLANATION}
+                      />
+                    </Stack>
                   </FormLabel>
                   <Select
                     placeholder="Select validator type"
@@ -165,7 +206,24 @@ export default function DesktopEditor({
 
                 <FormControl>
                   <FormLabel>
-                    <Heading size="sm">Models to test</Heading>
+                    <Stack direction={["row"]} alignItems="center">
+                      <Text size="sm">System Prompt (Recommended)</Text>
+                      <InfoPopover
+                        title={SYSTEM_PROMPT_TITLE}
+                        content={SYSTEM_PROMPT_EXPLANATION}
+                      />
+                    </Stack>
+                  </FormLabel>
+                  <Textarea
+                    placeholder="You are a mathematics professor at MIT."
+                    value={systemPrompt}
+                    onChange={(e) => setSystemPrompt(e.target.value)}
+                  />
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel>
+                    <Heading size="sm">Models</Heading>
                   </FormLabel>
                   <Wrap direction="column">
                     {models?.map((model) => (
@@ -179,17 +237,6 @@ export default function DesktopEditor({
                     ))}
                   </Wrap>
                 </FormControl>
-
-                <FormControl>
-                  <FormLabel>
-                    <Heading size="sm">System Prompt (Recommended)</Heading>
-                  </FormLabel>
-                  <Textarea
-                    placeholder="You are a mathematics professor at MIT."
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                  />
-                </FormControl>
               </VStack>
             </>
           )}
@@ -198,7 +245,7 @@ export default function DesktopEditor({
       <PanelResizeHandle />
       <Panel
         collapsible={true}
-        collapsedSize={2}
+        collapsedSize={3}
         defaultSize={2}
         minSize={24}
         ref={panel2Ref}
@@ -282,10 +329,12 @@ export default function DesktopEditor({
       <PanelResizeHandle />
       <Panel
         collapsible={true}
-        collapsedSize={2}
+        collapsedSize={3}
         defaultSize={32}
         minSize={24}
-        ref={panel3Ref}
+        ref={panel3Ref as React.RefObject<ImperativePanelHandle>}
+        onExpand={() => setPanel3Collapsed(false)}
+        onCollapse={() => setPanel3Collapsed(true)}
       >
         <Box
           w="100%"
@@ -297,84 +346,70 @@ export default function DesktopEditor({
           gap={4}
           p={4}
         >
-          <Tabs index={tabIndex} onChange={handleTabsChange} variant="enclosed">
-            <TabList>
-              <Tab>Contribute</Tab>
-              <Tab>Try out an eval</Tab>
-              <Tab>Results</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <Card variant="outline">
-                  <CardBody>
-                    <Heading size="md">
-                      Welcome to OpenEvals, a practical evals database that
-                      anyone can contribute to. 💛
-                    </Heading>
-                    <Text my={4}>
-                      An <b>eval</b> is a task that grades an AI {`system's`}{" "}
-                      output. It takes in a specific type of <b>input</b> and
-                      generates a specific type of <b>output</b>.{" "}
-                      <Link
-                        href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system."
-                        textDecoration="underline"
-                      >
-                        [1]
-                      </Link>
-                    </Text>
-                    <Text my={4}>This is an editor to contribute evals.</Text>
-                    <Heading size="md" my={4}>
-                      Tips for submission:
-                    </Heading>
-                    <Text>
-                      1. Choose an eval topic that you know well, e.g. a topic
-                      you would be comfortable teaching.
-                    </Text>
-                    <Text my={4}>
-                      2. Compare results between at least 3 AI <b>models</b>.
-                    </Text>
-                    {/* <Text>3. For fair comparison, change one variable (ex: model, system prompt, user prompt) and keep the others constant.</Text> */}
-                    <Text my={4}>
-                      3. Add at least {MIN_INSTANCES} <b>task instances</b>. A
-                      task instance is one input-output pair for an eval.
-                    </Text>
-                    <Text my={4}>
-                      4. Mark at least 1 task instance as a public example. Task
-                      instances are private by default to avoid{" "}
-                      <b>data contamination</b>.{" "}
-                      <Link
-                        href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations."
-                        textDecoration="underline"
-                      >
-                        [2]
-                      </Link>
-                    </Text>
-                    <Text>
-                      5. Double check ideal outputs for task instances.
-                    </Text>
-                    <Text my={4}>{`That's all! Have fun~`}</Text>
-                  </CardBody>
-                </Card>
-              </TabPanel>
-              <TabPanel textAlign="left">
-                <Trending />
-              </TabPanel>
-              <TabPanel>
-                {step === 3 ? (
-                  <EvalRunResults
-                    evalName={evalObj.name}
-                    evalId={evalObj.id}
-                    evalRunIds={evalRunIds}
-                    taskInstances={evalObj.taskInstances}
-                  />
-                ) : (
-                  <Center py={4}>
-                    Your evaluation results will appear here 🌱
-                  </Center>
-                )}
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+          {!panel3Collapsed && (
+            <Tabs
+              index={tabIndex}
+              onChange={handleTabsChange}
+              variant="enclosed"
+            >
+              <TabList>
+                <Tab>Contribute</Tab>
+                <Tab>Try an eval</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <Card variant="outline">
+                    <CardBody>
+                      <Heading size="md">
+                        Welcome to OpenEvals, a practical evals database that
+                        anyone can contribute to. 💛
+                      </Heading>
+                      <Text my={4}>
+                        An <b>eval</b> is a task that grades an AI {`system's`}{" "}
+                        output. It takes in a specific type of <b>input</b> and
+                        generates a specific type of <b>output</b>.{" "}
+                        <Link href="https://cookbook.openai.com/examples/evaluation/getting_started_with_openai_evals#:~:text=Evaluation%20is%20the,the%20LLM%20system.">
+                          [1]
+                        </Link>
+                      </Text>
+                      <Text my={4}>
+                        This is an editor to make your own textual evals.
+                      </Text>
+                      <Heading size="md" my={4}>
+                        Tips:
+                      </Heading>
+                      <Text>
+                        1. Choose an eval topic that you know well, e.g. a topic
+                        you would be comfortable teaching.
+                      </Text>
+                      <Text my={4}>
+                        2. Compare results between at least 3 AI <b>models</b>.
+                      </Text>
+                      <Text my={4}>
+                        3. Add at least {MIN_INSTANCES} <b>task instances</b>. A
+                        task instance is one input-output pair for an eval.
+                      </Text>
+                      <Text my={4}>
+                        4. Mark at least 1 task instance as a public example.
+                        Task instances are private by default to avoid{" "}
+                        <b>data contamination</b>.{" "}
+                        <Link href="https://conda-workshop.github.io/#:~:text=Data%20contamination%2C%20where,and%20reliable%20evaluations.">
+                          [2]
+                        </Link>
+                      </Text>
+                      <Text>
+                        5. Double check ideal outputs for task instances.
+                      </Text>
+                      <Text my={4}>{`That's all! Have fun~`}</Text>
+                    </CardBody>
+                  </Card>
+                </TabPanel>
+                <TabPanel textAlign="left">
+                  <Trending />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          )}
         </Box>
       </Panel>
     </PanelGroup>
