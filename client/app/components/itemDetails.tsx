@@ -34,6 +34,7 @@ import {
   IModelSystemResponse,
   ITaskInstanceResponse,
   TaskInstance,
+  IUserProfileResponse,
 } from "../lib/types";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -77,6 +78,10 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
 
   const { evalRuns, allRunsCompleted } = useEvalResults(evalItem.id, runIds);
   const [taskMap, setTaskMap] = useState<Record<number, any>>({});
+
+  const profile = useSelector<IRootState, IUserProfileResponse>(
+    (state: IRootState) => state.auth.profile,
+  );
 
   useEffect(() => {
     if (evalItem && evalItem.modelSystems) {
@@ -165,6 +170,8 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
       });
   };
 
+  
+
   return (
     <>
       <Wrap m={{ base: 0, md: 8 }}>
@@ -179,9 +186,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Heading size="lg">{evalItem.name}</Heading>
               <Spacer />
               <HStack spacing={4}>
-                <Button variant="ghost" width="fit-content" onClick={tryEval}>
-                  Edit
-                </Button>
+                {evalItem.authors.some(author => author.id === profile?.id) && (
+                  <Button variant="ghost" width="fit-content" onClick={tryEval}>
+                    Edit
+                  </Button>
+                )}
                 <Button variant="outline" onClick={copyLink}>
                   <LinkIcon />
                   {!isMobile && <Text ml={2}>Copy Link</Text>}
@@ -279,6 +288,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                   ))}
                 </Text>
               </Box>
+              {evalItem.contributors.length > 0 && (
               <Box>
                 <Heading size="xs">Contributors:</Heading>
                 <Text pt="2" fontSize="sm">
@@ -287,6 +297,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                   ))}
                 </Text>
               </Box>
+              )}
             </Stack>
           </Stack>
           <Box
