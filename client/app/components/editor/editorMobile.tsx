@@ -35,6 +35,15 @@ import RobotoHeader from "../robotoHeader";
 import useEvalResults from "../../lib/hooks/useEvalResults";
 import { useState } from "react";
 import ModelCheckbox from "./ModelCheckbox";
+import InfoHeader from "../infoHeader";
+import {
+  VALIDATOR_TITLE,
+  VALIDATOR_EXPLANATION,
+  SYSTEM_PROMPT_TITLE,
+  SYSTEM_PROMPT_EXPLANATION,
+  TASK_INSTANCES_TITLE,
+  TASK_INSTANCES_EXPLANATION,
+} from "../../lib/constants";
 
 export default function MobileEditor({
   isTryingEval,
@@ -151,7 +160,11 @@ export default function MobileEditor({
                 />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel>Validator</FormLabel>
+                <InfoHeader
+                  title="Validator"
+                  popoverTitle={VALIDATOR_TITLE}
+                  popoverContent={VALIDATOR_EXPLANATION}
+                />
                 <Select
                   value={validator}
                   onChange={(e) =>
@@ -181,7 +194,11 @@ export default function MobileEditor({
                 ))}
               </VStack>
               <FormControl>
-                <FormLabel>System Prompt</FormLabel>
+                <InfoHeader
+                  title="System Prompt (Recommended)"
+                  popoverTitle={SYSTEM_PROMPT_TITLE}
+                  popoverContent={SYSTEM_PROMPT_EXPLANATION}
+                />
                 <Textarea
                   value={systemPrompt}
                   onChange={(e) => setSystemPrompt(e.target.value)}
@@ -206,6 +223,14 @@ export default function MobileEditor({
           </TabPanel>
           <TabPanel>
             <VStack spacing={4} py={4} align="stretch">
+              <Center>
+                <InfoHeader
+                  size="sm"
+                  title={TASK_INSTANCES_TITLE}
+                  popoverTitle={TASK_INSTANCES_TITLE}
+                  popoverContent={TASK_INSTANCES_EXPLANATION}
+                />
+              </Center>
               <Center>Add at least {MIN_INSTANCES} task instances.</Center>
               <FormControl>
                 <FormLabel>Input</FormLabel>

@@ -25,7 +25,7 @@ import { IRootState } from "../lib/store";
 import { addNewEvalRuns } from "../utils/getEvalRun";
 import { useRouter } from "next/navigation";
 import { useModelStorageContext } from "../lib/providers/model-storage";
-import EditorModelItem from "./editor/ModelCheckbox";
+import ModelCheckbox from "./editor/ModelCheckbox";
 
 interface RunModalProps {
   evalItem: IEvalResponse;
@@ -111,22 +111,20 @@ const RunModal: React.FC<RunModalProps> = ({
                 Check the accuracy of a model for yourself, while sharing the
                 run results with others!
               </Text>
-              <FormControl>
-                <FormLabel>
-                  <Heading size="sm">Models</Heading>
-                </FormLabel>
-                <Wrap direction="column">
-                  {models?.map((model: IModelResponse) => (
-                    <EditorModelItem
-                      key={`model-${model.id}`}
-                      model={model}
-                      modelUpdated={() => {
-                        setModels([...models]);
-                      }}
-                    />
-                  ))}
-                </Wrap>
-              </FormControl>
+              <FormLabel>
+                <Heading size="sm">Models</Heading>
+              </FormLabel>
+              <Wrap direction="column">
+                {models?.map((model: IModelResponse) => (
+                  <ModelCheckbox
+                    key={`model-${model.id}`}
+                    model={model}
+                    onCheck={() => {
+                      setModels([...models]);
+                    }}
+                  />
+                ))}
+              </Wrap>
             </VStack>
           </ModalBody>
 

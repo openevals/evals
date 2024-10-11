@@ -23,6 +23,7 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
+import InfoPopover from "../infoPopover";
 
 export type DataTableProps<Data extends object> = {
   data: Data[];
@@ -118,9 +119,22 @@ export function BasicTable<Data extends object>({
                       backgroundColor: "gray.100",
                     }}
                   >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
+                    {header.column.id === 'accuracy' ? (
+                      <>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        <InfoPopover
+                          title="Percentage of tasks where model responded correctly"
+                          content="Accuracy = (True Positives + True Negatives) / | Dataset |"
+                        />
+                      </>
+                    ) : (
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )
                     )}
 
                     <Box

@@ -30,15 +30,6 @@ import {
   TabPanel,
   Card,
   CardBody,
-  Center,
-  Icon,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
 import { MIN_INSTANCES } from "@/app/lib/constants";
@@ -47,15 +38,16 @@ import InstancesTable from "../tables/instancesTable";
 import Trending from "../trending";
 import RobotoHeader from "../robotoHeader";
 import { useState } from "react";
-import { FaRegClipboard } from "react-icons/fa";
 import useEvalResults from "../../lib/hooks/useEvalResults";
 import ModelCheckbox from "./ModelCheckbox";
-import InfoPopover from "../infoPopover";
+import InfoHeader from "../infoHeader";
 import {
   VALIDATOR_TITLE,
   VALIDATOR_EXPLANATION,
   SYSTEM_PROMPT_TITLE,
   SYSTEM_PROMPT_EXPLANATION,
+  TASK_INSTANCES_TITLE,
+  TASK_INSTANCES_EXPLANATION
 } from "../../lib/constants";
 
 export default function DesktopEditor({
@@ -179,16 +171,14 @@ export default function DesktopEditor({
                 </FormControl>
 
                 <FormControl>
-                  <FormLabel>
-                    <Stack direction={["row"]} alignItems="center">
-                      <Heading size="sm">Validator</Heading>
-                      <InfoPopover
-                        title={VALIDATOR_TITLE}
-                        content={VALIDATOR_EXPLANATION}
-                      />
-                    </Stack>
-                  </FormLabel>
+                  <InfoHeader
+                    size="sm"
+                    title="Validator"
+                    popoverTitle={VALIDATOR_TITLE}
+                    popoverContent={VALIDATOR_EXPLANATION}
+                  />
                   <Select
+                    mt={2}
                     placeholder="Select validator type"
                     value={validator}
                     onChange={(e) =>
@@ -205,16 +195,14 @@ export default function DesktopEditor({
                 </FormControl>
 
                 <FormControl>
-                  <FormLabel>
-                    <Stack direction={["row"]} alignItems="center">
-                      <Heading size="sm">System Prompt (Recommended)</Heading>
-                      <InfoPopover
-                        title={SYSTEM_PROMPT_TITLE}
-                        content={SYSTEM_PROMPT_EXPLANATION}
-                      />
-                    </Stack>
-                  </FormLabel>
+                  <InfoHeader
+                    size="sm"
+                    title="System Prompt (Recommended)"
+                    popoverTitle={SYSTEM_PROMPT_TITLE}
+                    popoverContent={SYSTEM_PROMPT_EXPLANATION}
+                  />
                   <Textarea
+                    mt={2}
                     placeholder="You are a mathematics professor at MIT."
                     value={systemPrompt}
                     onChange={(e) => setSystemPrompt(e.target.value)}
@@ -222,8 +210,13 @@ export default function DesktopEditor({
                 </FormControl>
 
                 {/* No <FormControl /> component because it interferes with checkboxes  */}
-                <Heading size="sm">Models</Heading>
-                <Wrap direction="column">
+                <InfoHeader
+                  size="sm"
+                  title="Models to test"
+                  popoverTitle="Models to test"
+                  popoverContent="The selected models will be run once you submit the eval. Models can also be run after submission by you or others."
+                />
+                <Wrap direction="column" mt={2}>
                   {models.map((model) => (
                     <ModelCheckbox
                       key={`model-${model.modelName}`}
@@ -268,7 +261,12 @@ export default function DesktopEditor({
             <>
               <HStack mx={2} position="sticky" top={0} bg="white" zIndex={1}>
                 <Box as="span" flex="1" textAlign="left">
-                  <Heading size="sm">Task instances</Heading>
+                  <InfoHeader
+                    size="sm"
+                    title={TASK_INSTANCES_TITLE}
+                    popoverTitle={TASK_INSTANCES_TITLE}
+                    popoverContent={TASK_INSTANCES_EXPLANATION}
+                  />
                 </Box>
                 <Button
                   variant="outline"

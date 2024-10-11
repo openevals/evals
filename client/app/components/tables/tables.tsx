@@ -19,7 +19,7 @@ export const RunSummary = ({ evalRuns }: { evalRuns: IEvalRunResponse[] }) => (
       }))}
       columns={[
         { header: "Model", accessorKey: "model" },
-        { header: "Score", accessorKey: "accuracy" },
+        { header: "Accuracy", accessorKey: "accuracy" },
         { header: "Status", accessorKey: "status" },
       ]}
     />

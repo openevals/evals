@@ -5,8 +5,8 @@ export type AIProvider = "openai" | "anthropic" | "google";
 
 // This matches ValidatorType in the backend
 export enum ValidatorType {
-  Includes = "Includes",
   ExactMatch = "ExactMatch",
+  Includes = "Includes",
   FuzzyMatch = "FuzzyMatch",
 }
 

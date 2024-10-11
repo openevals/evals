@@ -33,7 +33,6 @@ import {
   IModelResponse,
   IModelSystemResponse,
   ITaskInstanceResponse,
-  TaskInstance,
   IUserProfileResponse,
 } from "../lib/types";
 import { useParams, useRouter } from "next/navigation";
@@ -45,6 +44,8 @@ import {
   SYSTEM_PROMPT_TITLE,
   VALIDATOR_EXPLANATION,
   VALIDATOR_TITLE,
+  TASK_INSTANCES_TITLE,
+  TASK_INSTANCES_EXPLANATION,
 } from "../lib/constants";
 import { setEvalToTry } from "../lib/store/dataSlice";
 import { LinkIcon } from "@chakra-ui/icons";
@@ -56,7 +57,7 @@ import {
 } from "./tables/tables";
 import useEvalResults from "../lib/hooks/useEvalResults";
 import RunModal from "./runModal";
-import InfoPopover from "./infoPopover";
+import InfoHeader from "./infoHeader";
 
 export default function ItemDetails({ evalId }: { evalId?: number }) {
   const [evalItem, setEvalItem] = useState<IEvalResponse>(defaultEvalItem);
@@ -205,15 +206,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             </Flex>
             <Stack divider={<StackDivider />} spacing="4" py={8}>
               <Box>
-                <Heading size="xs">
-                  <Stack direction={["row"]} alignItems="center">
-                    <Text>Validator </Text>
-                    <InfoPopover
-                      title={VALIDATOR_TITLE}
-                      content={VALIDATOR_EXPLANATION}
-                    />
-                  </Stack>
-                </Heading>
+                <InfoHeader
+                  title="Validator"
+                  popoverTitle={VALIDATOR_TITLE}
+                  popoverContent={VALIDATOR_EXPLANATION}
+                />
                 <Text pt="2">
                   <Tag>{evalItem.validatorType}</Tag>
                 </Text>
@@ -225,15 +222,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 </Text>
               </Box>
               <Box>
-                <Heading size="xs">
-                  <Stack direction={["row"]} alignItems="center">
-                    <Text>System Prompt </Text>
-                    <InfoPopover
-                      title={SYSTEM_PROMPT_TITLE}
-                      content={SYSTEM_PROMPT_EXPLANATION}
-                    />
-                  </Stack>
-                </Heading>
+                <InfoHeader
+                  title="System Prompt"
+                  popoverTitle={SYSTEM_PROMPT_TITLE}
+                  popoverContent={SYSTEM_PROMPT_EXPLANATION}
+                />
                 <Text pt="2" fontSize="sm">
                   {evalItem.taskInstances[0]?.systemPrompt ? (
                     <Text>{evalItem.taskInstances[0].systemPrompt}</Text>
@@ -243,7 +236,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 </Text>
               </Box>
               <Box>
-                <Heading size="xs">Models tested</Heading>
+                <InfoHeader
+                  title="Models tested"
+                  popoverTitle="Models tested"
+                  popoverContent="These models that have been evaluated with this eval."
+                />
                 <Text pt="2" fontSize="sm">
                   {evalItem.modelSystems.length > 0 ? (
                     Array.from<string>(
@@ -267,7 +264,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 </Text>
               </Box>
               <Box>
-                <Heading size="xs">Authors</Heading>
+                <InfoHeader
+                  title="Authors"
+                  popoverTitle="Authors"
+                  popoverContent="Authors are users who curated this eval, including its name, validator, description, system prompt, and task instances."
+                />
                 <Text pt="2" fontSize="sm">
                   {evalItem.authors.map((a: IAuthorResponse) => (
                     <React.Fragment key={`author-item-${a.id}`}>
@@ -290,7 +291,11 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               </Box>
               {evalItem.contributors.length > 0 && (
               <Box>
-                <Heading size="xs">Contributors:</Heading>
+                <InfoHeader
+                  title="Contributors"
+                  popoverTitle="Contributors"
+                  popoverContent="Contributors are users who have generously contributed API tokens to run this eval on different models. 💛"
+                />
                 <Text pt="2" fontSize="sm">
                   {evalItem.contributors.map((a: IAuthorResponse) => (
                     <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
@@ -305,9 +310,14 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
             w={{ base: "100%", lg: "70%" }}
             maxW={{ base: "100%", lg: "70%" }}
           >
-            <Heading size="md" mb={6}>
-              Task Instances
-            </Heading>
+            <Box mb={6}>
+              <InfoHeader
+                title="Task Instances"
+                popoverTitle={TASK_INSTANCES_TITLE}
+                popoverContent={TASK_INSTANCES_EXPLANATION}
+                size="sm"
+              />
+            </Box>
             <Box
               maxH="60vh"
               overflowY="auto"
@@ -387,9 +397,7 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 setSelectedModel={setSelectedModel}
                 taskMap={taskMap}
               />
-              <Box flex={1}>
-                <RunSummary evalRuns={evalRuns} />
-              </Box>
+              <RunSummary evalRuns={evalRuns} />
             </>
           ) : (
             <Center>

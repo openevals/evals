@@ -69,7 +69,7 @@ export default function EvalRunResults({
             <Thead>
               <Tr>
                 <Th>Model</Th>
-                <Th>Score</Th>
+                <Th>Accuracy</Th>
                 <Th>Status</Th>
               </Tr>
             </Thead>
