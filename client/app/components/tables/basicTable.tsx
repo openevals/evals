@@ -70,6 +70,7 @@ export function BasicTable<Data extends object>({
       colSizes[`--col-${header.column.id}-size`] = header.column.getSize();
     }
     return colSizes;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
   const pageSizeOptions = React.useMemo(() => {
@@ -226,7 +227,7 @@ export function BasicTable<Data extends object>({
               }}
               ml={2}
             >
-              {pageSizeOptions.map((pageSize) => (
+              {pageSizeOptions.map((pageSize: number) => (
                 <option key={pageSize} value={pageSize}>
                   Show {pageSize}
                 </option>
