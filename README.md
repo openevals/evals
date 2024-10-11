@@ -13,7 +13,7 @@ If you are looking to make evals without any setup, use the deployed version at 
 
 ## Contributing
 
-We welcome your contributions! In particular, hwe would love help with:
+We welcome your contributions! In particular, we would love help with:
 
 - [ ] Support for more models, especially open-source ones (Integration with Together.ai, etc.)
 - [ ] Model-graded validators

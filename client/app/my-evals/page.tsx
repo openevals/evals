@@ -152,9 +152,14 @@ export default function MyEvals() {
             ),
           )
         ) : (
-          <Text ml={4} my={4}>
-            User has not contributed to any evals
-          </Text>
+          <Link
+            href="/evals"
+            color="gray"
+            fontWeight="bold"
+            textDecoration="none"
+          >
+            Browse evals to see what you&apos;d like to contribute model runs to.
+          </Link>
         )}
       </Box>
       <Heading size="lg" my={8} textAlign="center">
