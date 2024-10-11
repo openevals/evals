@@ -53,4 +53,5 @@ export const SYSTEM_PROMPT_EXPLANATION =
   "This system prompt is applied at the beginning of each task instance run.";
 export const TASK_INSTANCES_TITLE = "Task Instances";
 
-export const TASK_INSTANCES_EXPLANATION = "Each task instance consists of an input and an ideal output. For each instance, the model receives the input and matches the ideal output based on the eval's validator. If there is a system prompt, it is applied to the model before the input.";
+export const TASK_INSTANCES_EXPLANATION =
+  "Each task instance consists of an input and an ideal output. For each instance, the model receives the input and matches the ideal output based on the eval's validator. If there is a system prompt, it is applied to the model before the input.";

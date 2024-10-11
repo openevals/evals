@@ -47,7 +47,7 @@ import {
   SYSTEM_PROMPT_TITLE,
   SYSTEM_PROMPT_EXPLANATION,
   TASK_INSTANCES_TITLE,
-  TASK_INSTANCES_EXPLANATION
+  TASK_INSTANCES_EXPLANATION,
 } from "../../lib/constants";
 
 export default function DesktopEditor({

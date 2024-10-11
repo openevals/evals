@@ -158,7 +158,8 @@ export default function MyEvals() {
             fontWeight="bold"
             textDecoration="none"
           >
-            Browse evals to see what you&apos;d like to contribute model runs to.
+            Browse evals to see what you&apos;d like to contribute model runs
+            to.
           </Link>
         )}
       </Box>

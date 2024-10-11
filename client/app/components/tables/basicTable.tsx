@@ -120,11 +120,11 @@ export function BasicTable<Data extends object>({
                       backgroundColor: "gray.100",
                     }}
                   >
-                    {header.column.id === 'accuracy' ? (
+                    {header.column.id === "accuracy" ? (
                       <>
                         {flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                         <InfoPopover
                           title="Percentage of tasks where model responded correctly"
@@ -134,7 +134,7 @@ export function BasicTable<Data extends object>({
                     ) : (
                       flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )
                     )}
 

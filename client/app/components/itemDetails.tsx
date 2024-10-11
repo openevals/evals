@@ -171,8 +171,6 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
       });
   };
 
-  
-
   return (
     <>
       <Wrap m={{ base: 0, md: 8 }}>
@@ -187,7 +185,9 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
               <Heading size="lg">{evalItem.name}</Heading>
               <Spacer />
               <HStack spacing={4}>
-                {evalItem.authors.some(author => author.id === profile?.id) && (
+                {evalItem.authors.some(
+                  (author) => author.id === profile?.id,
+                ) && (
                   <Button variant="ghost" width="fit-content" onClick={tryEval}>
                     Edit
                   </Button>
@@ -290,18 +290,18 @@ export default function ItemDetails({ evalId }: { evalId?: number }) {
                 </Text>
               </Box>
               {evalItem.contributors.length > 0 && (
-              <Box>
-                <InfoHeader
-                  title="Contributors"
-                  popoverTitle="Contributors"
-                  popoverContent="Contributors are users who have generously contributed API tokens to run this eval on different models. 💛"
-                />
-                <Text pt="2" fontSize="sm">
-                  {evalItem.contributors.map((a: IAuthorResponse) => (
-                    <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
-                  ))}
-                </Text>
-              </Box>
+                <Box>
+                  <InfoHeader
+                    title="Contributors"
+                    popoverTitle="Contributors"
+                    popoverContent="Contributors are users who have generously contributed API tokens to run this eval on different models. 💛"
+                  />
+                  <Text pt="2" fontSize="sm">
+                    {evalItem.contributors.map((a: IAuthorResponse) => (
+                      <Text key={`contributor-item-${a.id}`}>{a.username}</Text>
+                    ))}
+                  </Text>
+                </Box>
               )}
             </Stack>
           </Stack>
