@@ -19,12 +19,12 @@ import { useEffect, useState } from "react";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { AI_PROVIDER_NAME, AI_PROVIDER_A_AN } from "../../lib/constants";
 
-export default function EditorModelItem({
+export default function ModelCheckbox({
   model,
-  modelUpdated,
+  onCheck,
 }: {
   model: IModelResponse;
-  modelUpdated: () => void;
+  onCheck: () => void;
 }) {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const [provider, setProvider] = useState<AIProvider>(
@@ -58,10 +58,7 @@ export default function EditorModelItem({
       <Checkbox
         isDisabled={isDisabled}
         isChecked={model.checked}
-        onChange={(e) => {
-          model.checked = !model.checked;
-          modelUpdated();
-        }}
+        onChange={onCheck}
       >
         {model.modelName}
       </Checkbox>

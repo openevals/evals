@@ -34,7 +34,7 @@ import InstancesTable from "../tables/instancesTable";
 import RobotoHeader from "../robotoHeader";
 import useEvalResults from "../../lib/hooks/useEvalResults";
 import { useState } from "react";
-import EditorModelItem from "./editorModel";
+import ModelCheckbox from "./ModelCheckbox";
 
 export default function MobileEditor({
   isTryingEval,
@@ -87,7 +87,7 @@ export default function MobileEditor({
       >
         <TabList>
           <Tab>🌎</Tab>
-          <Tab>Meta</Tab>
+          <Tab>About</Tab>
           <Tab>Instances</Tab>
           <Tab>Results</Tab>
         </TabList>
@@ -167,20 +167,19 @@ export default function MobileEditor({
                   ))}
                 </Select>
               </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Models</FormLabel>
-                <VStack align="stretch" w="100%">
-                  {models.map((model, index) => (
-                    <EditorModelItem
-                      key={`model-${model.id}`}
-                      model={model}
-                      modelUpdated={() => {
-                        setModels([...models]);
-                      }}
-                    />
-                  ))}
-                </VStack>
-              </FormControl>
+              <FormLabel>Models</FormLabel>
+              <VStack align="stretch" w="100%">
+                {models.map((model, index) => (
+                  <ModelCheckbox
+                    key={`model-${model.id}`}
+                    model={model}
+                    onCheck={() => {
+                      model.checked = !model.checked;
+                      setModels([...models]);
+                    }}
+                  />
+                ))}
+              </VStack>
               <FormControl>
                 <FormLabel>System Prompt</FormLabel>
                 <Textarea

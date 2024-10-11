@@ -25,7 +25,7 @@ import { IRootState } from "../lib/store";
 import { addNewEvalRuns } from "../utils/getEvalRun";
 import { useRouter } from "next/navigation";
 import { useModelStorageContext } from "../lib/providers/model-storage";
-import EditorModelItem from "./editor/editorModel";
+import EditorModelItem from "./editor/ModelCheckbox";
 
 interface RunModalProps {
   evalItem: IEvalResponse;

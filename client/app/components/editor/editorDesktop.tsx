@@ -49,7 +49,7 @@ import RobotoHeader from "../robotoHeader";
 import { useState } from "react";
 import { FaRegClipboard } from "react-icons/fa";
 import useEvalResults from "../../lib/hooks/useEvalResults";
-import EditorModelItem from "./editorModel";
+import ModelCheckbox from "./ModelCheckbox";
 import InfoPopover from "../infoPopover";
 import {
   VALIDATOR_TITLE,
@@ -181,7 +181,7 @@ export default function DesktopEditor({
                 <FormControl>
                   <FormLabel>
                     <Stack direction={["row"]} alignItems="center">
-                      <Text size="sm">Validator</Text>
+                      <Heading size="sm">Validator</Heading>
                       <InfoPopover
                         title={VALIDATOR_TITLE}
                         content={VALIDATOR_EXPLANATION}
@@ -207,7 +207,7 @@ export default function DesktopEditor({
                 <FormControl>
                   <FormLabel>
                     <Stack direction={["row"]} alignItems="center">
-                      <Text size="sm">System Prompt (Recommended)</Text>
+                      <Heading size="sm">System Prompt (Recommended)</Heading>
                       <InfoPopover
                         title={SYSTEM_PROMPT_TITLE}
                         content={SYSTEM_PROMPT_EXPLANATION}
@@ -221,22 +221,20 @@ export default function DesktopEditor({
                   />
                 </FormControl>
 
-                <FormControl>
-                  <FormLabel>
-                    <Heading size="sm">Models</Heading>
-                  </FormLabel>
-                  <Wrap direction="column">
-                    {models?.map((model) => (
-                      <EditorModelItem
-                        key={`model-${model.id}`}
-                        model={model}
-                        modelUpdated={() => {
-                          setModels([...models]);
-                        }}
-                      />
-                    ))}
-                  </Wrap>
-                </FormControl>
+                {/* No <FormControl /> component because it interferes with checkboxes  */}
+                <Heading size="sm">Models</Heading>
+                <Wrap direction="column">
+                  {models.map((model) => (
+                    <ModelCheckbox
+                      key={`model-${model.modelName}`}
+                      model={model}
+                      onCheck={() => {
+                        model.checked = !model.checked;
+                        setModels([...models]);
+                      }}
+                    />
+                  ))}
+                </Wrap>
               </VStack>
             </>
           )}
