@@ -14,12 +14,12 @@ export const RunSummary = ({ evalRuns }: { evalRuns: IEvalRunResponse[] }) => (
     <BasicTable
       data={evalRuns.map((run) => ({
         model: run.model.modelName,
-        averageScore: run.score.toFixed(2),
+        accuracy: run.score.toFixed(2),
         status: run.status,
       }))}
       columns={[
         { header: "Model", accessorKey: "model" },
-        { header: "Score", accessorKey: "averageScore" },
+        { header: "Score", accessorKey: "accuracy" },
         { header: "Status", accessorKey: "status" },
       ]}
     />
@@ -53,7 +53,7 @@ export const ResultsSummary = ({
           model: run.model.modelName,
           numberOfRuns: evalRuns.filter((r) => r.model.id === run.model.id)
             .length,
-          averageScore: (
+          accuracy: (
             evalRuns
               .filter((r) => r.model.id === run.model.id)
               .reduce((sum, r) => sum + r.score, 0) /
@@ -70,7 +70,7 @@ export const ResultsSummary = ({
         columns={[
           { header: "Model", accessorKey: "model" },
           { header: "Number of Runs", accessorKey: "numberOfRuns" },
-          { header: "Average Score", accessorKey: "averageScore" },
+          { header: "Accuracy", accessorKey: "accuracy" },
           { header: "Date Last Ran", accessorKey: "dateLastRan" },
         ]}
       />
