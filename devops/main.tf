@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "openevals-terraform"
+    bucket = "openevals-terraform-env"
     key    = "eks-state"
     region = "us-west-1"
   }

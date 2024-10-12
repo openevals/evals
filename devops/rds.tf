@@ -34,11 +34,11 @@ resource "aws_security_group" "openevals_rds_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
+    description = "Allow traffic from VPC"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.openevals_eks_sg.id]
-    description = "Allow traffic from cluster"
+    cidr_blocks = [module.vpc.vpc_cidr_block]
   }
 
   egress {
