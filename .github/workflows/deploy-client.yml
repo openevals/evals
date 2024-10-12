@@ -4,20 +4,20 @@ on:
     branches:
       - main
     paths:
-      - 'client/**'
-      - '.eks_deploy/client.yml'
-      - '.github/workflows/deploy-client.yml'
+      - "client/**"
+      - ".eks_deploy/client.yml"
+      - ".github/workflows/deploy-client.yml"
 
 env:
-  ECR_REPO_NAME: 'openevals-client'
-  AWS_REGION_NAME: 'us-west-1'
-  CLUSTER_NAME: 'openevals-prod'
-  ENVIRONMENT: 'prod'
+  ECR_REPO_NAME: "openevals-deployment"
+  AWS_REGION_NAME: "us-west-1"
+  CLUSTER_NAME: "openevals-prod"
+  ENVIRONMENT: "prod"
   DESIRED_REPLICAS: 4
   MIN_REPLICAS: 4
-  MAX_REPLICAS: 15
+  MAX_REPLICAS: 10
   SSL_ARN: ${{ secrets.CLIENT_SSL_ARN }}
-  AWS_GROUP_TYPE: 'general-processing'
+  AWS_GROUP_TYPE: "general-processing"
 
 jobs:
   server-deploy:
@@ -52,7 +52,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
-          IMAGE_TAG: openevals-client-${{ env.ENVIRONMENT }}-latest
+          IMAGE_TAG: client-${{ env.ENVIRONMENT }}-latest
         run: |
           # Build a docker container and push it to ECR
           cd client
@@ -71,7 +71,7 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION_NAME }}
-    
+
       - name: Deploy
         run: |
           cat .eks_deploy/client.yml | envsubst > .eks_deploy/client-updated.yml

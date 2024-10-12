@@ -27,7 +27,7 @@ spec:
         group-type: $AWS_GROUP_TYPE
       containers:
         - name: openevals-backend-app
-          image: 160885253688.dkr.ecr.$AWS_REGION_NAME.amazonaws.com/openevals-backend:openevals-backend-$ENVIRONMENT-latest
+          image: 248189933412.dkr.ecr.$AWS_REGION_NAME.amazonaws.com/openevals-deployment:backend-$ENVIRONMENT-latest
           imagePullPolicy: Always
           resources:
             limits:
@@ -56,10 +56,10 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
-    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: $SSL_ARN
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: '443'
-    service.beta.kubernetes.io/aws-load-balancer-ssl-redirect: 'true'
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-redirect: "true"
 spec:
   type: LoadBalancer
   ports:
