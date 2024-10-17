@@ -1,8 +1,8 @@
 import { getTopEvals } from "../utils/getEvals";
 import { useEffect, useState } from "react";
 import { IEvalListItemResponse, IVoteResult } from "../lib/types";
-import { Divider } from "@chakra-ui/react";
-import ResultItem from "./resultItem";
+import { Heading } from "@chakra-ui/react";
+import ResultItem from "./search/resultItem";
 
 export default function Trending() {
   const [evals, setEvals] = useState<IEvalListItemResponse[]>([]);
@@ -16,7 +16,7 @@ export default function Trending() {
   }, []);
 
   const updateEvals = (payload: IVoteResult) => {
-    setEvals(prevValues => {
+    setEvals((prevValues) => {
       return prevValues.map((value) => {
         if (value.id === payload.id) {
           value.upvotes = payload.upvotes;
@@ -29,24 +29,33 @@ export default function Trending() {
 
   return (
     <>
-      {evals.map(({
-        id, name, description, validatorType, upvotes, upvoted, authors
-      }) => (
-        <>
+      <Heading size="md" textAlign="center" py={4}>
+        Trending evals
+      </Heading>
+      {evals.map(
+        ({
+          id,
+          name,
+          description,
+          validatorType,
+          upvotes,
+          upvoted,
+          authors,
+        }) => (
           <ResultItem
             key={`trending-eval-${id}`}
             id={id}
             name={name}
-            description={description ?? ''}
+            description={description ?? ""}
             validatorType={validatorType}
             upvotes={upvotes}
             upvoted={upvoted}
             onVote={updateEvals}
-            mainAuthor={authors[0]}
+            mainAuthor={authors?.[0] ?? null}
+            onClick="Editor"
           />
-          <Divider />
-        </>
-      ))}
+        ),
+      )}
     </>
   );
 }

@@ -9,11 +9,12 @@ import {
   Checkbox,
   Box,
   Input,
+  Textarea,
   Icon,
-} from '@chakra-ui/react';
-import { DeleteIcon } from '@chakra-ui/icons';
-import { TaskInstance } from '../lib/types';
-import { Dispatch, SetStateAction } from 'react';
+} from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { TaskInstance } from "../../lib/types";
+import { Dispatch, SetStateAction } from "react";
 
 export default function InstancesTable({
   instances,
@@ -25,10 +26,7 @@ export default function InstancesTable({
   onChange?: () => void;
 }): JSX.Element {
   return (
-    <TableContainer
-      border='1px'
-      borderRadius='md'
-      borderColor='lightgray'>
+    <TableContainer border="1px" borderRadius="md" borderColor="lightgray">
       <Table>
         <Thead>
           <Tr>
@@ -40,15 +38,19 @@ export default function InstancesTable({
         </Thead>
         <Tbody>
           {instances.map((instance, index) => (
-            <Tr key={index} position="relative" _hover={{ "& .delete-icon": { opacity: 1 } }}>
-              {setInstances &&
-                (<Td>
+            <Tr
+              key={index}
+              position="relative"
+              _hover={{ "& .delete-icon": { opacity: 1 } }}
+            >
+              {setInstances && (
+                <Td>
                   <Checkbox
                     isChecked={instance.isPublic}
                     onChange={(e) => {
-                      setInstances(prevInstances => {
+                      setInstances((prevInstances) => {
                         return prevInstances.map((value, idx) => {
-                          const obj = {...value};
+                          const obj = { ...value };
                           if (idx === index) obj.isPublic = e.target.checked;
                           return obj;
                         });
@@ -56,42 +58,49 @@ export default function InstancesTable({
                       if (onChange) onChange();
                     }}
                   />
-                </Td>)
-              }
+                </Td>
+              )}
               <Td>
-                <Input
+                <Textarea
                   value={instance.input}
                   onChange={(e) => {
-                    setInstances(prevInstances => {
+                    setInstances((prevInstances) => {
                       return prevInstances.map((value, idx) => {
-                        const obj = {...value};
+                        const obj = { ...value };
                         if (idx === index) obj.input = e.target.value;
                         return obj;
                       });
                     });
                     if (onChange) onChange();
                   }}
-                  variant='unstyled'
+                  variant="unstyled"
+                  resize="vertical"
                 />
               </Td>
               <Td>
-                <Input
+                <Textarea
                   value={instance.ideal}
                   onChange={(e) => {
-                    setInstances(prevInstances => {
+                    setInstances((prevInstances) => {
                       return prevInstances.map((value, idx) => {
-                        const obj = {...value};
+                        const obj = { ...value };
                         if (idx === index) obj.ideal = e.target.value;
                         return obj;
                       });
                     });
                     if (onChange) onChange();
                   }}
-                  variant='unstyled'
+                  variant="unstyled"
+                  resize="vertical"
                 />
               </Td>
               <Td>
-                <Box position="absolute" right="4" top="50%" transform="translateY(-50%)">
+                <Box
+                  position="absolute"
+                  right="4"
+                  top="50%"
+                  transform="translateY(-50%)"
+                >
                   <Icon
                     as={DeleteIcon}
                     opacity={0}
@@ -100,7 +109,9 @@ export default function InstancesTable({
                     transition="opacity 0.1s"
                     onClick={() => {
                       if (setInstances) {
-                        const updatedInstances = instances.filter((_, i) => i !== index);
+                        const updatedInstances = instances.filter(
+                          (_, i) => i !== index,
+                        );
                         setInstances(updatedInstances);
                         if (onChange) onChange();
                       }

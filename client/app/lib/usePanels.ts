@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { ImperativePanelHandle } from 'react-resizable-panels';
+import { useState, useEffect, useRef } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
 export default function usePanels(step: number) {
   const panel1Ref = useRef<ImperativePanelHandle>(null);
@@ -7,6 +7,7 @@ export default function usePanels(step: number) {
   const panel3Ref = useRef<ImperativePanelHandle>(null);
   const [panel1Collapsed, setPanel1Collapsed] = useState<boolean>(false);
   const [panel2Collapsed, setPanel2Collapsed] = useState<boolean>(false);
+  const [panel3Collapsed, setPanel3Collapsed] = useState<boolean>(false);
 
   useEffect(() => {
     if (step === 2) {
@@ -16,7 +17,6 @@ export default function usePanels(step: number) {
     }
   }, [step]);
 
-
   return [
     panel1Ref,
     panel2Ref,
@@ -24,7 +24,9 @@ export default function usePanels(step: number) {
     panel1Collapsed,
     setPanel1Collapsed,
     panel2Collapsed,
-    setPanel2Collapsed
+    setPanel2Collapsed,
+    panel3Collapsed,
+    setPanel3Collapsed,
   ] as [
     React.RefObject<ImperativePanelHandle>,
     React.RefObject<ImperativePanelHandle>,
@@ -32,7 +34,8 @@ export default function usePanels(step: number) {
     boolean,
     React.Dispatch<React.SetStateAction<boolean>>,
     boolean,
-    React.Dispatch<React.SetStateAction<boolean>>
+    React.Dispatch<React.SetStateAction<boolean>>,
+    boolean,
+    React.Dispatch<React.SetStateAction<boolean>>,
   ];
-
 }

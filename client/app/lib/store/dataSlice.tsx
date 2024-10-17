@@ -38,7 +38,7 @@ const dataSlice = createSlice({
       ];
     },
     setUpvotedEval(state, action) {
-      state.evals = state.evals.map((value: any) => {
+      state.evals = state.evals.map((value: IEvalListItemResponse) => {
         if (value.id !== action.payload.id) return value;
         value.upvotes = action.payload.upvotes;
         value.upvoted = action.payload.upvoted;
@@ -59,7 +59,7 @@ const dataSlice = createSlice({
     },
     deleteEval(state, action) {
       state.evals = state.evals.filter(
-        (value: any) => value.id !== action.payload,
+        (value: IEvalListItemResponse) => value.id !== action.payload,
       );
     },
   },

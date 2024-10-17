@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Heading,
   Button,
@@ -9,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 
 import { SmallCloseIcon, ExternalLinkIcon } from "@chakra-ui/icons";
-import { useState } from "react";
 import { isValidAIModelKey } from "@/app/utils/validateKeys";
 import { AI_PROVIDER_NAME, AI_PROVIDER_URL } from "@/app/lib/constants";
 
@@ -30,7 +30,7 @@ export default function BaseKeysSettings({
    * Track the changes for the key
    * @param evt
    */
-  const onKeyChange = (evt: any) => {
+  const onKeyChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setKeyValue(evt.target.value);
     setKeySaved(false);
   };

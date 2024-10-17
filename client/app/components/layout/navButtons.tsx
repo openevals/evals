@@ -1,34 +1,33 @@
 "use client";
 
-import {
-  Tabs, TabList, Tab,
-} from '@chakra-ui/react';
+import { Tabs, TabList, Tab } from "@chakra-ui/react";
 
-
-import { useSelector } from 'react-redux';
-import { IRootState } from '../../lib/store';
-import { IEvalListItemResponse } from '../../lib/types';
-import React, { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Flex } from '@chakra-ui/react';
+import { useSelector } from "react-redux";
+import { IRootState } from "../../lib/store";
+import { IEvalListItemResponse } from "../../lib/types";
+import React, { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Flex } from "@chakra-ui/react";
 
 interface NavButtonsProps {
-  direction?: 'row' | 'column';
+  direction?: "row" | "column";
 }
 
-export default function NavButtons({ direction = 'row' }: NavButtonsProps) {
+export default function NavButtons({ direction = "row" }: NavButtonsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [tabIndex, setTabIndex] = useState(0);
   const [lastEvalId, setLastEvalId] = useState(0);
-  const evals = useSelector<IRootState, IEvalListItemResponse[]>((state: IRootState) => state.data.evals);
+  const evals = useSelector<IRootState, IEvalListItemResponse[]>(
+    (state: IRootState) => state.data.evals,
+  );
 
   useEffect(() => {
     if (pathname == `/evals/${lastEvalId}`) {
       setTabIndex(0);
-    } else if (pathname == '/') {
+    } else if (pathname == "/") {
       setTabIndex(1);
-    } else if (pathname == '/evals') {
+    } else if (pathname == "/evals") {
       setTabIndex(2);
     } else {
       setTabIndex(-1);
@@ -43,7 +42,7 @@ export default function NavButtons({ direction = 'row' }: NavButtonsProps) {
   const feelingLucky = () => {
     const idx = Math.floor(Math.random() * evals.length);
     if (idx >= evals.length) {
-      gotoPage('/');
+      gotoPage("/");
       setTabIndex(1);
       return false;
     }
@@ -59,21 +58,27 @@ export default function NavButtons({ direction = 'row' }: NavButtonsProps) {
         if (!feelingLucky()) return;
         break;
       case 1:
-        gotoPage('/');
+        gotoPage("/");
         break;
       case 2:
-        gotoPage('/evals');
+        gotoPage("/evals");
         break;
     }
     setTabIndex(index);
   };
 
   return (
-    <Tabs variant='soft-rounded' w='100%' defaultIndex={1} index={tabIndex} onChange={handleTabsChange}>
+    <Tabs
+      variant="soft-rounded"
+      w="100%"
+      defaultIndex={1}
+      index={tabIndex}
+      onChange={handleTabsChange}
+    >
       <TabList as={Flex} flexDirection={direction}>
         <Tab onClick={feelingLucky}>{"I'm feeling lucky 🍀"}</Tab>
-        <Tab>Contribute an eval (5 min) ⚒️</Tab>
-        <Tab onClick={() => gotoPage('/evals')}>Browse evals 🌎</Tab>
+        <Tab>Create an eval (5 min) ⚒️</Tab>
+        <Tab onClick={() => gotoPage("/evals")}>Browse evals 🌎</Tab>
       </TabList>
     </Tabs>
   );
