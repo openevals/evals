@@ -22,7 +22,8 @@ resource "aws_db_instance" "openevals_rds" {
 
 resource "aws_db_subnet_group" "openevals_subnet_group" {
   name       = "openevals-subnet-group"
-  subnet_ids = module.vpc.public_subnets
+  description = "Subnet group for OpenEvals RDS instance"
+  subnet_ids  = concat(module.vpc.public_subnets, module.vpc.private_subnets)
   tags = {
     Name = "OpenEvals Subnet Group"
   }
