@@ -40,7 +40,7 @@ spec:
             - containerPort: 8000
           livenessProbe:
             httpGet:
-              path: /health
+              path: /
               port: 8000
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -60,9 +60,15 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: $SSL_ARN
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
     service.beta.kubernetes.io/aws-load-balancer-ssl-redirect: "true"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS13-1-2-2021-06"
+    service.beta.kubernetes.io/aws-load-balancer-alpn-policy: "HTTP2Preferred"
 spec:
   type: LoadBalancer
   ports:
+    - name: https
+      port: 80
+      targetPort: 8000
+      protocol: TCP
     - name: https
       port: 443
       targetPort: 8000
